@@ -6,10 +6,7 @@
 Description
 ===========
 
-This project aims at providing a simple GraphViz graph input file from a Python
-program. We are trying to override the import procedures to find out what
-files/modules a Python program depends upon.
-
+Create a dependency graph from Python code, without running any code.
 
 This dependency tracker has a few unique characteristics:
 

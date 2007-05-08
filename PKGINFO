@@ -1,0 +1,10 @@
+Description: Dependency Graphing for Python
+Official-Homepage: http://furius.ca/snakefood
+Author: Martin Blais
+Author-Email: blais@furius.ca
+ChangeLog: http://furius.ca/snakefood/CHANGES
+Bugs-Reporting: mailto:blais@furius.ca
+Download-Releases: http://furius.ca/downloads/snakefood/releases
+Download-Snapshots: http://furius.ca/downloads/snakefood/snapshots
+License: GNU GPL
+
