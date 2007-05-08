@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# $Id: bashrc,v 1.1 2004/02/03 18:44:45 blais Exp $
+# $Source: /home/blais/repos/cvsroot/pydeps/etc/bashrc,v $
+#
+# Bash configuration for this project.
+#
+
+complete -F _optcomplete pydeps-gen2

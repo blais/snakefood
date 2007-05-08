@@ -1,0 +1,187 @@
+#!/usr/bin/env python
+#
+# $Source: /home/blais/repos/cvsroot/pydeps/bin/pydeps-gen3,v $
+# $Id: pydeps-gen3,v 1.1 2005/05/08 18:19:41 blais Exp $
+#
+
+"""pydeps [<options>] <dir-or-fn> [<dir-or-fn> ...]
+
+Compute and print dependencies of Python source files by inspecting the code and
+then finding the import statements.
+
+An advantage of this over running the code is that some import modules could be
+imported conditionally, or within a function, and thus to get the entire list of
+runtime dependencies it is perhaps a better idea to look at the source code
+directly.
+
+  pydeps-gen | dot -Tps | kghostview -
+
+"""
+
+__version__ = "$Revision: 1.1 $"
+__author__ = "Martin Blais <blais@furius.ca>"
+
+
+import sys, re, os, StringIO
+from os.path import *
+from pprint import pprint, pformat
+
+
+debug = 0
+
+impre = re.compile('[ \t]*import[ \t]*([^;]*)[ \t]*')
+fromre = re.compile('[ \t]*from[ \t]*([^;]*)[ \t]*import[ \t]*([^;]*)[ \t]*')
+asre = re.compile('([^ \t]+)[ \t]+as[ \t]+[^ \t]+')
+
+def finddeps( fn ):
+    """Opens a file and extracts the imported modules."""
+    try:
+        lines = map(lambda x: x.strip(), open(fn, 'r').readlines())
+    except IOError, e:
+        raise SystemExit("Error: reading file '%s' (%s)" % (fn, str(e)))
+
+    modules = []
+    for l in lines:
+        mo = impre.match(l.strip())
+        mods = None
+        if mo:
+            mods = mo.group(1)
+            base = None
+        else:
+            mo = fromre.match(l)
+            if mo:
+                base, mods = mo.groups()
+                base = base.strip()
+        if mods:
+            for modname in mods.split(','):
+                modname = modname.strip()
+                mo = asre.match(modname)
+                if mo:
+                    modname = mo.group(1)
+
+                if base:
+                    modules.append( ('%s.%s' % (base, modname), base) )
+                else:
+                    modules.append( (modname,) )
+    
+    return modules
+
+def graph( pairs ):
+    
+    f = StringIO.StringIO()
+    
+    print >> f, """
+digraph "source tree" {
+    overlap=scale;
+    size="8,10";
+    ratio="fill";
+    fontsize="16";
+    fontname="Helvetica";
+        clusterrank="local";
+"""
+    for p in pairs:
+        print >> f, '"%s" -> "%s" ;' % p
+
+    print >> f, "}"
+    return f.getvalue()
+
+def modname( libdir, fn ):
+    "Returns the module name given the library search path and the filename."
+    mn = fn[len(libdir)+1:]
+    if mn.endswith('.py'):
+        mn = mn[:-3]
+    mn = mn.replace('/', '.')
+    if mn.endswith('.__init__'):
+        mn = mn.replace('.__init__', '')
+    return mn
+        
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip(), version=__version__)
+    parser.add_option('-p', '--path', action='store',
+                      help="PYTHONPATH to use.")
+    parser.add_option('--view', action='store_true',
+                      help="View results immediately.")
+
+    import optcomplete; optcomplete.autocomplete(parser)
+    opts, args = parser.parse_args()
+
+    # First find all the files to process.
+    pyre = re.compile('.*\.py$')
+    allfiles = []
+    for fn in args:
+        fn = abspath(fn)
+        if isdir(fn):
+            for root, dirs, files in os.walk(fn):
+                for x in files:
+                    if pyre.match(x):
+                        allfiles.append(join(root,x))
+        else:
+            allfiles.append(fn)
+
+    if debug:
+        print >> sys.stderr, pformat(allfiles)
+
+    # Second we need to get the python path we're going to use.
+    if opts.path:
+        path = opts.path.split(':')
+    else:
+        path = os.environ['PYTHONPATH'].split(':')
+    path = map(abspath, path)
+    # (sort inversely according to length for find loop below.)
+    path.sort(lambda x, y: cmp(len(y), len(x)))
+
+    # Now we attempt to associate a module name to each of the files to be
+    # processed by looking at where they are located relative to the library
+    # directories.
+    depends = {}
+    for fn in allfiles:
+        for p in path:
+            if fn.startswith(p):
+                break
+        else:
+            p = None
+        if p:
+            mn = modname(p, fn)
+            depends[mn] = (fn, [])
+        else:
+            depends[fn] = (fn, [])
+
+    # Iterate until there is no more work to be done.
+    for mn, contents in depends.iteritems():
+        fn, deps = contents
+
+        ## print '-----------------\n== %s\n' % mn
+        
+        for deplist in finddeps(fn):
+            for dep in deplist:
+                if dep in depends:
+                    break
+            else:
+                dep = None
+            if dep and dep not in deps:
+                deps.append(dep)
+        
+    # Expand dependencies into a list of pairs.
+    pairs = []
+    for mn, contents in depends.iteritems():
+        fn, deps = contents
+        for dep in deps:
+            pairs.append( (mn, dep) )
+
+    # Print out results.
+    text = graph(pairs)
+    print text
+    
+    # View if requested.
+    if opts.view:
+        cin, cout = os.popen2('dot -Tps | kghostview -')
+        cin.write(text)
+        cin.close()
+        cout.close()
+
+if __name__ == '__main__':
+    main()
+
+    

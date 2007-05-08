@@ -1,0 +1,240 @@
+#!/usr/bin/env python
+"""
+Detecting import statements using the AST parser.
+
+This dependency tracker has a few unique characteristics:
+
+- It uses the AST to parse the Python files
+
+- No module is loaded.  There is often code in the global namespace that gets
+  run when you import a module.
+
+- It works on a set of files, i.e. you do not have to specify a single script,
+  you can select a package or a set of files.
+
+- It does not 'follow' dependencies between modules, i.e. it only considers the
+  files you specify and their dependencies.
+
+- It can filter for a subset of modules; filtering is performed by the root of
+  the package directory (see output dot file for the roots if you have any
+  problems).
+
+A problem with dependency trackers that run code is that they are unreliable
+anyway, due to the dynamic nature of Python (the presence of imports within
+function calls and __import__ hooks makes it almost impossible to always do the
+right thing ).  This script aims at being right 99% of the time, and we think
+that this is good enough.
+"""
+
+import sys, os, re, logging, StringIO
+import imp, compiler
+from os.path import *
+from collections import defaultdict
+
+class ImportVisitor(object):
+
+    def __init__(self):
+        self.modules = set()
+
+    def visitImport(self, node):
+        self.modules.update(x[0] for x in node.names)
+
+    def visitFrom(self, node):
+        modname = node.modname
+        for name, as_ in node.names:
+            if name != '*':
+                name = '.'.join((modname, name))
+            else:
+                name = modname
+            self.modules.add(name)
+
+def process_file(fn):
+    "Returns a list of the files it depends on."
+    mod = compiler.parseFile(fn)
+
+    vis = ImportVisitor()
+    compiler.walk(mod, vis)
+
+    files = []
+    for mod in vis.modules:
+        modfile = find_dotted_module(mod, fn)
+        if modfile is None:
+            continue
+        files.append(modfile)
+    return files
+
+def find_dotted_module(modname, fn):
+    """A version of find_module that supports dotted module names (packages)."""
+
+    names = modname.split('.')
+    path = sys.path + [dirname(fn)]
+    file_ = None
+    for name in names:
+        try:
+            (file_, pathname, description) = imp.find_module(name, path)
+            if not isdir(pathname):
+                pathname = dirname(pathname)
+            path = [pathname]
+        except ImportError, e:
+            logging.debug("Not a module: '%s'" % modname)
+            break
+    out = file_ and realpath(file_.name)
+    return out
+
+
+
+prefix = '''
+digraph "source tree" {
+    overlap=scale;
+    size="8,10";
+    ratio="fill";
+    fontsize="16";
+    fontname="Helvetica";
+    clusterrank="local";
+
+'''
+postfix = '''
+
+}
+'''
+
+def graph(pairs, write):
+    "Given (from, to) pairs of (root, fn) files, output a dot graph."
+    write(prefix)
+    lines = []
+    for (froot, f), (troot, t) in pairs:
+        lines.append(('"%s" -> "%s"' % (f, t), '%s , %s' % (froot, troot)))
+    fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
+    for l, r in lines:
+        write(fmt % (l, r))
+    write(postfix)
+
+def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
+    """Yield all the files ending with .py recursively.  'dirsorfn' is a list of
+    filenames or directories."""
+    for dn in dirsorfn:
+        dn = realpath(dn)
+
+        if not isdir(dn):
+            if dn.endswith('.py'):
+                yield dn
+
+        else:
+            for root, dirs, files in os.walk(dn):
+                for r in ignores:
+                    try:
+                        dirs.remove(r)
+                    except ValueError:
+                        pass
+
+                pyfiles = [fn for fn in files if fn.endswith('.py')]
+                if not pyfiles:
+                    continue
+                for fn in pyfiles:
+                    yield join(root, fn)
+
+def find_packroot(fn):
+    "Returns the package root for the given Python file."
+    # Find the root of the packages.
+    packroot = fn
+    if not isdir(packroot):
+        packroot = dirname(packroot)
+    while 1:
+        if not exists(join(packroot, '__init__.py')):
+            break
+        packroot = dirname(packroot)
+    return packroot
+
+def relfile(fn):
+    "Return pairs of (package root, relative filename)."
+    root = find_packroot(fn)
+    return root, fn[len(root)+1:]
+
+def filter_p(opts, root, fn):
+    "Return true if the file should be ignored."
+    if not opts.filter:
+        return False
+    elif root in opts.filter_paths:
+        return False
+    else:
+        return True
+
+def apply_cluster(cdirs, root, fn):
+    "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
+## FIXME this has to work on the root itself too
+
+    afn = join(root, fn)
+    for x in cdirs:
+        if afn.startswith(x):
+            afn = x
+    return root, afn
+
+def normpyfn(fn):
+    "Normalize the python filenames for output."
+    if fn.endswith('.py'):
+        fn = fn[:-3]
+    return fn
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip())
+
+    parser.add_option('-f', '--filter', action='append', default=[],
+                      help="Filter the results by the given path prefix.")
+
+    parser.add_option('-c', '--cluster', '--group', action='append', default=[],
+                      dest='cluster_dirs',
+                      help="Add a cluster to reduce the filenames by.  "
+                      "The clusters should be pathnames.")
+
+    parser.add_option('--debug', action='store_true', help="Turn on debugging")
+
+    opts, args = parser.parse_args()
+    if opts.filter:
+        opts.filter_paths = map(realpath, opts.filter)
+    if opts.cluster_dirs:
+        opts.cluster_dirs = map(realpath, opts.cluster_dirs)
+
+    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO)
+
+    # Find all the dependencies.
+    allfiles = defaultdict(set)
+    for fn in iter_pyfiles(args):
+        logging.info("Processing %s" % fn)
+        files = process_file(fn)
+        for xfn in files:
+            allfiles[relfile(fn)].add(relfile(xfn))
+
+    # Apply the clustering reduction rules.
+    if opts.cluster_dirs:
+        clusfiles = defaultdict(set)
+        for (from_root, from_), tolist in allfiles.iteritems():
+            for (to_root, to_) in tolist:
+                cfrom_ = apply_cluster(opts.cluster_dirs, from_root, from_)
+                cto_ = apply_cluster(opts.cluster_dirs, to_root, to_)
+                clusfiles[cfrom_].add(cto_)
+        allfiles = clusfiles
+
+    # Apply filtering and name cleanup.
+    depends = []
+    for (from_root, from_), tolist in allfiles.iteritems():
+        if filter_p(opts, from_root, from_):
+            continue
+
+        for (to_root, to_) in tolist:
+            if filter_p(opts, to_root, to_):
+                continue
+
+            depends.append(((from_root, normpyfn(from_)),
+                            (to_root, normpyfn(to_))))
+
+    # Output stage.
+    graph(depends, sys.stdout.write)
+
+if __name__ == '__main__':
+    main()
+
+
+
+# TODO: output all the roots that were found
+

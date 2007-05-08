@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# $Id: env,v 1.1 2003/10/14 05:36:10 blais Exp $
+#
+# My environment initialization for this project.  This could or could not be
+# used as an example for your own settings for development.
+
+USERPATH=$USERPATH:$PROJDIR/bin

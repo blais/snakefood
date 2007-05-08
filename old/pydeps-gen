@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+#
+# $Source: /home/blais/repos/cvsroot/pydeps/bin/pydeps-gen,v $
+# $Id: pydeps-gen,v 1.6 2003/12/29 07:55:49 blais Exp $
+#
+
+"""Compute and print dependencies between Python modules.
+
+A typical entire chain of usage goes like this::
+
+  pydeps-gen album-fetch | grep <user> | \
+     pydeps-resolve -sn | partorder-to-graph | dot -Tps | kghostview -
+
+"""
+
+__version__ = "$Revision: 1.6 $"
+__author__ = "Martin Blais <blais@furius.ca>"
+
+
+import sys, __builtin__, imp, os.path
+
+impmap = {}
+
+def ignorepath( fn ):
+    # hacks are located in packages that start with a '_'.
+    for cn in fn.split(os.sep):
+        if cn and cn[0] == '_':
+            return True
+    return False
+
+
+def override_import( name, globals, locals, fromlist ):
+    retmod = saved_import(name, globals, locals, fromlist)
+
+    print '=====', name
+    tomod = retmod
+    fromm = globals['__name__']
+
+    ##print 'From:', fromm
+    ##if hasattr(tomod, '__path__'):
+    ##    print tomod, tomod.__path__, tomod.__name__
+
+    ###if not fromlist and not tomod.__name__.startswith('_'):
+    if hasattr(tomod, '__path__') and not ignorepath(tomod.__path__[0]):
+        print 'CHASING', tomod, name
+
+    if name != tomod.__name__ and name.startswith(tomod.__name__):
+        components = name.split('.')
+        for comp in components[1:]:
+            ##print 'COMP', comp, dir(tomod)
+            tomod = getattr(tomod, comp)
+    to = tomod.__name__
+    ##print 'To:', to
+    if fromm not in impmap:
+        impmap[fromm] = []
+    if to not in impmap:
+        impmap[to] = []
+    if to not in impmap[fromm]:
+        impmap[fromm].append(to)
+
+
+    return retmod
+
+saved_import = __builtin__.__import__
+__builtin__.__import__ = override_import
+
+
+
+
+def main():
+
+    execmap = {}
+    for fn in sys.argv[1:]:
+        bn = os.path.basename(fn)
+        execmap[bn] = os.path.abspath(fn)
+        
+        desc = None
+        for suffix, mode, typee in imp.get_suffixes():
+            if fn.endswith(suffix):
+                desc = suffix, mode, typee
+                name = os.path.splitext(bn)[0]
+        if not desc:
+            desc = ('', 'U', imp.PY_SOURCE)
+            name = '%s' % os.path.splitext(bn)[0]
+
+        if 1:
+            g = globals()
+            g['__name__'] = bn
+            execfile(fn, g)
+        else:
+            f = open(fn, 'r')
+            imp.load_module(name, f, os.path.abspath(fn), desc)
+            # Note: load_source also builds pyc files here.
+            f.close()
+
+    __builtin__.__import__ = saved_import
+
+    #for k, mod in sys.modules.iteritems():
+    for k in impmap.iterkeys():
+        try:
+            mod = sys.modules[k]
+            if not hasattr(mod, '__file__'):
+                continue
+            #if mod.__name__ not in impmap:
+            #    continue
+            fn = mod.__file__
+
+            # don't print pydeps itself
+            ##if fn.endswith(sys.argv[0]):
+            ##    continue
+
+        except KeyError:
+            fn = execmap[k]
+
+        # find relations for this module
+        rels = impmap[k]
+
+        print fn, k, ' '.join(rels)
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+#
+# $Source: /home/blais/repos/cvsroot/pydeps/bin/pydeps-resolve,v $
+# $Id: pydeps-resolve,v 1.2 2003/12/29 07:55:49 blais Exp $
+#
+
+"""pydeps-resolve [<options>] [<dep-filename> ...]
+
+This is a filter that reads in a series of dependencies entries in the following
+form::
+
+  filepath name dep1 [dep2 ...]
+
+and then removes dependencies which don't have a corresponding filepath/name
+entry.
+
+"""
+
+__version__ = "$Revision: 1.2 $"
+__author__ = "Martin Blais <blais@furius.ca>"
+
+
+import sys, os
+
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip(), version=__version__)
+    parser.add_option('-n', '--no-path', action='store_true',
+                      help="don't print out the filepath.")
+    parser.add_option('-s', '--spread', action='store_true',
+                      help="spread out the dependencies entries, one per line.")
+
+    opts, args = parser.parse_args()
+
+    #
+    # read input
+    #
+    if not args:
+        deps = sys.stdin.readlines()
+        sys.stdin.close()
+    else:
+        deps = []
+        for fn in args:
+            try:
+                deps += open(fn, 'r').readlines()
+            except IOError, e:
+                raise SystemExit("Error: cannot read depfile. (%s)" % str(e))
+
+    #
+    # process entries
+    #
+    cdeps = {}
+    for d in deps:
+        w = d.split()
+        if len(w) < 2:
+            raise SystemExit("Error: invalid depend line:" + d)
+        if w[1] not in cdeps:
+            ##raise SystemExit("Error: module %s is present twice." % w[1])
+            cdeps[ w[1] ] = (w[0], w[2:])
+
+    for name, v in cdeps.iteritems():
+        path, depends = v
+
+        # filter dependencies
+        fdepends = filter(cdeps.get, depends)
+
+        if opts.spread:
+            for cc in fdepends:
+                if not opts.no_path:
+                    print path,
+                print name, cc
+        else:
+            if not opts.no_path:
+                print path,
+            print name, ' '.join(fdepends)
+
+if __name__ == '__main__':
+    main()

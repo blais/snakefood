@@ -1,0 +1,14 @@
+# Compute the dependencies for the EWT codebase.
+
+ROOT=$(HOME)/p/diamond
+OUTPUT=$(HOME)/dependencies
+
+all: $(OUTPUT) diamond
+
+$(OUTPUT):
+	mkdir $(OUTPUT)
+
+diamond:
+	snakefood --filter=$(ROOT)/src $(ROOT)/src > $(OUTPUT)/diamond.dot
+	cat $(OUTPUT)/diamond.dot | grep -E -v "/(test)/" | dot -Tps | ps2pdf - > $(OUTPUT)/diamond.pdf
+

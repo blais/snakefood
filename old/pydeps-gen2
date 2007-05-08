@@ -1,0 +1,162 @@
+#!/usr/bin/env python
+#
+# $Source: /home/blais/repos/cvsroot/pydeps/bin/pydeps-gen2,v $
+# $Id: pydeps-gen2,v 1.1 2004/02/03 18:44:45 blais Exp $
+#
+
+"""pydeps [<options>] <file> [<file> ...]
+
+Compute and print dependencies of Python source files by inspecting the code and
+then finding the import statements.
+
+An advantage of this over running the code is that some import modules could be
+imported conditionally, or within a function, and thus to get the entire list of
+runtime dependencies it is perhaps a better idea to look at the source code
+directly.
+"""
+
+__version__ = "$Revision: 1.1 $"
+__author__ = "Martin Blais <blais@furius.ca>"
+
+
+import sys, re
+from os.path import *
+
+import imp
+
+
+from pprint import pprint
+
+
+
+
+impre = re.compile('\s*import\s*([^;]*)\s*')
+fromre = re.compile('\s*from\s*([^;]*)\s*import')
+asre = re.compile('(\S+)\s+as\s+\S+')
+
+def finddeps( fn ):
+
+    """Opens a file and extracts the imported modules."""
+
+    try:
+        lines = map(lambda x: x.strip(), open(fn, 'r').readlines())
+    except IOError, e:
+        raise SystemExit("Error: reading file (%s)" % str(e))
+
+    modules = {}
+    for l in lines:
+        mo = impre.match(l.strip())
+        mods = None
+        if mo:
+            mods = mo.group(1)
+        else:
+            mo = fromre.match(l)
+            if mo:
+                mods = mo.group(1)
+        if mods:
+            for modname in mods.split(','):
+                modname = modname.strip()
+                mo = asre.match(modname)
+                if mo:
+                    modname = mo.group(1)
+                modules[modname] = True
+    
+    return modules.keys()
+
+def graph( pairs ):
+    
+    print """
+digraph "source tree" {
+    overlap=scale;
+    size="8,10";
+    ratio="fill";
+    fontsize="16";
+    fontname="Helvetica";
+        clusterrank="local";
+"""
+    for p in pairs:
+        print '"%s" -> "%s" ;' % p
+
+    print "}"
+
+def __import_final__(name):
+
+    """Import that returns the final component module.  This is exactly from the
+    Library Reference documentation in builtin-functions."""
+
+    mod = __import__(name)
+    components = name.split('.')
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip(), version=__version__)
+    parser.add_option('-p', '--restrict-path', action='append',
+                      help="Restricts modules in the given path.")
+    import optcomplete; optcomplete.autocomplete(parser)
+    opts, args = parser.parse_args()
+
+    # Create initial list of unresolve dependencies in the depends map.
+    depends = {}
+    for fn in args:
+        depends[abspath(fn)] = None
+
+    # Iterate until there is no more work to be done.
+
+    clean = False
+    while clean == False:
+        clean = True
+        for fn, deps in depends.items():
+            if deps == None:
+                clean = False
+                deps = finddeps(fn)
+
+                adeps = []
+                for dep in deps:
+                    try:
+                        impdep = __import_final__(dep)
+                    except ImportError:
+                        continue
+                    try:
+                        dfn = impdep.__file__
+
+                        # Reject if not under path restriction.
+                        if opts.restrict_path:
+                            ok = False
+                            for pfn in opts.restrict_path:
+                                if dfn.startswith(pfn):
+                                    ok = True
+                                    break
+                            if not ok:
+                                continue
+
+                        if dfn.endswith('.pyc') or dfn.endswith('.pyo'):
+                            dfn = dfn[:-1]
+                        depends.setdefault(dfn, None)
+                        adeps.append(dfn)
+                    except AttributeError:
+                        pass
+
+                depends[fn] = adeps
+
+    def cleanfn( fn ):
+        cfn = basename(fn)
+        if cfn.endswith('.py'):
+            cfn = cfn[:-3]
+        return cfn
+
+    # Compute pairs.
+    pairs = []
+    for fn, deps in depends.iteritems():
+        cfn = cleanfn(fn)
+        for dep in deps:
+            pairs.append( ( cfn, cleanfn(dep) ) )
+        
+    # Print out results.
+    graph(pairs)
+    
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,11 @@
+============
+TODO: pydeps
+============
+
+- pydeps: script to compute dependencies, use this to cleanup jukebox code
+
+- graphviz dep generation for python scripts and modules
+  - we could overload import for this purpose
+
+- generate graphviz for python modules dependencies for all my scripts!
+
