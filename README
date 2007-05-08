@@ -1,8 +1,7 @@
-====================================
-pydeps: Python Dependency Visualizer
-====================================
+=============================================
+   snakefood: Python Dependency Visualizer
+=============================================
 
-.. contents:: Table of Contents
 
 Description
 ===========
@@ -10,6 +9,31 @@ Description
 This project aims at providing a simple GraphViz graph input file from a Python
 program. We are trying to override the import procedures to find out what
 files/modules a Python program depends upon.
+
+
+This dependency tracker has a few unique characteristics:
+
+- It uses the AST to parse the Python files
+
+- No module is loaded.  There is often code in the global namespace that gets
+  run when you import a module.
+
+- It works on a set of files, i.e. you do not have to specify a single script,
+  you can select a package or a set of files.
+
+- It does not 'follow' dependencies between modules, i.e. it only considers the
+  files you specify and their dependencies.
+
+- It can filter for a subset of modules; filtering is performed by the root of
+  the package directory (see output dot file for the roots if you have any
+  problems).
+
+A problem with dependency trackers that run code is that they are unreliable
+anyway, due to the dynamic nature of Python (the presence of imports within
+function calls and __import__ hooks makes it almost impossible to always do the
+right thing ).  This script aims at being right 99% of the time, and we think
+that this is good enough.
+
 
 Documentation
 =============
@@ -21,7 +45,7 @@ Documentation
 Download
 ========
 
-Not yet.
+- `Download </downloads/snakefood/>`_
 
 
 Copyright and License
@@ -36,5 +60,4 @@ Author
 ======
 
 Martin Blais <blais@furius.ca>
-
 

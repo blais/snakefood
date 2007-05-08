@@ -1,0 +1,7 @@
+@import url("/docutils-style.css");
+@import url("/project.css");
+
+div#project-header {
+  background-image: url("etc/header-gecko.jpg");
+}
+

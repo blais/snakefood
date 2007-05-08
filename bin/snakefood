@@ -1,29 +1,7 @@
 #!/usr/bin/env python
 """
 Detecting import statements using the AST parser.
-
-This dependency tracker has a few unique characteristics:
-
-- It uses the AST to parse the Python files
-
-- No module is loaded.  There is often code in the global namespace that gets
-  run when you import a module.
-
-- It works on a set of files, i.e. you do not have to specify a single script,
-  you can select a package or a set of files.
-
-- It does not 'follow' dependencies between modules, i.e. it only considers the
-  files you specify and their dependencies.
-
-- It can filter for a subset of modules; filtering is performed by the root of
-  the package directory (see output dot file for the roots if you have any
-  problems).
-
-A problem with dependency trackers that run code is that they are unreliable
-anyway, due to the dynamic nature of Python (the presence of imports within
-function calls and __import__ hooks makes it almost impossible to always do the
-right thing ).  This script aims at being right 99% of the time, and we think
-that this is good enough.
+See http://furius.ca/snakefood for details.
 """
 
 import sys, os, re, logging, StringIO
@@ -162,7 +140,6 @@ def filter_p(opts, root, fn):
 def apply_cluster(cdirs, root, fn):
     "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
 ## FIXME this has to work on the root itself too
-
     afn = join(root, fn)
     for x in cdirs:
         if afn.startswith(x):
@@ -237,4 +214,3 @@ if __name__ == '__main__':
 
 
 # TODO: output all the roots that were found
-
