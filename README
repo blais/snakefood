@@ -35,6 +35,12 @@ right thing ).  This script aims at being right 99% of the time, and we think
 that this is good enough.
 
 
+Dependencies
+============
+
+- Python 2.5 or higher.
+
+
 Documentation
 =============
 
@@ -51,7 +57,7 @@ Download
 Copyright and License
 =====================
 
-Copyright (C) 2001-2004  Martin Blais.  All Rights Reserved.
+Copyright (C) 2001-2007  Martin Blais.  All Rights Reserved.
 
 This code is distributed under the `GNU General Public License <COPYING>`_;
 
