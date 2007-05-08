@@ -62,13 +62,13 @@ def find_dotted_module(modname, fn):
 
 
 prefix = '''
+
 digraph "source tree" {
-    overlap=scale;
-    size="8,10";
-    ratio="fill";
-    fontsize="16";
-    fontname="Helvetica";
-    clusterrank="local";
+     graph [ rankdir = "LR" ];
+     node [
+         fontsize=7
+         style=ellipse
+     ];
 
 '''
 postfix = '''
@@ -82,9 +82,10 @@ def graph(pairs, write):
     lines = []
     for (froot, f), (troot, t) in pairs:
         lines.append(('"%s" -> "%s"' % (f, t), '%s , %s' % (froot, troot)))
-    fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
-    for l, r in lines:
-        write(fmt % (l, r))
+    if lines:
+        fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
+        for l, r in lines:
+            write(fmt % (l, r))
     write(postfix)
 
 def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
@@ -157,7 +158,7 @@ def main():
     parser = optparse.OptionParser(__doc__.strip())
 
     parser.add_option('-f', '--filter', action='append', default=[],
-                      help="Filter the results by the given path prefix.")
+                      help="Filter the results by include only the given path prefixes.")
 
     parser.add_option('-c', '--cluster', '--group', action='append', default=[],
                       dest='cluster_dirs',
