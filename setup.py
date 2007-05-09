@@ -25,7 +25,7 @@ setup(name="snakefood",
       description=\
       "Dependency Graphing for Python",
       long_description="""
-Generate dependenciies from Python code, filter, cluster and generate graphs
+Generate dependencies from Python code, filter, cluster and generate graphs
 from the dependency list.
 """,
       license="GPL",
