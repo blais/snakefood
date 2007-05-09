@@ -1,14 +1,14 @@
 # Compute the dependencies for the EWT codebase.
 
 ROOT=$(HOME)/p/diamond
-OUTPUT=$(HOME)/dependencies
 
-all: $(OUTPUT) diamond
+all: diamond.pdf
 
-$(OUTPUT):
-	mkdir $(OUTPUT)
+diamond.deps.raw:
+	snakefood $(ROOT)/src > diamond.deps.raw
 
-diamond:
-	snakefood --filter=$(ROOT)/src $(ROOT)/src > $(OUTPUT)/diamond.dot
-	cat $(OUTPUT)/diamond.dot | grep -E -v "/(test)/" | dot -Tps | ps2pdf - > $(OUTPUT)/diamond.pdf
+diamond.pdf: diamond.deps.raw
+	cd $(ROOT)/src; ls -1d */* | grep -v .py > clusters
+	cat diamond.deps.raw | grep -v /usr/lib/python2. | snakefood-cluster -f clusters > diamond.deps.clean
+	cat diamond.deps.clean | snakefood-graph -e | dot -Tps | ps2pdf - > diamond.pdf
 
