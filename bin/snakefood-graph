@@ -1,33 +1,27 @@
 #!/usr/bin/env python
 """
-Read the dependencies of snakefood, filter and cluster and output a visual
-graph of the dependencies.
+Read snakefood dependencies and output a visual graph.
 """
 
-import sys, os
+import sys, os, re
 from os.path import *
 from collections import defaultdict
 
 
-def read_depends():
-    FIXME continue
-
-
-def apply_cluster(cdirs, root, fn):
-    "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
-    for croot, cfn in cdirs:
-        if root == croot and fn.startswith(cfn):
-            return root, cfn
-    else:
-        return root, fn  # no change.
+# (Refactor candidate.)
+def read_depends(f):
+    "Generator for the dependencies read from the given file object."
+    for line in f.xreadlines():
+        try:
+            yield eval(line)
+        except Exception:
+            logging.warning("Invalid line: '%s'" % line)
 
 def normpyfn(fn):
     "Normalize the python filenames for output."
     if fn.endswith('.py'):
         fn = fn[:-3]
     return fn
-
-
 
 prefix = '''
 
@@ -57,44 +51,38 @@ def graph(pairs, write):
     write(prefix)
     lines = []
     for (froot, f), (troot, t) in pairs:
-        lines.append(('"%s" -> "%s"' % (f, t), '%s , %s' % (froot, troot)))
-    if lines:
-        fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
-        for l, r in lines:
-            write(fmt % (l, r))
+        if opts.remove_extensions:
+            f = normpyfn(f)
+            t = normpyfn(t)
+        if opts.full_pathnames:
+            f = join(froot, f)
+            t = join(troot, t)
+        write('"%s" -> "%s";\n' % (f, t))
     write(postfix)
 
-def other():  ## FIXME: move this to another script.
-    
-    # Apply the clustering reduction rules.
-    if opts.cluster_dirs:
-        clusfiles = defaultdict(set)
-        for (from_root, from_), tolist in allfiles.iteritems():
-            for (to_root, to_) in tolist:
-                cfrom_ = apply_cluster(opts.cluster_dirs, from_root, from_)
-                cto_ = apply_cluster(opts.cluster_dirs, to_root, to_)
-                clusfiles[cfrom_].add(cto_)
-        allfiles = clusfiles
 
-    # Apply filtering and name cleanup.
-    depends = []
-    for (from_root, from_), tolist in allfiles.iteritems():
-        if filter_p(opts, from_root, from_):
-            continue
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip())
 
-        for (to_root, to_) in tolist:
-            if filter_p(opts, to_root, to_):
-                continue
+    parser.add_option('-f', '--full-pathnames', '--full', action='store_true',
+                      help="Output the full pathnames, not just the relative.")
 
-            depends.append(((from_root, normpyfn(from_)),
-                            (to_root, normpyfn(to_))))
+    parser.add_option('-e', '--remove-extensions', '--remove-ext',
+                      action='store_true',
+                      help="Remove filename extensions in the graph.")
 
-    # Output stage.
-    graph(depends, sys.stdout.write)
+    global opts
+    opts, args = parser.parse_args()
 
+    if not args:
+        args = ['-']
+    for fn in args:
+        f = sys.stdin if fn == '-' else open(fn)
+        depends = read_depends(f)
+        graph(depends, sys.stdout.write)
+
+        
 if __name__ == '__main__':
     main()
-
-
-
 

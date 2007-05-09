@@ -2,12 +2,22 @@
    TODO: snakefood
 =====================
 
-- Store the results of processing all the files in an sqlite DB so
-  that quick clustering and filter can be done without having to
-  reparse all the files.
+snakefood
+=========
 
 - When recursing through files, check for non .py files that may be Python code
   too and include them.
 
+
+snakefood-graph
+===============
+
+- Support dot subgraphs.
+
+
+snakefood-cluster
+=================
+
+- Automatically remove dependencies on one-self, they create unnecessary arrows.
 
 

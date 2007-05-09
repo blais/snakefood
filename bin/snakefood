@@ -112,36 +112,31 @@ def relfile(fn):
     root = find_packroot(realpath(fn))
     return root, fn[len(root)+1:]
 
-def filter_p(opts, root, fn):
-    "Return true if the file should be ignored."
-    if not opts.filter:
-        return False
-    elif root in opts.filter_paths:
-        return False
-    else:
-        return True
+# (Refactor candidate.)
+def output_depends(depdict):
+    """Given a dictionary of (from -> list of targets), generate an appropriate
+    output file."""
+
+    # Output the dependencies.
+    write = sys.stdout.write
+    for (from_root, from_), tolist in sorted(depdict.iteritems(),
+                                             key=itemgetter(0)):
+        for to_root, to_ in sorted(tolist):
+            write(repr( ((from_root, from_), (to_root, to_)) ))
+##             write('%s,%s;%s,%s' % (from_root, from_, to_root, to_))
+            write('\n')
 
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
 
-    parser.add_option('-f', '--filter', action='append', default=[],
-                      help="Filter the results by include only the given path prefixes.")
-
-    parser.add_option('-c', '--cluster', '--group', action='append', default=[],
-                      dest='cluster_dirs',
-                      help="Add a cluster to reduce the filenames by.  "
-                      "The clusters should be pathnames.")
-
     parser.add_option('--debug', action='store_true', help="Turn on debugging")
 
     opts, args = parser.parse_args()
-    if opts.filter:
-        opts.filter_paths = map(realpath, opts.filter)
-    if opts.cluster_dirs:
-        opts.cluster_dirs = map(relfile, opts.cluster_dirs)
-
     logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO)
+    if not args:
+        logging.warning("Searching for files from root directory.")
+        args = ['.']
 
     # Find all the dependencies.
     allfiles = defaultdict(set)
@@ -156,17 +151,10 @@ def main():
     for root in frozenset(x[0] for x in allfiles.iterkeys()):
         logging.info('  %s' % root)
 
-    # Output the dependencies.
-    write = sys.stdout.write
-    for (from_root, from_), tolist in sorted(allfiles.iteritems(),
-                                             key=itemgetter(0)):
-        for to_root, to_ in sorted(tolist):
-            write(','.join((from_root, from_, to_root, to_)))
-            write('\n')
+    output_depends(allfiles)
+    
 
 
 if __name__ == '__main__':
     main()
-
-
 
