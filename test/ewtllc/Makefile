@@ -15,11 +15,11 @@ diamond.raw.deps:
 # Only keep files imported at the root of diamond.
 # This removes the stdlib files and the test subdirectories as well.
 diamond.filtered.deps: diamond.raw.deps
-	cat diamond.raw.deps | grep "$(ROOT)'.*$(ROOT)" > diamond.filtered.deps
+	cat diamond.raw.deps | grep "$(ROOT)/src'.*$(ROOT)/src" > diamond.filtered.deps
 
 # Cluster the files to remove unnecessary amount of detail.
 clusters:
-	(cd $(ROOT); ls -1d */* | grep -v \\. > $(shell pwd)/clusters)
+	(cd $(ROOT)/src; ls -1d */* | grep -v \\. > $(shell pwd)/clusters)
 diamond.clean.deps: diamond.filtered.deps clusters
 	cat diamond.filtered.deps | snakefood-cluster -f clusters > diamond.clean.deps
 
