@@ -1,6 +1,6 @@
-=============================================
-   snakefood: Python Dependency Visualizer
-=============================================
+=========================================
+   snakefood: Python Dependency Graphs
+=========================================
 
 
 Description
@@ -18,8 +18,9 @@ This dependency tracker has a few unique characteristics:
 - It works on a set of files, i.e. you do not have to specify a single script,
   you can select a package or a set of files.
 
-- It does not 'follow' dependencies between modules, i.e. it only considers the
-  files you specify and their dependencies.
+- It does not automatically 'follow' dependencies between modules,
+  i.e. it only considers the files and directories you specify on the
+  command-line and their immediate dependencies.
 
 - It can filter for a subset of modules; filtering is performed by the root of
   the package directory (see output dot file for the roots if you have any
