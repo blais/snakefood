@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Detecting import statements using the AST parser.
+Detect import statements using the AST parser.
 
 This script outputs a comma-separated list of tuples:
 
