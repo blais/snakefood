@@ -59,6 +59,11 @@ def main():
     for (froot, f), (troot, t) in depends:
         cfrom = apply_cluster(clusters, froot, f)
         cto = apply_cluster(clusters, troot, t)
+
+        # Skip self-dependencies that may occur.
+        if cfrom == cto:
+            continue
+
         clusfiles[cfrom].add(cto)
 
     output_depends(clusfiles)

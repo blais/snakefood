@@ -17,12 +17,6 @@ def read_depends(f):
         except Exception:
             logging.warning("Invalid line: '%s'" % line)
 
-def normpyfn(fn):
-    "Normalize the python filenames for output."
-    if fn.endswith('.py'):
-        fn = fn[:-3]
-    return fn
-
 prefix = '''
 
 digraph "source tree" {
@@ -51,7 +45,7 @@ def graph(pairs, write):
     write(prefix)
     lines = []
     for (froot, f), (troot, t) in pairs:
-        if opts.remove_extensions:
+        if opts.pythonify_filenames:
             f = normpyfn(f)
             t = normpyfn(t)
         if opts.full_pathnames:
@@ -60,6 +54,12 @@ def graph(pairs, write):
         write('"%s" -> "%s";\n' % (f, t))
     write(postfix)
 
+def normpyfn(fn):
+    "Normalize the python filenames for output."
+    if fn.endswith('.py'):
+        fn = fn[:-3]
+    fn = fn.replace(os.sep, '.')
+    return fn
 
 def main():
     import optparse
@@ -68,9 +68,10 @@ def main():
     parser.add_option('-f', '--full-pathnames', '--full', action='store_true',
                       help="Output the full pathnames, not just the relative.")
 
-    parser.add_option('-e', '--remove-extensions', '--remove-ext',
+    parser.add_option('-p', '--pythonify-filenames', '--remove-extensions',
                       action='store_true',
-                      help="Remove filename extensions in the graph.")
+                      help="Remove filename extensions in the graph and "
+                      "replace slashes with dots.")
 
     global opts
     opts, args = parser.parse_args()
@@ -82,7 +83,7 @@ def main():
         depends = read_depends(f)
         graph(depends, sys.stdout.write)
 
-        
+
 if __name__ == '__main__':
     main()
 
