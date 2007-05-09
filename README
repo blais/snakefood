@@ -6,14 +6,13 @@
 Description
 ===========
 
-Create a dependency graph from Python code, without running any code.
-
-This dependency tracker has a few unique characteristics:
+Generate dependency graphs from Python code.  This dependency tracker
+package has a few distinguishing characteristics:
 
 - It uses the AST to parse the Python files
 
-- No module is loaded.  There is often code in the global namespace that gets
-  run when you import a module.
+- No module is loaded.  There is often code in the global namespace
+  that gets run when you import a module.
 
 - It works on a set of files, i.e. you do not have to specify a single script,
   you can select a package or a set of files.
@@ -22,21 +21,24 @@ This dependency tracker has a few unique characteristics:
   i.e. it only considers the files and directories you specify on the
   command-line and their immediate dependencies.
 
-- It can filter for a subset of modules; filtering is performed by the root of
-  the package directory (see output dot file for the roots if you have any
-  problems).
+- It follows the UNIX philosophy of small programs that do one thing
+  well, so you can combine it with your favourite tools, grep, sed,
+  etc.
 
-A problem with dependency trackers that run code is that they are unreliable
-anyway, due to the dynamic nature of Python (the presence of imports within
-function calls and __import__ hooks makes it almost impossible to always do the
-right thing ).  This script aims at being right 99% of the time, and we think
-that this is good enough.
+- The code is damn simple and there very little of it.
+
+A problem with dependency trackers that run code is that they are
+unreliable anyway, due to the dynamic nature of Python (the presence
+of imports within function calls and __import__ hooks makes it almost
+impossible to always do the right thing ).  This script aims at being
+right 99% of the time, and we think that this is good enough for 99%
+of the uses.
 
 
 Dependencies
 ============
 
-- Python 2.5 or higher.
+- Python 2.5 or higher.  That's it.
 
 
 Documentation
