@@ -65,10 +65,18 @@ prefix = '''
 
 digraph "source tree" {
      graph [ rankdir = "LR" ];
-     node [
-         fontsize=7
-         style=ellipse
-     ];
+
+     overlap=scale;
+     size="8,10";
+     ratio="fill";
+     fontsize="16";
+     fontname="Helvetica";
+     clusterrank="local";
+
+//     node [
+//         fontsize=7
+//       style=ellipse
+//     ];
 
 '''
 postfix = '''
@@ -115,7 +123,7 @@ def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
 def find_packroot(fn):
     "Returns the package root for the given Python file."
     # Find the root of the packages.
-    packroot = fn
+    packroot = realpath(fn)
     if not isdir(packroot):
         packroot = dirname(packroot)
     while 1:
@@ -126,7 +134,7 @@ def find_packroot(fn):
 
 def relfile(fn):
     "Return pairs of (package root, relative filename)."
-    root = find_packroot(fn)
+    root = find_packroot(realpath(fn))
     return root, fn[len(root)+1:]
 
 def filter_p(opts, root, fn):
@@ -140,12 +148,11 @@ def filter_p(opts, root, fn):
 
 def apply_cluster(cdirs, root, fn):
     "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
-## FIXME this has to work on the root itself too
-    afn = join(root, fn)
-    for x in cdirs:
-        if afn.startswith(x):
-            afn = x
-    return root, afn
+    for croot, cfn in cdirs:
+        if root == croot and fn.startswith(cfn):
+            return root, cfn
+    else:
+        return root, fn  # no change.
 
 def normpyfn(fn):
     "Normalize the python filenames for output."
@@ -171,7 +178,7 @@ def main():
     if opts.filter:
         opts.filter_paths = map(realpath, opts.filter)
     if opts.cluster_dirs:
-        opts.cluster_dirs = map(realpath, opts.cluster_dirs)
+        opts.cluster_dirs = map(relfile, opts.cluster_dirs)
 
     logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO)
 
@@ -214,4 +221,3 @@ if __name__ == '__main__':
 
 
 
-# TODO: output all the roots that were found

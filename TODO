@@ -2,8 +2,11 @@
    TODO: snakefood
 =====================
 
-- graphviz dep generation for python scripts and modules
-  - we could overload import for this purpose
+- All the roots that were found should be output on stderr.
 
-- generate graphviz for python modules dependencies for all my scripts!
+- Store the results of processing all the files in an sqlite DB so
+  that quick clustering and filter can be done without having to
+  reparse all the files.
+
+
 
