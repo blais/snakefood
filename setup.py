@@ -6,11 +6,11 @@ Install script for the snakefood dependency graph tool.
 
 __author__ = "Martin Blais <blais@furius.ca>"
 
-import sys
+import sys, os, os.path
 from distutils.core import setup
 
 
-allscripts = [join('bin', x) for x in os.listdir('bin')
+allscripts = [os.path.join('bin', x) for x in os.listdir('bin')
               if x.startswith('snakefood')]
 
 def read_version():
@@ -20,7 +20,7 @@ def read_version():
         raise SystemExit(
             "Error: you must run setup from the root directory (%s)" % str(e))
 
-setup(name="antiorm",
+setup(name="snakefood",
       version=read_version(),
       description=\
       "Dependency Graphing for Python",
