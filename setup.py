@@ -32,7 +32,6 @@ from the dependency list.
       author="Martin Blais",
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
-      package_dir = {'': 'lib/python'},
       scripts = allscripts
      )
 
