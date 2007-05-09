@@ -9,6 +9,10 @@ __author__ = "Martin Blais <blais@furius.ca>"
 import sys
 from distutils.core import setup
 
+
+allscripts = [join('bin', x) for x in os.listdir('bin')
+              if x.startswith('snakefood')]
+
 def read_version():
     try:
         return open('VERSION', 'r').readline().strip()
@@ -21,14 +25,15 @@ setup(name="antiorm",
       description=\
       "Dependency Graphing for Python",
       long_description="""
-Create a dependency graph from Python code.
+Generate dependenciies from Python code, filter, cluster and generate graphs
+from the dependency list.
 """,
       license="GPL",
       author="Martin Blais",
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
       package_dir = {'': 'lib/python'},
-      scripts = ['bin/snakefood']
+      scripts = allscripts
      )
 
 

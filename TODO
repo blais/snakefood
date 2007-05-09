@@ -5,8 +5,11 @@
 snakefood
 =========
 
+- BUG: If a file does not import anything, it should still appear.
+
 - When recursing through files, check for non .py files that may be Python code
   too and include them.
+
 
 
 snakefood-graph

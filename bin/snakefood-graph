@@ -50,12 +50,18 @@ def graph(pairs, write):
             t = normpyfn(t)
         if opts.full_pathnames:
             f = join(froot, f)
-            t = join(troot, t)
-        write('"%s" -> "%s";\n' % (f, t))
+            if troot:
+                t = join(troot, t)
+        if troot is None:
+            write('"%s";\n' % f)
+        else:
+            write('"%s" -> "%s";\n' % (f, t))
     write(postfix)
 
 def normpyfn(fn):
     "Normalize the python filenames for output."
+    if fn is None:
+        return fn
     if fn.endswith('.py'):
         fn = fn[:-3]
     fn = fn.replace(os.sep, '.')

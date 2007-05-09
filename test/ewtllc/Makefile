@@ -1,6 +1,7 @@
 # Compute the dependencies for the EWT codebase.
 
-ROOT=$(HOME)/pe/diamond
+ROOT=$(HOME)/p/diamond
+#ROOT=$(HOME)/pe/diamond
 GENGRAPH= snakefood-graph -p | dot -Tps | ps2pdf - 
 
 all: diamond.pdf diamond.mt.pdf
@@ -18,7 +19,7 @@ diamond.filtered.deps: diamond.raw.deps
 
 # Cluster the files to remove unnecessary amount of detail.
 clusters:
-	(cd $(ROOT)/src; ls -1d */* | grep -v .py > $(shell pwd)/clusters)
+	(cd $(ROOT)/src; ls -1d */* | grep -v \\. > $(shell pwd)/clusters)
 diamond.clean.deps: diamond.filtered.deps clusters
 	cat diamond.filtered.deps | snakefood-cluster -f clusters > diamond.clean.deps
 

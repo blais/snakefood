@@ -4,16 +4,20 @@ Detect import statements using the AST parser.
 
 This script outputs a comma-separated list of tuples:
 
-  (from_root, from_filename, to_root, to_filename)
+  ((from_root, from_filename), (to_root, to_filename))
   
 The roots are the root directories where the modules lie.  You can use
 snakefood-graph or some other tool to filter, cluster and generate a meaningful
 graph from this list of dependencies.
 
+As a special case, if the 'to' tuple is (None, None), this means to at least
+include the 'from' tuple as a node.  This may happen if the file has no
+dependencies on anything.
+
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging
+import sys, os, logging, traceback
 import imp, compiler
 from os.path import *
 from collections import defaultdict
@@ -40,8 +44,13 @@ class ImportVisitor(object):
 
 def process_file(fn):
     "Returns a list of the files it depends on."
-    mod = compiler.parseFile(fn)
-
+    try:
+        mod = compiler.parseFile(fn)
+    except Exception, e:
+        logging.error("Error processing file '%s':\n\n%s" %
+                      (fn, traceback.format_exc(sys.stderr)))
+        return []
+        
     vis = ImportVisitor()
     compiler.walk(mod, vis)
 
@@ -123,7 +132,6 @@ def output_depends(depdict):
                                              key=itemgetter(0)):
         for to_root, to_ in sorted(tolist):
             write(repr( ((from_root, from_), (to_root, to_)) ))
-##             write('%s,%s;%s,%s' % (from_root, from_, to_root, to_))
             write('\n')
 
 def main():
@@ -143,6 +151,11 @@ def main():
     for fn in iter_pyfiles(args):
         logging.info("Processing %s" % fn)
         files = process_file(fn)
+
+        # Make sure all the files at least appear.
+        allfiles[relfile(fn)].add((None, None)) 
+
+        # Add the dependencies.
         for xfn in files:
             allfiles[relfile(fn)].add(relfile(xfn))
 

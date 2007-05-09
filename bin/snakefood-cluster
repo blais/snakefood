@@ -34,6 +34,9 @@ def output_depends(depdict):
 
 def apply_cluster(cdirs, root, fn):
     "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
+    if root is None:
+        return root, fn
+
     for cfn in cdirs:
         if fn.startswith(cfn):
             return root, cfn
@@ -62,7 +65,7 @@ def main():
 
         # Skip self-dependencies that may occur.
         if cfrom == cto:
-            continue
+            cto = (None, None)
 
         clusfiles[cfrom].add(cto)
 
@@ -71,3 +74,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
