@@ -2,11 +2,12 @@
    TODO: snakefood
 =====================
 
-- All the roots that were found should be output on stderr.
-
 - Store the results of processing all the files in an sqlite DB so
   that quick clustering and filter can be done without having to
   reparse all the files.
+
+- When recursing through files, check for non .py files that may be Python code
+  too and include them.
 
 
 

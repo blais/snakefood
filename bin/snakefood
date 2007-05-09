@@ -1,15 +1,27 @@
 #!/usr/bin/env python
 """
 Detecting import statements using the AST parser.
+
+This script outputs a comma-separated list of tuples:
+
+  (from_root, from_filename, to_root, to_filename)
+  
+The roots are the root directories where the modules lie.  You can use
+snakefood-graph or some other tool to filter, cluster and generate a meaningful
+graph from this list of dependencies.
+
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, re, logging, StringIO
+import sys, os, logging
 import imp, compiler
 from os.path import *
 from collections import defaultdict
+from operator import itemgetter
+
 
 class ImportVisitor(object):
+    "AST visitor for grabbing the import statements."
 
     def __init__(self):
         self.modules = set()
@@ -58,43 +70,6 @@ def find_dotted_module(modname, fn):
             break
     out = file_ and realpath(file_.name)
     return out
-
-
-
-prefix = '''
-
-digraph "source tree" {
-     graph [ rankdir = "LR" ];
-
-     overlap=scale;
-     size="8,10";
-     ratio="fill";
-     fontsize="16";
-     fontname="Helvetica";
-     clusterrank="local";
-
-//     node [
-//         fontsize=7
-//       style=ellipse
-//     ];
-
-'''
-postfix = '''
-
-}
-'''
-
-def graph(pairs, write):
-    "Given (from, to) pairs of (root, fn) files, output a dot graph."
-    write(prefix)
-    lines = []
-    for (froot, f), (troot, t) in pairs:
-        lines.append(('"%s" -> "%s"' % (f, t), '%s , %s' % (froot, troot)))
-    if lines:
-        fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
-        for l, r in lines:
-            write(fmt % (l, r))
-    write(postfix)
 
 def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
     """Yield all the files ending with .py recursively.  'dirsorfn' is a list of
@@ -146,20 +121,6 @@ def filter_p(opts, root, fn):
     else:
         return True
 
-def apply_cluster(cdirs, root, fn):
-    "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
-    for croot, cfn in cdirs:
-        if root == croot and fn.startswith(cfn):
-            return root, cfn
-    else:
-        return root, fn  # no change.
-
-def normpyfn(fn):
-    "Normalize the python filenames for output."
-    if fn.endswith('.py'):
-        fn = fn[:-3]
-    return fn
-
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
@@ -190,31 +151,19 @@ def main():
         for xfn in files:
             allfiles[relfile(fn)].add(relfile(xfn))
 
-    # Apply the clustering reduction rules.
-    if opts.cluster_dirs:
-        clusfiles = defaultdict(set)
-        for (from_root, from_), tolist in allfiles.iteritems():
-            for (to_root, to_) in tolist:
-                cfrom_ = apply_cluster(opts.cluster_dirs, from_root, from_)
-                cto_ = apply_cluster(opts.cluster_dirs, to_root, to_)
-                clusfiles[cfrom_].add(cto_)
-        allfiles = clusfiles
+    # Output the list of roots found.
+    logging.info("Found roots:")
+    for root in frozenset(x[0] for x in allfiles.iterkeys()):
+        logging.info('  %s' % root)
 
-    # Apply filtering and name cleanup.
-    depends = []
-    for (from_root, from_), tolist in allfiles.iteritems():
-        if filter_p(opts, from_root, from_):
-            continue
+    # Output the dependencies.
+    write = sys.stdout.write
+    for (from_root, from_), tolist in sorted(allfiles.iteritems(),
+                                             key=itemgetter(0)):
+        for to_root, to_ in sorted(tolist):
+            write(','.join((from_root, from_, to_root, to_)))
+            write('\n')
 
-        for (to_root, to_) in tolist:
-            if filter_p(opts, to_root, to_):
-                continue
-
-            depends.append(((from_root, normpyfn(from_)),
-                            (to_root, normpyfn(to_))))
-
-    # Output stage.
-    graph(depends, sys.stdout.write)
 
 if __name__ == '__main__':
     main()

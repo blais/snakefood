@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+"""
+Read the dependencies of snakefood, filter and cluster and output a visual
+graph of the dependencies.
+"""
+
+import sys, os
+from os.path import *
+from collections import defaultdict
+
+
+def read_depends():
+    FIXME continue
+
+
+def apply_cluster(cdirs, root, fn):
+    "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
+    for croot, cfn in cdirs:
+        if root == croot and fn.startswith(cfn):
+            return root, cfn
+    else:
+        return root, fn  # no change.
+
+def normpyfn(fn):
+    "Normalize the python filenames for output."
+    if fn.endswith('.py'):
+        fn = fn[:-3]
+    return fn
+
+
+
+prefix = '''
+
+digraph "source tree" {
+     graph [ rankdir = "LR" ];
+
+     overlap=scale;
+     size="8,10";
+     ratio="fill";
+     fontsize="16";
+     fontname="Helvetica";
+     clusterrank="local";
+
+//     node [
+//         fontsize=7
+//       style=ellipse
+//     ];
+
+'''
+postfix = '''
+
+}
+'''
+
+def graph(pairs, write):
+    "Given (from, to) pairs of (root, fn) files, output a dot graph."
+    write(prefix)
+    lines = []
+    for (froot, f), (troot, t) in pairs:
+        lines.append(('"%s" -> "%s"' % (f, t), '%s , %s' % (froot, troot)))
+    if lines:
+        fmt = '%%-%ds ; //   %%s\n' % max(len(x[0]) for x in lines)
+        for l, r in lines:
+            write(fmt % (l, r))
+    write(postfix)
+
+def other():  ## FIXME: move this to another script.
+    
+    # Apply the clustering reduction rules.
+    if opts.cluster_dirs:
+        clusfiles = defaultdict(set)
+        for (from_root, from_), tolist in allfiles.iteritems():
+            for (to_root, to_) in tolist:
+                cfrom_ = apply_cluster(opts.cluster_dirs, from_root, from_)
+                cto_ = apply_cluster(opts.cluster_dirs, to_root, to_)
+                clusfiles[cfrom_].add(cto_)
+        allfiles = clusfiles
+
+    # Apply filtering and name cleanup.
+    depends = []
+    for (from_root, from_), tolist in allfiles.iteritems():
+        if filter_p(opts, from_root, from_):
+            continue
+
+        for (to_root, to_) in tolist:
+            if filter_p(opts, to_root, to_):
+                continue
+
+            depends.append(((from_root, normpyfn(from_)),
+                            (to_root, normpyfn(to_))))
+
+    # Output stage.
+    graph(depends, sys.stdout.write)
+
+if __name__ == '__main__':
+    main()
+
+
+
+
