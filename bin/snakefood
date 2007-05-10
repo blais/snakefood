@@ -255,6 +255,9 @@ def main():
 
         # Add the dependencies.
         for xfn in files:
+            if basename(xfn) == '__init__.py':
+                xfn = dirname(xfn)
+
             allfiles[relfile(fn)].add(relfile(xfn))
 
     # Output the list of roots found.
