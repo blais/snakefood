@@ -27,6 +27,10 @@ package has a few distinguishing characteristics:
 
 - The code is damn simple and there very little of it.
 
+- Your PYTHONPATH is adjusted to include the specified package roots
+  automatically, you do not have to configure.
+
+
 A problem with dependency trackers that run code is that they are
 unreliable anyway, due to the dynamic nature of Python (the presence
 of imports within function calls and __import__ hooks makes it almost

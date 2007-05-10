@@ -31,18 +31,18 @@ class ImportVisitor(object):
         self.modules = set()
 
     def visitImport(self, node):
-        self.modules.update(x[0] for x in node.names)
+        self.modules.update((x[0], None) for x in node.names)
 
     def visitFrom(self, node):
         modname = node.modname
         for name, as_ in node.names:
             if name != '*':
-                name = '.'.join((modname, name))
+                mod = (modname, name)
             else:
-                name = modname
-            self.modules.add(name)
+                mod = (modname, None)
+            self.modules.add(mod)
 
-def process_file(fn, inroots):
+def process_file(fn):
     "Returns a list of the files it depends on."
     try:
         mod = compiler.parseFile(fn)
@@ -55,35 +55,93 @@ def process_file(fn, inroots):
     compiler.walk(mod, vis)
 
     files = []
-    for mod in vis.modules:
-        modfile = find_dotted_module(mod, fn, inroots)
+    assert not isdir(fn)
+    dn = dirname(fn)
+    for mod, sub in vis.modules:
+        modfile = find_dotted_module(mod, sub, dn)
         if modfile is None:
             continue
         files.append(modfile)
     return files
 
-def find_dotted_module(modname, fn, inroots):
-    """A version of find_module that supports dotted module names (packages)."""
+
+
+
+
+try:
+    from imp import ImpImporter
+except ImportError:
+    from pkgutil import ImpImporter
+def_imper = ImpImporter()
+
+def find_dotted_module(modname, sub, parentdir):
+    """
+    A version of find_module that supports dotted module names (packages).
+    This function returns the path of the found module.
+
+    If 'sub' is not None, it first attempts to import 'modname.sub', and if it
+    fails, it must therefore not be a module, so we look up 'modname'.
+
+    'parentdir' is the directory of the file that attempts to do the import.  We
+    attempt to do a local import there first.
+    """
+    names = modname.split('.')
+    if sub is not None:
+        names.append(sub)
+        
+    path = [parentdir]
+    out = None
+
+    curnames = []
+    for i, n in enumerate(names):
+        curnames.append(n)
+        name = '.'.join(curnames)
+        
+        # Try local import first.
+        mod = ImpImporter(parentdir).find_module(name)
+        if mod:
+            out = mod.get_filename()
+            if out is None:
+                break
+            parentdir = dirname(out)
+            continue
+
+        # Try global import otherwise
+        mod = def_imper.find_module(name)
+        if mod:
+            out = mod.get_filename()
+            if out is None:
+                break
+            parentdir = dirname(out)
+            continue
+
+    if out is None:
+        # Note: builtin modules will not show up.  Maybe we should do something
+        # special for them.
+        logging.warning("Not a module: '%s'" % modname)
+    else:
+        return out
+
+
+
+def find_dotted_module__OLD(modname, sub, parentdir):
 
     names = modname.split('.')
-    path = [dirname(fn)]
+    path = [parentdir]
     out = None
+
     for name in names:
 
         # Try local import.
         try:
             (file_, pathname, description) = imp.find_module(name, path)
         except ImportError, e:
-            # Try discovered inroots import.
+            # Try import from builtins, inroots, sys.path.
             try:
-                (file_, pathname, description) = imp.find_module(name, inroots)
+                (file_, pathname, description) = imp.find_module(name, None)
             except ImportError, e:
-                # Try import from builtins and sys.path.
-                try:
-                    (file_, pathname, description) = imp.find_module(name, None)
-                except ImportError, e:
-                    logging.debug("Not a module: '%s'" % modname)
-                    break # Still import the parent of this.
+                logging.debug("Not a module: '%s'" % modname)
+                break # Still import the parent of this.
 
         out = pathname
         if not isdir(pathname):
@@ -93,6 +151,7 @@ def find_dotted_module(modname, fn, inroots):
     if out:
         out = realpath(out)
     return out
+
 
 def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
     """Yield all the files ending with .py recursively.  'dirsorfn' is a list of
@@ -173,7 +232,8 @@ def main():
 
     logging.info("")
     logging.info("Using path:")
-    for dn in inroots + sys.path:
+    sys.path = inroots + sys.path
+    for dn in sys.path:
         logging.info("  %s" % dn)
 
     # Find all the dependencies.
@@ -182,7 +242,7 @@ def main():
     allfiles = defaultdict(set)
     for fn in iter_pyfiles(args):
         logging.info("  %s" % fn)
-        files = process_file(fn, inroots)
+        files = process_file(fn)
 
         # When packages are the source of dependencies, remove the __init__
         # file.  This is important because the targets also do not include the

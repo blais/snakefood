@@ -1,0 +1,23 @@
+========================
+   Usage Instructions
+========================
+:Date: 2007-05-10
+:Abstract:
+
+    Documentation for using snakefood.
+
+
+Basic Usage
+===========
+
+You need to install graphviz to generate graphs.
+
+::
+
+   cd myproject
+   snakefood -i > /tmp/myproject.defs
+   cat /tmp/myproject.defs | snakefood-graph | dot -Tps | ps2pdf - > /tmp/myproject.pdf
+
+
+
+
