@@ -2,4 +2,5 @@
 (('/home/blais/p/snakefood/test/snakefood', 'project/foo_import.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/bar.py'))
 (('/home/blais/p/snakefood/test/snakefood', 'project/foo_import.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/bli.py'))
 (('/home/blais/p/snakefood/test/snakefood', 'project/foo_import.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/sub1'))
+(('/home/blais/p/snakefood/test/snakefood', 'project/foo_import.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/sub1/test.py'))
 (('/home/blais/p/snakefood/test/snakefood', 'project/foo_import.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/sub2'))

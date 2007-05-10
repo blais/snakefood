@@ -15,3 +15,6 @@ import sub2
 import project.alien
 import project.alien.alien2
 
+# More than one level and relative.
+import sub1.test
+ 
