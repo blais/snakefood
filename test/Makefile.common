@@ -21,7 +21,7 @@ all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps:
-	snakefood --internal-only $(ROOT) > $@
+	snakefood --debug --internal-only $(ROOT) > $@
 
 # Implicit rules.
 .deps.dot:

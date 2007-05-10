@@ -73,13 +73,16 @@ def process_file(fn):
 
 
 
-
+# **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.
 try:
     from imp import ImpImporter
 except ImportError:
     from pkgutil import ImpImporter
 
 libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
+
+exceptions = ('os.path',)
+builtin_module_names = sys.builtin_module_names + exceptions
 
 def find_dotted_module(modname, sub, parentdir):
     """
@@ -95,7 +98,7 @@ def find_dotted_module(modname, sub, parentdir):
     attempt to do a local import there first.
     """
     # Check for builtins.
-    if modname in sys.builtin_module_names:
+    if modname in builtin_module_names:
         return join(libpath, modname)
 
     names = modname.split('.')
@@ -106,7 +109,7 @@ def find_dotted_module(modname, sub, parentdir):
         fn = find_dotted(names)
 
         if not fn:
-            logging.warning("Could not import module: '%s'" % modname)
+            logging.warning("    Could not import module: '%s'" % modname)
             return None
 
     # If this is a from-form, try the target symbol as a module.
@@ -115,10 +118,10 @@ def find_dotted_module(modname, sub, parentdir):
         if fn2:
             fn = fn2
         else:
-            logging.warning("from %s import %s: Symbol is not a module." % (modname, sub))
+            logging.debug("    from %s import %s: Symbol '%s' is not a module." % (modname, sub, sub))
+            # Pass-thru and return the filename of the parent, which was found.
 
     return fn
-
 
 def find_dotted(names, parentdir=None):
     """
@@ -136,42 +139,8 @@ def find_dotted(names, parentdir=None):
         parentdir = dirname(filename)
     else:
         return filename
-    
 
 
-## def find_dotted_module__OLD(modname, sub, parentdir):
-##
-##     names = modname.split('.')
-##     if sub is not None:
-##         names.append(sub)
-##
-##     path = [parentdir]
-##     out = None
-##
-##     for i, name in enumerate(names):
-##
-##         # Try local import.
-##         try:
-##             (file_, pathname, description) = imp.find_module(name, path)
-##             out = pathname
-##         except ImportError, e:
-##             # Try import from builtins, inroots, sys.path.
-##             try:
-##                 (file_, pathname, description) = imp.find_module(name, None)
-##                 out = pathname
-##             except ImportError, e:
-##                 logging.debug("Not a module: '%s'" % modname)
-##                 break # Still import the parent of this.
-##
-##         out = pathname
-##         if not isdir(pathname):
-##             pathname = dirname(pathname)
-##         path = [pathname]
-##
-##     if out:
-##         out = realpath(out)
-##
-##     return out
 
 
 def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
@@ -228,6 +197,8 @@ def output_depends(depdict):
             write(repr( ((from_root, from_), (to_root, to_)) ))
             write('\n')
 
+LOG_FORMAT = "%(levelname)-12s: %(message)s"
+
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
@@ -239,7 +210,8 @@ def main():
     parser.add_option('--debug', action='store_true', help="Turn on debugging")
 
     opts, args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO)
+    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
+                        format=LOG_FORMAT)
     if not args:
         logging.warning("Searching for files from root directory.")
         args = ['.']
