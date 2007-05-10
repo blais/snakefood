@@ -1,11 +1,11 @@
 # Graph the dependencies for Python Web Objects.
-include ../Makefile.common
 
 ROOT=$(HOME)/src/PythonWeb.org
 
 PDFS =						\
 	pythonweb.pdf
 
+include ../Makefile.common
 
 # Cluster at least the first level of subdirectories.
 pythonweb.clusters:

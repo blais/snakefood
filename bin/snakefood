@@ -102,6 +102,7 @@ def find_dotted_module(modname, sub, parentdir):
         if mod:
             out = mod.get_filename()
             if out is None:
+                trace(out)
                 break
             parentdir = dirname(out)
             continue
@@ -111,6 +112,7 @@ def find_dotted_module(modname, sub, parentdir):
         if mod:
             out = mod.get_filename()
             if out is None:
+                trace(out)
                 break
             parentdir = dirname(out)
             continue

@@ -3,7 +3,7 @@
 .SUFFIXES: .py .deps .log
 
 
-all: stdlib invalid relative
+all: stdlib invalid relative notfound
 
 
 # Check the standard library.
@@ -12,6 +12,10 @@ stdlib:
 	diff $@.deps $@.expect
 
 invalid:
+	snakefood $@.py > $@.deps 2> $@.log
+	diff $@.deps $@.expect
+
+notfound:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 

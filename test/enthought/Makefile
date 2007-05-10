@@ -1,5 +1,4 @@
 # Graph the dependencies for the Enthought Tool Suite.
-include ../Makefile.common
 
 ROOT=$(HOME)/p/enthought/src/lib
 
@@ -8,6 +7,8 @@ PDFS =							\
 	enthought-big.pdf				\
 	traits.pdf					\
 	traits_simplified.pdf			
+
+include ../Makefile.common
 
 # Enthought, clustered.
 enthought.clusters:

@@ -1,11 +1,11 @@
 # Graph the dependencies for zooko's pyutil.
-include ../Makefile.common
 
 ROOT=/usr/lib/python2.5
 
 PDFS =						\
 	stdlib.pdf
 
+include ../Makefile.common
 
 # Remove anything that is not simply from the root of the package dir (including
 # site-packages).

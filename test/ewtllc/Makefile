@@ -1,5 +1,4 @@
 # Graph the dependencies for the EWT codebase.
-include ../Makefile.common
 
 ROOT=$(HOME)/p/diamond/src
 
@@ -7,6 +6,8 @@ PDFS =						\
 	diamond.pdf				\
 	diamond-mt.pdf				\
 	diamond-core.pdf
+
+include ../Makefile.common
 
 # diamond, clustered.
 diamond.clusters:

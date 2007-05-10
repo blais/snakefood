@@ -5,6 +5,8 @@
 snakefood
 =========
 
+- Do not warn on builtin modules not being found.
+
 - Finish complete test suite.
 
 - Feature: When recursing through files, check for non .py files that

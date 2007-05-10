@@ -17,8 +17,7 @@
 # Do not delete intermediate dot files from chained implicit rules.
 .PRECIOUS: %.dot
 
-
-all: $$(PDFS)
+all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps:
