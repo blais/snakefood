@@ -1,5 +1,12 @@
-# Compute the dependencies for the EWT codebase.
+# Graph the dependencies for zooko's pyutil.
+include ../Makefile.common
 
 ROOT=$(HOME)/src/pyutil-1.0.5
 
-FIXME TODO
+PDFS =						\
+	pyutil.pdf
+
+
+pyutil.deps: raw.deps
+	cp $< $@
+
