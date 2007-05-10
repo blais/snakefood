@@ -5,8 +5,10 @@
 snakefood
 =========
 
-- When recursing through files, check for non .py files that may be
-  Python code too and include them.
+- Finish complete test suite.
+
+- Feature: When recursing through files, check for non .py files that
+  may be Python code too and include them.
 
 
 snakefood-clusters
@@ -27,5 +29,6 @@ snakefood-graph
 
 - Support coloring: the program should take some prefixes on the
   command-line and colour the related nodes together.
+
 
 

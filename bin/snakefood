@@ -5,7 +5,7 @@ Detect import statements using the AST parser.
 This script outputs a comma-separated list of tuples:
 
   ((from_root, from_filename), (to_root, to_filename))
-  
+
 The roots are the root directories where the modules lie.  You can use
 snakefood-graph or some other tool to filter, cluster and generate a meaningful
 graph from this list of dependencies.
@@ -42,7 +42,7 @@ class ImportVisitor(object):
                 name = modname
             self.modules.add(name)
 
-def process_file(fn):
+def process_file(fn, inroots):
     "Returns a list of the files it depends on."
     try:
         mod = compiler.parseFile(fn)
@@ -50,34 +50,48 @@ def process_file(fn):
         logging.error("Error processing file '%s':\n\n%s" %
                       (fn, traceback.format_exc(sys.stderr)))
         return []
-        
+
     vis = ImportVisitor()
     compiler.walk(mod, vis)
 
     files = []
     for mod in vis.modules:
-        modfile = find_dotted_module(mod, fn)
+        modfile = find_dotted_module(mod, fn, inroots)
         if modfile is None:
             continue
         files.append(modfile)
     return files
 
-def find_dotted_module(modname, fn):
+def find_dotted_module(modname, fn, inroots):
     """A version of find_module that supports dotted module names (packages)."""
 
     names = modname.split('.')
-    path = sys.path + [dirname(fn)]
-    file_ = None
+    path = [dirname(fn)]
+    out = None
     for name in names:
+
+        # Try local import.
         try:
             (file_, pathname, description) = imp.find_module(name, path)
-            if not isdir(pathname):
-                pathname = dirname(pathname)
-            path = [pathname]
         except ImportError, e:
-            logging.debug("Not a module: '%s'" % modname)
-            break
-    out = file_ and realpath(file_.name)
+            # Try discovered inroots import.
+            try:
+                (file_, pathname, description) = imp.find_module(name, inroots)
+            except ImportError, e:
+                # Try import from builtins and sys.path.
+                try:
+                    (file_, pathname, description) = imp.find_module(name, None)
+                except ImportError, e:
+                    logging.debug("Not a module: '%s'" % modname)
+                    break # Still import the parent of this.
+
+        out = pathname
+        if not isdir(pathname):
+            pathname = dirname(pathname)
+        path = [pathname]
+
+    if out:
+        out = realpath(out)
     return out
 
 def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
@@ -150,37 +164,51 @@ def main():
         logging.warning("Searching for files from root directory.")
         args = ['.']
 
+    # Get the list of package roots for our input files and prepend them to the
+    # module search path to insure localized imports.
+    inroots = sorted(map(find_package_root, args))
+    logging.info("Roots of input:")
+    for root in inroots:
+        logging.info('  %s' % root)
+
+    logging.info("")
+    logging.info("Using path:")
+    for dn in inroots + sys.path:
+        logging.info("  %s" % dn)
+
     # Find all the dependencies.
+    logging.info("")
+    logging.info("Processing files")
     allfiles = defaultdict(set)
     for fn in iter_pyfiles(args):
-        logging.info("Processing %s" % fn)
-        files = process_file(fn)
+        logging.info("  %s" % fn)
+        files = process_file(fn, inroots)
+
+        # When packages are the source of dependencies, remove the __init__
+        # file.  This is important because the targets also do not include the
+        # __init__ (i.e. when "from <package> import <subpackage>" is seen).
+        if basename(fn) == '__init__.py':
+            fn = dirname(fn)
 
         # Make sure all the files at least appear.
-        allfiles[relfile(fn)].add((None, None)) 
+        allfiles[relfile(fn)].add((None, None))
 
         # Add the dependencies.
         for xfn in files:
             allfiles[relfile(fn)].add(relfile(xfn))
-
-    # Get the list of package roots for our input files.
-    inroots = frozenset(map(find_package_root, args))
-    logging.info("")
-    logging.info("Roots of input:")
-    for root in sorted(inroots):
-        logging.info('  %s' % root)
 
     # Output the list of roots found.
     logging.info("")
     logging.info("Found roots:")
     for root in sorted(frozenset(x[0] for x in allfiles.iterkeys())):
         logging.info('  %s' % root)
-    
+
     if opts.internal:
         # Filter out the dependencies that lie outside of the package roots of
         # the input files.
         #
         # Note: this *could* be moved to another script.
+        inroots = frozenset(inroots)
         for from_, targets in allfiles.items():
             if from_[0] not in inroots:
                 del allfiles[from_]
@@ -197,4 +225,5 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
+
 
