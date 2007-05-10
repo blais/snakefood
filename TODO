@@ -5,15 +5,6 @@
 snakefood
 =========
 
-- FIXME: move back the code to use the imp module again, it's faster
-- FIXME: detect builtins, do not warn
-- FIXME: add a test case for from-importing an attribute, should get warning
-
-
-- Do not warn on builtin modules not being found.
-
-- Finish complete test suite.
-
 - Feature: When recursing through files, check for non .py files that
   may be Python code too and include them.
 

@@ -167,6 +167,17 @@ def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
                 for fn in pyfiles:
                     yield join(root, fn)
 
+
+def find_roots(list_dirofn):
+    """
+    Given a list of directories or filenames, find Python files and calculate
+    the entire list of roots.
+    """
+    inroots = set()
+    for fn in iter_pyfiles(list_dirofn):
+        inroots.add(find_package_root(fn))
+    return sorted(inroots)
+
 def find_package_root(fn):
     "Returns the package root for the given Python file."
     # Find the root of the packages.
@@ -218,7 +229,7 @@ def main():
 
     # Get the list of package roots for our input files and prepend them to the
     # module search path to insure localized imports.
-    inroots = sorted(map(find_package_root, args))
+    inroots = find_roots(args)
     logging.info("Roots of input:")
     for root in inroots:
         logging.info('  %s' % root)
@@ -258,7 +269,7 @@ def main():
     logging.info("Found roots:")
     for root in sorted(frozenset(x[0] for x in allfiles.iterkeys())):
         logging.info('  %s' % root)
-
+        
     if opts.internal:
         # Filter out the dependencies that lie outside of the package roots of
         # the input files.
