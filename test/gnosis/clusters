@@ -1,8 +1,11 @@
 disthelper
 gnosis/anon
 gnosis/magic
+gnosis/util/test
 gnosis/util/convert
+gnosis/xml/objectify/test
 gnosis/xml/objectify
+gnosis/xml/pickle/test
 gnosis/xml/pickle
 gnosis/xml/relax
 gnosis/xml/validity

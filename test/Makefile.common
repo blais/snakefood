@@ -11,8 +11,9 @@
 # Define new file types.
 .SUFFIXES: .deps .dot .pdf .clusters
 
-# Allow including this file from anywhere.
-.SECONDEXPANSION:
+# Allow including this file from anywhere. 
+## (only works with GNU make-3.81)
+##.SECONDEXPANSION:
 
 # Do not delete intermediate dot files from chained implicit rules.
 .PRECIOUS: %.dot
