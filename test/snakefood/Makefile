@@ -10,8 +10,9 @@ stdlib:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
-
-
+invalid:
+	snakefood $@.py > $@.deps 2> $@.log
+	diff $@.deps $@.expect
 
 clean:
 	rm -f *.deps *.log
