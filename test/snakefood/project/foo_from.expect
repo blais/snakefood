@@ -1,0 +1,4 @@
+(('/home/blais/p/snakefood/test/snakefood', 'project/foo_from.py'), (None, None))
+(('/home/blais/p/snakefood/test/snakefood', 'project/foo_from.py'), ('/home/blais/p/snakefood/test/snakefood', 'project'))
+(('/home/blais/p/snakefood/test/snakefood', 'project/foo_from.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/bar.py'))
+(('/home/blais/p/snakefood/test/snakefood', 'project/foo_from.py'), ('/home/blais/p/snakefood/test/snakefood', 'project/sub1'))

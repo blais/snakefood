@@ -11,3 +11,7 @@ import bli
 # Relative package
 import sub2
 
+# Not found.
+import project.alien
+import project.alien.alien2
+

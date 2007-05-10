@@ -33,6 +33,12 @@ def find_mod(modname, fn):
 
 
 
+## print find_module('ctypes.util')
+## print find_module('util', '/usr/lib/python2.5/ctypes/__init__.py')
+## raise SystemExit
+
+
+
 import sys, os, os.path
 find_mod('sys', os.__file__)
 find_mod('os', os.__file__)

@@ -3,29 +3,22 @@
 .SUFFIXES: .py .deps .log
 
 
-TARGETS = 					\
-	simple/stdlib 				\
+TARGETS =					\
+	simple/stdlib				\
 	simple/invalid				\
-	simple/relative				\
-	simple/notfound
+	simple/notfound				\
+	project/foo_import			\
+	project/foo_from
 
 all: $(TARGETS)
 
 # Check the standard library.
-simple/stdlib:
+simple/stdlib simple/invalid simple/notfound:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
-simple/invalid:
+project/foo_import project/foo_from:
 	snakefood $@.py > $@.deps 2> $@.log
-	diff $@.deps $@.expect
-
-simple/notfound:
-	snakefood $@.py > $@.deps 2> $@.log
-	diff $@.deps $@.expect
-
-simple/relative:
-	snakefood project/foo_*.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
 clean:
