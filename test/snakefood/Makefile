@@ -3,23 +3,28 @@
 .SUFFIXES: .py .deps .log
 
 
-all: stdlib invalid relative notfound
+TARGETS = 					\
+	simple/stdlib 				\
+	simple/invalid				\
+	simple/relative				\
+	simple/notfound
 
+all: $(TARGETS)
 
 # Check the standard library.
-stdlib:
+simple/stdlib:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
-invalid:
+simple/invalid:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
-notfound:
+simple/notfound:
 	snakefood $@.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
-relative:
+simple/relative:
 	snakefood project/foo_*.py > $@.deps 2> $@.log
 	diff $@.deps $@.expect
 
