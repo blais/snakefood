@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Builtin modules.
-import sys, imp
+import sys, imp, signal
 
 # Special modules (runtime only).
 import os.path

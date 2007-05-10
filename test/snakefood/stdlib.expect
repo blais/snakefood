@@ -1,6 +1,6 @@
 (('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), (None, None))
 (('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 'StringIO.py'))
-(('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 'ctypes/util.py'))
+(('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 'ctypes'))
 (('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 'os.py'))
 (('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 're.py'))
 (('/home/blais/p/snakefood/test/snakefood', 'stdlib.py'), ('/usr/lib/python2.5', 'urllib.py'))
