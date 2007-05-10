@@ -1,0 +1,49 @@
+# Common rules for all tests.
+#
+# The tests only have to define the following variables and rules:
+#
+# - ROOT: the root of the source
+# - PDFS: the list of Pdf files to be generated.
+# - For each of the Pdf files, a rule that generates either a .deps file or a
+#   .clusters file (there is a rule that automatically generates a clusted .deps
+#   from a .clusters if required).
+
+# Define new file types.
+.SUFFIXES: .deps .dot .pdf .clusters
+
+# Allow including this file from anywhere.
+.SECONDEXPANSION:
+
+# Do not delete intermediate dot files from chained implicit rules.
+.PRECIOUS: %.dot
+
+
+all: $$(PDFS)
+
+# Generate the raw list of dependencies for the entire codebase.
+raw.deps:
+	snakefood --internal-only $(ROOT) > $@
+
+# Implicit rules.
+.deps.dot:
+	cat $< | snakefood-graph -p > $@
+
+.dot.pdf:
+	cat $< | dot -Tps | ps2pdf - > $@
+
+# Implicit rule to convert the raw.deps file simply from the existence of a
+# .clusters file.
+%.deps: %.clusters raw.deps 
+	cat raw.deps | snakefood-cluster -f $< > $@
+
+# Clean everything but the costly raw dependencies.
+clean:
+	rm -f *.clusters
+	ls -1 *.deps | grep -v ^raw.deps | xargs rm -f
+	rm -f *.dot
+	rm -f *.pdf
+
+# Really clean everything.
+realclean: clean
+	rm -f raw.deps
+

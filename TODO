@@ -5,21 +5,18 @@
 snakefood
 =========
 
-- Add an option to only report dependencies inside of roots of the
-  files and directories that were specified on the command-line.  This
-  would be a very useful option! TODO:
-
-  - For each of the files specified as arguments, get the package root
-  - Before doing the final output, filter out entries whose from_root
-    or to_root are not in this set.
-
 - When recursing through files, check for non .py files that may be Python code
   too and include them.
-
 
 
 snakefood-graph
 ===============
 
-- Support dot subgraphs somehow.
+- Support dot subgraphs somehow.  This program should be able to take
+  some prefixes on the command-line and group the nodes together
+  somehow.
+
+- Support coloring: the program should take some prefixes on the
+  command-line and colour the related nodes together.
+
 

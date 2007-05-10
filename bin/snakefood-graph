@@ -3,9 +3,8 @@
 Read snakefood dependencies and output a visual graph.
 """
 
-import sys, os, re
+import sys, os, logging
 from os.path import *
-from collections import defaultdict
 
 
 # (Refactor candidate.)
