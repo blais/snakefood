@@ -5,8 +5,17 @@
 snakefood
 =========
 
-- When recursing through files, check for non .py files that may be Python code
-  too and include them.
+- When recursing through files, check for non .py files that may be
+  Python code too and include them.
+
+
+snakefood-clusters
+==================
+
+- Support non-prefix clusters: We could try clustering a variety of
+  modules by hand, according to the documentation groupings, but that
+  would require supporting cluster groups that do not depend on a
+  filename prefix.  Do that for stdlib analysis.
 
 
 snakefood-graph
