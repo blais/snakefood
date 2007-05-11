@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Usage Instructions</title>
+<meta name="date" content="2007-05-10" />
+<link rel="stylesheet" href="../style.css" type="text/css" />
+</head>
+<body>
+
+<div id="project-header">
+  <a href="/"><img src="/home/furius-logo-w.png" id="logo"></a>
+  <div id="project-home"><a href="..">Project Home</a></div>
+</div>
+
+<div class="document" id="usage-instructions">
+<h1 class="title">Usage Instructions</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Date:</th>
+<td>2007-05-10</td></tr>
+</tbody>
+</table>
+<div class="abstract topic">
+<p class="topic-title first">Abstract</p>
+<p>Documentation for using snakefood.</p>
+</div>
+<div class="section">
+<h1><a id="basic-usage" name="basic-usage">Basic Usage</a></h1>
+<p>You need to install graphviz to generate graphs.</p>
+<pre class="literal-block">
+cd myproject
+snakefood -i &gt; /tmp/myproject.defs
+cat /tmp/myproject.defs | snakefood-graph | dot -Tps | ps2pdf - &gt; /tmp/myproject.pdf
+</pre>
+</div>
+</div>
+</body>
+</html>
