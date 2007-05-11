@@ -2,26 +2,6 @@
    TODO: snakefood
 =====================
 
-- Add documentation
-
-  * The simplest possible run.
-
-      “but this probably won't do what you want it to.”
-      “there is not formula for filtering, that has to be a custom
-       process.  See the Makefile provided in the test directory.”
-
-  * Show the makefile rules.
-
-  * Create a flow diagram of the different kinds of types generated.
-
-    - Show what the various scripts do.
-
-  * Explain the format of the deps file, including the special case of
-    None, None.
-
-  * Explain --internal
-
-
 snakefood
 =========
 
@@ -59,5 +39,28 @@ snakefood-graph
 - Support coloring: the program should take some prefixes on the
   command-line and colour the related nodes together.
 
+
+
+Documentation
+=============
+
+Add this documentation before 1.0:
+
+  * The simplest possible run.
+
+      “but this probably won't do what you want it to.”
+      “there is not formula for filtering, that has to be a custom
+       process.  See the Makefile provided in the test directory.”
+
+  * Show the makefile rules.
+
+  * Create a flow diagram of the different kinds of types generated.
+
+    - Show what the various scripts do.
+
+  * Explain the format of the deps file, including the special case of
+    None, None.
+
+  * Explain --internal
 
 
