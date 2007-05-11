@@ -17,6 +17,8 @@ snakefood
 
 - Modify the makefiles to keep the log files around.
 
+- Add the missing codebases to tests
+
 
 snakefood-clusters
 ==================
