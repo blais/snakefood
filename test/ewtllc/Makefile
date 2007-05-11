@@ -4,8 +4,9 @@ ROOT=$(HOME)/p/diamond/src
 
 PDFS =						\
 	diamond.pdf				\
-	diamond-mt.pdf				\
-	diamond-core.pdf
+	mt.pdf					\
+	core.pdf				\
+	apps.pdf
 
 include ../Makefile.common
 
@@ -14,10 +15,12 @@ diamond.clusters:
 	(cd $(ROOT); ls -1d */* | grep -v \\. > $(shell pwd)/$@)
 
 # Without mtt.
-diamond-mt.deps: diamond.deps
+mt.deps: diamond.deps
 	cat $< | grep -v mtt/ > $@
 
 # With the core package exploded.
-diamond-core.clusters: 
+core.clusters: 
 	(cd $(ROOT); ls -1d */* | grep -v \\. | grep -v /core > $(shell pwd)/$@)
 
+apps.clusters:
+	(cd $(ROOT); ls -1d mt/{gui,apps}/* | grep -v \\. ; echo mt ) > $(shell pwd)/$@

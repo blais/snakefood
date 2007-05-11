@@ -30,6 +30,9 @@ snakefood-clusters
 
   Each of these clusters should be called "cluster groups".
 
+- Add an option filter out/ignore all the files that are not in a
+  declared cluster.
+
 
 snakefood-graph
 ===============
