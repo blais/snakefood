@@ -46,7 +46,7 @@ snakefood-graph
 Documentation
 =============
 
-Add this documentation before 1.0:
+- Add this documentation before 1.0:
 
   * The simplest possible run.
 
@@ -64,5 +64,8 @@ Add this documentation before 1.0:
     None, None.
 
   * Explain --internal
+
+- Prepare submission and slides for PyCon presentation
+
 
 
