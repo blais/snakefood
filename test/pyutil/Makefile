@@ -7,6 +7,7 @@ PDFS =						\
 
 include ../Makefile.common
 
+# No clusters.
 pyutil.deps: raw.deps
 	cp $< $@
 

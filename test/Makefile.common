@@ -16,7 +16,7 @@
 ##.SECONDEXPANSION:
 
 # Do not delete intermediate dot files from chained implicit rules.
-.PRECIOUS: %.dot
+.PRECIOUS: %.dot %.deps .clusters
 
 all: $(PDFS)
 

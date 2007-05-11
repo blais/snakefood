@@ -2,11 +2,40 @@
    TODO: snakefood
 =====================
 
+- Add documentation
+
+  * The simplest possible run.
+
+      “but this probably won't do what you want it to.”
+      “there is not formula for filtering, that has to be a custom
+       process.  See the Makefile provided in the test directory.”
+
+  * Show the makefile rules.
+
+  * Create a flow diagram of the different kinds of types generated.
+
+    - Show what the various scripts do.
+
+  * Explain the format of the deps file, including the special case of
+    None, None.
+
+  * Explain --internal
+
+
 snakefood
 =========
 
 - Feature: When recursing through files, check for non .py files that
   may be Python code too and include them.
+
+- Create a new snakefood-filter script that does the same as
+  --internal.
+
+- At the end of the run, you should output a clean list of all the
+  modules that were not found, and if in debug mode, of all the
+  symbols that were not modules, in one list.
+
+- Modify the makefiles to keep the log files around.
 
 
 snakefood-clusters
@@ -16,6 +45,8 @@ snakefood-clusters
   modules by hand, according to the documentation groupings, but that
   would require supporting cluster groups that do not depend on a
   filename prefix.  Do that for stdlib analysis.
+
+  Each of these clusters should be called "cluster groups".
 
 
 snakefood-graph
