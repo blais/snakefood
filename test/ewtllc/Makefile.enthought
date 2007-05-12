@@ -1,0 +1,18 @@
+# Graph the dependencies for the EWT codebase.
+
+ROOT=$(HOME)/p/enthought.mt/experiments/signal
+
+PDFS =						\
+	signal.pdf
+
+include ../Makefile.common
+
+raw.deps: 
+	snakefood --debug $(FOOD_FLAGS) $(ROOT) > $@
+
+signal.deps: signal.clusters raw.deps
+	cat raw.deps | snakefood-cluster -f $< | grep -v /usr/lib/python > $(shell pwd)/$@
+
+signal.clusters:
+	(cd $(ROOT); ls -1d * | grep -v \\. > $(shell pwd)/$@)
+

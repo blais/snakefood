@@ -143,10 +143,18 @@ def find_dotted(names, parentdir=None):
 
 
 
-def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
-    """Yield all the files ending with .py recursively.  'dirsorfn' is a list of
-    filenames or directories."""
-    for dn in dirsorfn:
+_iter_ignores = ['.svn', 'CVS', 'build']
+# Note: 'build' is for those packages which have been installed with setup.py.
+# It is pretty common to forget these around.
+
+def iter_pyfiles(dirsorfns, ignores=None):
+    """Yield all the files ending with .py recursively.  'dirsorfns' is a list
+    of filenames or directories."""
+    assert isinstance(dirsorfns, (list, tuple))
+    assert isinstance(ignores, list)
+
+    ignores = ignores or _iter_ignores
+    for dn in dirsorfns:
         dn = realpath(dn)
 
         if not isdir(dn):
@@ -168,13 +176,13 @@ def iter_pyfiles(dirsorfn, ignores=('.svn', 'CVS')):
                     yield join(root, fn)
 
 
-def find_roots(list_dirofn):
+def find_roots(list_dirofn, ignores):
     """
     Given a list of directories or filenames, find Python files and calculate
     the entire list of roots.
     """
     inroots = set()
-    for fn in iter_pyfiles(list_dirofn):
+    for fn in iter_pyfiles(list_dirofn, ignores):
         inroots.add(find_package_root(fn))
     return sorted(inroots)
 
@@ -218,6 +226,9 @@ def main():
                       help="Filter out dependencies that are outside of the "
                       "roots of the input files")
 
+    parser.add_option('-I', '--ignore', dest='ignores', action='append', default=[],
+                      help="Add the given directory name to the list to be ignored.")
+
     parser.add_option('--debug', action='store_true', help="Turn on debugging")
 
     opts, args = parser.parse_args()
@@ -229,7 +240,7 @@ def main():
 
     # Get the list of package roots for our input files and prepend them to the
     # module search path to insure localized imports.
-    inroots = find_roots(args)
+    inroots = find_roots(args, opts.ignores)
     logging.info("Roots of input:")
     for root in inroots:
         logging.info('  %s' % root)
@@ -244,7 +255,7 @@ def main():
     logging.info("")
     logging.info("Processing files")
     allfiles = defaultdict(set)
-    for fn in iter_pyfiles(args):
+    for fn in iter_pyfiles(args, opts.ignores):
         logging.info("  %s" % fn)
         files = process_file(fn)
 

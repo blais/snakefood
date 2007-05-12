@@ -19,9 +19,13 @@ snakefood
 
 - Add the missing codebases to tests
 
+- Move --debug to --verbose, with type 'count'.  -v should enable
+  DEBUG logging.  -vv should also print the offending code lines (see
+  if the AST has a reference to the source code somehow).
 
-snakefood-clusters
-==================
+
+snakefood-cluster
+=================
 
 - Support non-prefix clusters: We could try clustering a variety of
   modules by hand, according to the documentation groupings, but that
@@ -30,8 +34,8 @@ snakefood-clusters
 
   Each of these clusters should be called "cluster groups".
 
-- Add an option filter out/ignore all the files that are not in a
-  declared cluster.
+- Add an option filter out/ignore all the files that are not in the
+  declared clusters.
 
 
 snakefood-graph
