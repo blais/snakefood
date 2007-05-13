@@ -2,6 +2,7 @@
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'StringIO.py'))
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'ctypes/util.py'))
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'imp'))
+(('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'os.path'))
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'os.py'))
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 're.py'))
 (('/home/blais/p/snakefood/test/snakefood/simple', 'stdlib.py'), ('/usr/lib/python2.5', 'signal'))

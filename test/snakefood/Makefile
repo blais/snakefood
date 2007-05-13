@@ -12,14 +12,10 @@ TARGETS =					\
 
 all: $(TARGETS)
 
-# Check the standard library.
-simple/stdlib simple/invalid simple/notfound:
-	snakefood $@.py > $@.deps 2> $@.log
-	diff $@.deps $@.expect
-
-project/foo_import project/foo_from:
-	snakefood $@.py > $@.deps 2> $@.log
-	diff $@.deps $@.expect
+simple/stdlib simple/invalid simple/notfound project/foo_import project/foo_from:
+	@echo "Testing $@"
+	@snakefood $@.py > $@.deps 2> $@.log
+	@diff $@.expect $@.deps
 
 clean:
 	rm -f *.deps *.log
