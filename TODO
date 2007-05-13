@@ -26,6 +26,8 @@ snakefood
   DEBUG logging.  -vv should also print the offending code lines (see
   if the AST has a reference to the source code somehow).
 
+- Check that it can load file without the .py extension.
+
 
 snakefood-cluster
 =================
@@ -54,6 +56,9 @@ snakefood-graph
 
 - Support coloring: the program should take some prefixes on the
   command-line and colour the related nodes together.
+
+- By default, it should ignore redundant dependencies (right now it
+  does not).  Add an option to disable that feature.
 
 
 

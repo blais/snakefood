@@ -3,9 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
-<title>Usage Instructions</title>
+<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<title>Snakefood Documentation</title>
 <meta name="date" content="2007-05-10" />
+<meta name="author" content="Martin Blais &lt;blais&#64;furius.ca&gt;" />
 <link rel="stylesheet" href="../style.css" type="text/css" />
 </head>
 <body>
@@ -15,28 +16,372 @@
   <div id="project-home"><a href="..">Project Home</a></div>
 </div>
 
-<div class="document" id="usage-instructions">
-<h1 class="title">Usage Instructions</h1>
+<div class="document" id="snakefood-documentation">
+<h1 class="title">Snakefood Documentation</h1>
 <table class="docinfo" frame="void" rules="none">
 <col class="docinfo-name" />
 <col class="docinfo-content" />
 <tbody valign="top">
 <tr><th class="docinfo-name">Date:</th>
 <td>2007-05-10</td></tr>
+<tr><th class="docinfo-name">Author:</th>
+<td>Martin Blais &lt;<a class="reference" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</td></tr>
 </tbody>
 </table>
-<div class="abstract topic">
-<p class="topic-title first">Abstract</p>
-<p>Documentation for using snakefood.</p>
+<div class="contents topic">
+<p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
+<ul class="simple">
+<li><a class="reference" href="#introduction" id="id1" name="id1">Introduction</a><ul>
+<li><a class="reference" href="#what-is-a-dependency" id="id2" name="id2">What is a Dependency?</a></li>
+</ul>
+</li>
+<li><a class="reference" href="#seconds-usage-instructions" id="id3" name="id3">30-seconds Usage Instructions</a></li>
+<li><a class="reference" href="#installation" id="id4" name="id4">Installation</a></li>
+<li><a class="reference" href="#overview" id="id5" name="id5">Overview</a></li>
+<li><a class="reference" href="#generating-dependencies" id="id6" name="id6">Generating Dependencies</a><ul>
+<li><a class="reference" href="#how-packages-are-automatically-found" id="id7" name="id7">How Packages Are Automatically Found</a></li>
+<li><a class="reference" href="#following-dependencies" id="id8" name="id8">Following Dependencies</a></li>
+<li><a class="reference" href="#restricting-dependencies" id="id9" name="id9">Restricting Dependencies</a></li>
+<li><a class="reference" href="#the-format-of-dependencies-files" id="id10" name="id10">The Format of Dependencies Files</a></li>
+<li><a class="reference" href="#caching-raw-dependencies" id="id11" name="id11">Caching Raw Dependencies</a><ul>
+<li><a class="reference" href="#nodes-without-dependencies" id="id12" name="id12">Nodes Without Dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference" href="#filtering-and-clustering-dependencies" id="id13" name="id13">Filtering and Clustering Dependencies</a><ul>
+<li><a class="reference" href="#using-standard-unix-tools" id="id14" name="id14">Using Standard UNIX Tools</a></li>
+<li><a class="reference" href="#using-snakefood-cluster" id="id15" name="id15">Using <tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt></a></li>
+</ul>
+</li>
+<li><a class="reference" href="#using-a-makefile" id="id16" name="id16">Using a Makefile</a></li>
+<li><a class="reference" href="#feedback-and-comments" id="id17" name="id17">Feedback and Comments</a></li>
+</ul>
 </div>
-<div class="section" id="basic-usage">
-<h1>Basic Usage</h1>
-<p>You need to install graphviz to generate graphs.</p>
+<!-- 1  Introduction
+  1.1  What is a Dependency?
+2  30-seconds Usage Instructions
+3  Installation
+4  Overview
+5  Generating Dependencies
+  5.1  How Packages Are Automatically Found
+  5.2  Following Dependencies
+  5.3  Restricting Dependencies
+  5.4  The Format of Dependencies Files
+  5.5  Caching Raw Dependencies
+    5.5.1  Nodes Without Dependencies
+6  Filtering and Clustering Dependencies
+  6.1  Using Standard UNIX Tools
+  6.2  Using ``snakefood-cluster``
+7  Using a Makefile
+8  Feedback and Comments -->
+<div class="section">
+<h1><a class="toc-backref" href="#id1" id="introduction" name="introduction">Introduction</a></h1>
+<p>This is the documentation for Snakefood, a dependency graph generator
+for Python source code (written in Python).</p>
+<div class="section">
+<h2><a class="toc-backref" href="#id2" id="what-is-a-dependency" name="what-is-a-dependency">What is a Dependency?</a></h2>
+<p>In this document, dependencies are import relationships between Python
+source files.  If file <tt class="docutils literal"><span class="pre">a.py</span></tt> imports some code from file <tt class="docutils literal"><span class="pre">b.py</span></tt>,
+we say that <tt class="docutils literal"><span class="pre">a.py</span></tt> <em>depends on</em> <tt class="docutils literal"><span class="pre">b.py</span></tt>, or that <tt class="docutils literal"><span class="pre">a.py</span></tt> has a
+dependency on <tt class="docutils literal"><span class="pre">b.py</span></tt>.</p>
+<p>Controlling the dependencies between the various parts of your code
+(or between projects that your code uses) is a powerful way to
+increase the reusability of your code: the least amount of
+dependencies a body of source code has, the greater the likelihood
+that this code will be usable in the future.  Dependencies cause codes
+to break due to the independent evolution of modules and changes in
+the interfaces.  Even within a single project, controlling
+dependencies between layers is the essence of modularity.</p>
+<p>Snakefood allows you to automatically generate a visual graph of those
+dependencies.  When you produce these kinds of graphs, you will often
+be surprised at how certain parts of your code inadvertently become
+tied together.  Dependency graphs allow you to view the relationships
+clearly and will generate questions about the high-level organization
+of your code and allow to improve modularity and reusability.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id3" id="seconds-usage-instructions" name="seconds-usage-instructions">30-seconds Usage Instructions</a></h1>
+<p>(For the impatient.)  You will need Graphviz.  Snakefood generates a
+dot file (Graphviz input file).  Here is the simplest way to generate
+a graph:</p>
 <pre class="literal-block">
-cd myproject
-snakefood -i &gt; /tmp/myproject.defs
-cat /tmp/myproject.defs | snakefood-graph | dot -Tps | ps2pdf - &gt; /tmp/myproject.pdf
+snakefood /myproject | snakefood-graph | dot -Tps | pstopdf -i -o myproject.pdf
 </pre>
+<p>However <strong>this will probably not do what you want</strong>, unless your
+project is pretty small.  The dependency graphs for reasonably sized
+projects are generally complex, and you will want to filter out some
+of the dependencies, and cluster some of them in logical groups of
+files or by directory (see the text for the <tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt>
+tool).</p>
+<p>Read on for more details on how to use these tools.</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id4" id="installation" name="installation">Installation</a></h1>
+<ul>
+<li><p class="first">You need to install Python-2.5 or greater.</p>
+</li>
+<li><p class="first">You need to Graphviz tools to generate graphs.  Snakefood produces
+input files for Graphviz.</p>
+</li>
+<li><p class="first">To install the Snakefood tools themselves, just run the usual
+distutils command:</p>
+<pre class="literal-block">
+cd snakefood-&lt;version&gt;
+python setup.py install   # as root
+</pre>
+</li>
+</ul>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id5" id="overview" name="overview">Overview</a></h1>
+<p>Snakefood provides three main tools:</p>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">snakefood</span></tt>: Given a set of input files or root directories,
+generate a list of dependencies between the files;</li>
+<li><tt class="docutils literal"><span class="pre">snakefood-graph</span></tt>: Read a list of dependencies and produce a
+Graphviz dot file.  This file can be run through the Graphviz
+<tt class="docutils literal"><span class="pre">dot</span></tt> tool to produce a viewable/printable PDF file;</li>
+<li><tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt> (optional use): Read a list of dependencies,
+a list of file clusters, and output a list of simplified
+(clustered) dependencies.</li>
+</ol>
+<p>Typically, you will use <tt class="docutils literal"><span class="pre">snakefood</span></tt> to generate the dependencies,
+pass those on to <tt class="docutils literal"><span class="pre">snakefood-graph</span></tt> and pass its output to <tt class="docutils literal"><span class="pre">dot</span></tt> to
+generate your output PDF file.</p>
+<div class="figure">
+<img alt="programs1.png" src="programs1.png" />
+<p class="caption">Simple pipeline for generating a full dependency graph.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id6" id="generating-dependencies" name="generating-dependencies">Generating Dependencies</a></h1>
+<p>To generate the dependencies, you use the <tt class="docutils literal"><span class="pre">snakefood</span></tt> tool, giving
+it a list of filenames:</p>
+<pre class="literal-block">
+snakefood file1.py file2.py file3.py
+</pre>
+<p>You can also use directories:</p>
+<pre class="literal-block">
+snakefood /path/to/my/project
+</pre>
+<p>If you specify directories, <tt class="docutils literal"><span class="pre">snakefood</span></tt> will recurse through them
+and automatically find all the Python source files and process them.
+Each file is processed independently, giving the file to <tt class="docutils literal"><span class="pre">snakefood</span></tt>
+means &#8220;output the dependencies of this file&#8221;.</p>
+<p><tt class="docutils literal"><span class="pre">snakefood</span></tt> finds the dependencies in your source files using the
+AST parser.  It does not figure out which <tt class="docutils literal"><span class="pre">import</span></tt> statements run
+conditionally; it simply finds all the imports in the file and outputs
+dependencies for each of them.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>Note that none of the module your specify on the command-line are
+loaded nor run.  Loading modules is almost always problem, because
+a lot of codebases run initialization code in the global namespace,
+which often requires additional setup.  Snakefood is guaranteed not
+to have this problem: it just runs on your code;  the worst thing
+that can happen is that it misses some dependencies.</p>
+<p class="last">A problem with dependency trackers that run code is that they are
+unreliable too, due to the dynamic nature of Python: the presence
+of imports within function calls and <tt class="docutils literal"><span class="pre">__import__</span></tt> hooks makes it
+almost impossible to always do the right thing.  This script aims
+at being right 95% of the time, and we think that given the
+trade-offs, 95% is good enough for 95% of its uses.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id7" id="how-packages-are-automatically-found" name="how-packages-are-automatically-found">How Packages Are Automatically Found</a></h2>
+<p>For each file that it processes, <tt class="docutils literal"><span class="pre">snakefood</span></tt> automatically figures
+out which package it comes from.  It does this by walk up the
+directory hierarchy of each file until it finds a directory without a
+<tt class="docutils literal"><span class="pre">__init__.py</span></tt> file.</p>
+<p>All of the package roots found this way are automatically prepended to
+the Python import path, so you do not have to configure your
+PYTHONPATH before you invoke <tt class="docutils literal"><span class="pre">snakefood</span></tt>.  The roots are also used
+to separate the filename in two parts: the package root, and the
+filename relative to that root (see the section on dependencies format
+below).</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id8" id="following-dependencies" name="following-dependencies">Following Dependencies</a></h2>
+<p>By default, <tt class="docutils literal"><span class="pre">snakefood</span></tt> does not <em>follow</em> dependencies, that is, if
+you ask it to process <tt class="docutils literal"><span class="pre">a.py</span></tt> and it finds that it has a dependency
+on <tt class="docutils literal"><span class="pre">b.py</span></tt>, the file <tt class="docutils literal"><span class="pre">b.py</span></tt> does not get processed for its
+dependencies.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>(FUTURE FEATURE)</p>
+<p class="last">Use the <tt class="docutils literal"><span class="pre">--follow</span></tt> option to tell <tt class="docutils literal"><span class="pre">snakefood</span></tt> to follow its
+dependencies.  Files for each target dependency that were found are
+automatically examined for dependencies, and the process continues
+until all leaves are found (we check for cycles too).</p>
+</div>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id9" id="restricting-dependencies" name="restricting-dependencies">Restricting Dependencies</a></h2>
+<p>Normally you will want to find out the relationships only between
+files in the packages that you provide on the command-line.  For
+example, you will probably not be interested to find out about
+dependencies to the modules in the standard library that comes with
+Python.</p>
+<p>You can filter out the dependencies by yourself using the usual UNIX
+tools, like <tt class="docutils literal"><span class="pre">grep</span></tt> or <tt class="docutils literal"><span class="pre">sed</span></tt>, but since this is a typical case,
+there is a convenient <tt class="docutils literal"><span class="pre">--internal-only</span></tt> option to <tt class="docutils literal"><span class="pre">snakefood</span></tt> that
+automatically filters out dependencies to modules found outside of the
+package roots that you specify on the command-line.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id10" id="the-format-of-dependencies-files" name="the-format-of-dependencies-files">The Format of Dependencies Files</a></h2>
+<p>The format of dependencies is really simple:</p>
+<pre class="literal-block">
+((&lt;source_package_root&gt;, &lt;source_file.py&gt;), (&lt;dest_package_root&gt;, &lt;dest_file.py&gt;))
+</pre>
+<p>where the <tt class="docutils literal"><span class="pre">package_root</span></tt> files are the directory names at the root
+where the module files are found, and the <tt class="docutils literal"><span class="pre">file.py</span></tt> names are the
+Python filenames relative to the corresponding root.</p>
+<p>Each line is a valid Python tuple expression, so you can easily write
+a Python script to process them using a line like:</p>
+<pre class="literal-block">
+for dep in map(eval, sys.stdin.xreadlines()):
+    ...
+</pre>
+<p>and output them like:</p>
+<pre class="literal-block">
+dep = (froot, fn), (troot, tn)
+print repr(dep)
+</pre>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id11" id="caching-raw-dependencies" name="caching-raw-dependencies">Caching Raw Dependencies</a></h2>
+<p>The process of building a nicely filtered dependency graph is
+iterative, you will typically massage the dependencies to highlight
+the relationships that you care about.  Since calculating the
+dependencies can be a slow process (and filtering and graph generation
+is not), we recommend to save the output of <tt class="docutils literal"><span class="pre">snakefood</span></tt> to a file
+and work from that.</p>
+<div class="section">
+<h3><a class="toc-backref" href="#id12" id="nodes-without-dependencies" name="nodes-without-dependencies">Nodes Without Dependencies</a></h3>
+<p>To insure that all the file nodes show up in the graph, for each
+processed file we output a line like this:</p>
+<pre class="literal-block">
+((&lt;source_package_root&gt;, &lt;source_file.py&gt;), (None, None))
+</pre>
+<p>The graphing tool interprets that to mean it has to at least create a
+node for <tt class="docutils literal"><span class="pre">&lt;source_file&gt;.py</span></tt>, even if it has no dependency.  Scripts
+you write to filter the dependencies need to be able to interpret
+those lines appropriately.</p>
+</div>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id13" id="filtering-and-clustering-dependencies" name="filtering-and-clustering-dependencies">Filtering and Clustering Dependencies</a></h1>
+<div class="section">
+<h2><a class="toc-backref" href="#id14" id="using-standard-unix-tools" name="using-standard-unix-tools">Using Standard UNIX Tools</a></h2>
+<p>Since dependencies are simple line-based Python expressions, you can
+use <tt class="docutils literal"><span class="pre">grep</span></tt> or <tt class="docutils literal"><span class="pre">sed</span></tt> to filter out or modify unwanted lines:</p>
+<pre class="literal-block">
+cat raw.deps | grep -v /usr/lib/python | snakefood-graph &gt; out.dot
+</pre>
+<p>There is no formula for filtering or reformatting the dependencies; it
+depends on your codebase and what you want the graph to show.</p>
+</div>
+<div class="section">
+<h2><a class="toc-backref" href="#id15" id="using-snakefood-cluster" name="using-snakefood-cluster">Using <tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt></a></h2>
+<p>A useful operation is to transform the relative filenames into logical
+groups and to remove redundant lines.  We call this &#8220;clustering&#8221;.  A
+common example is to lump together all the filenames that start with a
+particular directory prefix.</p>
+<p>You could do this with <tt class="docutils literal"><span class="pre">sed</span></tt> but you also need to remove redundant
+lines to do it properly, i.e. after simplification of the relative
+filenames, multiple lines will be equivalent.  <tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt>
+does that automatically.  You create a file of cluster names:</p>
+<pre class="literal-block">
+pack1
+pack2
+</pre>
+<p>and a dependency file will be transformed from this:</p>
+<pre class="literal-block">
+(('/myproject', 'pack1/person.py'), ('/myproject', 'pack1/employee.py'))
+(('/myproject', 'pack1/person.py'), ('/myproject', 'pack1/manager.py'))
+(('/myproject', 'pack1/person.py'), ('/myproject', 'pack2/boss.py'))
+</pre>
+<p>to this:</p>
+<pre class="literal-block">
+(('/myproject', 'pack1'), ('/myproject', 'pack1'))
+(('/myproject', 'pack1'), ('/myproject', 'pack2'))
+</pre>
+<p>Here is how to use the <tt class="docutils literal"><span class="pre">snakefood-cluster</span></tt> tool:</p>
+<pre class="literal-block">
+snakefood /myproject | snakefood-cluster -f clusters | snakefood-graph &gt; myproject.dot
+</pre>
+<div class="figure">
+<img alt="programs2.png" src="programs2.png" />
+<p class="caption">Pipeline for dependency graph with clustering.</p>
+</div>
+<p>You can either create the <tt class="docutils literal"><span class="pre">clusters</span></tt> file manually to with a
+<tt class="docutils literal"><span class="pre">find</span></tt> or <tt class="docutils literal"><span class="pre">ls</span></tt> command in your source tree.</p>
+</div>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id16" id="using-a-makefile" name="using-a-makefile">Using a Makefile</a></h1>
+<p>If you will repeatedly compute the dependencies for a codebase that
+you maintain, you could write a simple script to do all the custom
+things that you need to, for example:</p>
+<pre class="literal-block">
+# Generate the raw dependencies.
+snakefood /myproject &gt; /tmp/raw.deps
+
+# Filter and cluster.
+cd /myproject ; ls -1d * &gt; /tmp/clusters
+cat /tmp/raw.deps | grep -v test_widget | snakefood-cluster -f /tmp/clusters &gt; /tmp/filt.deps
+
+# Generate the graph.
+cat /tmp/filt.deps | snakefood-graph -p | dot -Tps | pstopdf -i -o /tmp/myproject.pdf
+</pre>
+<p>While this will work, a better way to write such a script is to use a
+makefile.</p>
+<p>Here is an example for a simple self-contained <tt class="docutils literal"><span class="pre">Makefile</span></tt> that will
+process the relevant dependencies as above:</p>
+<pre class="literal-block">
+ROOT = /myproject
+PDFS = myproject.pdf
+
+.SUFFIXES: .deps .dot .pdf .clusters
+
+all: $(PDFS)
+
+raw.deps: $(ROOT)
+        snakefood -i $(ROOT) $(FOOD_FLAGS) &gt; $&#64;
+
+clusters: $(ROOT)
+        cd $(ROOT) ; ls -1d * &gt; $&#64;
+
+filt.deps: clusters raw.deps
+        cat raw.deps | snakefood-cluster -f $&lt; &gt; $&#64;
+
+.deps.pdf:
+        cat $&lt; | snakefood-graph -p | dot -Tps | pstopdf -i -o $&#64;
+
+clean:
+        rm -f *.clusters *.dot *.pdf
+        ls -1 *.deps | grep -v ^raw.deps | xargs rm -f
+
+realclean: clean
+        rm -f raw.deps
+</pre>
+<p>For a set of more reusable make rules, take a look at
+<tt class="docutils literal"><span class="pre">snakefood/test/Makefile.rules</span></tt> and the Makefiles that we use to run
+out tests on existing codebases.  You can probably leverage this for
+your project (feel free to copy and modify it as needed).</p>
+</div>
+<div class="section">
+<h1><a class="toc-backref" href="#id17" id="feedback-and-comments" name="feedback-and-comments">Feedback and Comments</a></h1>
+<p>I wrote this script in may 2007.  I had previously tried to write a
+reliable dependency grapher about 4 or 5 times, giving up each time on
+the various intricacies of the Python import semantics.  I'm pretty
+happy this time that I've found something reasonably reliable that
+works everywhere.  Comments, feedback and donations are welcome.  I
+hope you find this program useful.</p>
 </div>
 </div>
 </body>

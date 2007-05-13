@@ -10,7 +10,7 @@ include ../Makefile.rules
 raw.deps:
 	snakefood -i $(shell projects lsco -s | cut -d: -f1) | grep -v /test | grep -v /old > $(shell pwd)/$@
 
-projects.clusters:
+projects.clusters: $(ROOT)
 	projects lsco -s | cut -d: -f2 | tr -d ' ' > $(shell pwd)/$@
 	cat clusters >> $(shell pwd)/$@
 

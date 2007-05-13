@@ -2,116 +2,370 @@
    Snakefood Documentation
 =============================
 :Date: 2007-05-10
-:Abstract:
+:Author: Martin Blais <blais@furius.ca>
 
-    Documentation for Snakefood, a dependency graph generator for
-    Python.
-
-
-You need to install graphviz to generate graphs.
-
-
-
-5-second Usage Instructions
-===========================
-
-Here is the simplest way to generate a Graphviz graph file ::
-   
-   snakefood /myproject | snakefood-graph > myproject.dot
-
-Then you can generate a PDF file from it using UNIX tools::
-
-   cat myproject.dot | dot -Tps | pstopdf -i -o myproject.pdf
-
-This will probably not do what you want, however, unless your project
-is pretty small.  The dependency graphs for reasonably sized projects
-are very complex.  
-
-You will most likely want to cluster files together by directories
-depending on your project.  To do this, create a cluster file and use
-the ``snakefood-cluster`` tool::
-
-   snakefood /myproject | snakefood-cluster -f myproject.clusters | snakefood-graph > myproject.dot
-
-Also, as you experiment you will want to avoid having regenerating the
-raw unfiltered and unclustered dependencies every time (this can be a
-little slow to compute).  Follow the more detailed instructions below
-on how to do this.
+.. contents::
+..
+    1  Introduction
+      1.1  What is a Dependency?
+    2  30-seconds Usage Instructions
+    3  Installation
+    4  Overview
+    5  Generating Dependencies
+      5.1  How Packages Are Automatically Found
+      5.2  Following Dependencies
+      5.3  Restricting Dependencies
+      5.4  The Format of Dependencies Files
+      5.5  Caching Raw Dependencies
+        5.5.1  Nodes Without Dependencies
+    6  Filtering and Clustering Dependencies
+      6.1  Using Standard UNIX Tools
+      6.2  Using ``snakefood-cluster``
+    7  Using a Makefile
+    8  Feedback and Comments
 
 
+Introduction
+============
+
+This is the documentation for Snakefood, a dependency graph generator
+for Python source code (written in Python).
+
+What is a Dependency?
+---------------------
+
+In this document, dependencies are import relationships between Python
+source files.  If file ``a.py`` imports some code from file ``b.py``,
+we say that ``a.py`` *depends on* ``b.py``, or that ``a.py`` has a
+dependency on ``b.py``.
+
+Controlling the dependencies between the various parts of your code
+(or between projects that your code uses) is a powerful way to
+increase the reusability of your code: the least amount of
+dependencies a body of source code has, the greater the likelihood
+that this code will be usable in the future.  Dependencies cause codes
+to break due to the independent evolution of modules and changes in
+the interfaces.  Even within a single project, controlling
+dependencies between layers is the essence of modularity.
+
+Snakefood allows you to automatically generate a visual graph of those
+dependencies.  When you produce these kinds of graphs, you will often
+be surprised at how certain parts of your code inadvertently become
+tied together.  Dependency graphs allow you to view the relationships
+clearly and will generate questions about the high-level organization
+of your code and allow to improve modularity and reusability.
 
 
+30-seconds Usage Instructions
+=============================
+
+(For the impatient.)  You will need Graphviz.  Snakefood generates a
+dot file (Graphviz input file).  Here is the simplest way to generate
+a graph::
+
+   snakefood /myproject | snakefood-graph | dot -Tps | pstopdf -i -o myproject.pdf
+
+However **this will probably not do what you want**, unless your
+project is pretty small.  The dependency graphs for reasonably sized
+projects are generally complex, and you will want to filter out some
+of the dependencies, and cluster some of them in logical groups of
+files or by directory (see the text for the ``snakefood-cluster``
+tool).
+
+Read on for more details on how to use these tools.
 
 
+Installation
+============
 
-- Add this documentation before 1.0:
+- You need to install Python-2.5 or greater.
 
-  * The simplest possible run.
+- You need to Graphviz tools to generate graphs.  Snakefood produces
+  input files for Graphviz.
 
-      “but this probably won't do what you want it to.”
-      “there is not formula for filtering, that has to be a custom
-       process.  See the Makefile provided in the test directory.”
+- To install the Snakefood tools themselves, just run the usual
+  distutils command::
 
-  * Show the makefile rules.
-
-  * Create a flow diagram of the different kinds of types generated.
-
-    - Show what the various scripts do.
-
-  * Explain the format of the deps file, including the special case of
-    None, None.
-
-  * Explain --internal
-
-
-
+     cd snakefood-<version>
+     python setup.py install   # as root
 
 
 Overview
 ========
 
-Generate dependency graphs from Python code.  This dependency tracker
-package has a few distinguishing characteristics:
+Snakefood provides three main tools:
 
-- It uses the AST to parse the Python files.  This is pretty reliable.
+1. ``snakefood``: Given a set of input files or root directories,
+   generate a list of dependencies between the files;
 
-- No module is loaded.  Loading modules to figure out dependencies is
-  almost always problem, because a lot of codebases run initialization
-  code in the global namespace, which often requires additional setup.
-  Snakefood is guaranteed not to have this problem (it just runs, no
-  matter what).
+2. ``snakefood-graph``: Read a list of dependencies and produce a
+   Graphviz dot file.  This file can be run through the Graphviz
+   ``dot`` tool to produce a viewable/printable PDF file;
 
-- It works on a set of files, i.e. you do not have to specify a single
-  script, you can select a directory (package or else) or a set of
-  files.  It finds all the Python files recursively automatically.
+3. ``snakefood-cluster`` (optional use): Read a list of dependencies,
+   a list of file clusters, and output a list of simplified
+   (clustered) dependencies.
 
-- Your PYTHONPATH is automatically adjusted to include the required
-  package roots.  It figures out the paths that are required from the
-  files/directories given as input.  You should not have to setup
-  ANYTHING.
+Typically, you will use ``snakefood`` to generate the dependencies,
+pass those on to ``snakefood-graph`` and pass its output to ``dot`` to
+generate your output PDF file.
 
-- It does not have to automatically 'follow' dependencies between
-  modules, i.e. by default it only considers the files and directories
-  you specify on the command-line and their immediate dependencies.
-  It also has an option to automatically include only the dependencies
-  within the packages of the files you specify.
+.. figure:: programs1.png
 
-- It follows the UNIX philosophy of small programs that do one thing
-  well: it consists of a few simple programs whose outputs you combine
-  via pipes.  Graphing dependencies always requires the user to filter
-  and cluster the filenames, so this is appropriate.  You can combine
-  it with your favourite tools, grep, sed, etc.
+   Simple pipeline for generating a full dependency graph.
 
-- The code is darn simple and there very little of it.  We have run it
-  on a variety of popular Python packages.
 
-A problem with dependency trackers that run code is that they are
-unreliable, due to the dynamic nature of Python (the presence of
-imports within function calls and __import__ hooks makes it almost
-impossible to always do the right thing).  This script aims at being
-right 99% of the time, and we think that given the trade-offs, 99% is
-good enough for 99% of the uses.  
+Generating Dependencies
+=======================
 
-I fully intend that this program work on all codebases.  It has been
-tested on a number of popular open source codes (see the test
-directory).
+To generate the dependencies, you use the ``snakefood`` tool, giving
+it a list of filenames::
+
+  snakefood file1.py file2.py file3.py
+
+You can also use directories::
+
+  snakefood /path/to/my/project
+
+If you specify directories, ``snakefood`` will recurse through them
+and automatically find all the Python source files and process them.
+Each file is processed independently, giving the file to ``snakefood``
+means “output the dependencies of this file”.
+
+``snakefood`` finds the dependencies in your source files using the
+AST parser.  It does not figure out which ``import`` statements run
+conditionally; it simply finds all the imports in the file and outputs
+dependencies for each of them.
+
+.. note::
+
+   Note that none of the module your specify on the command-line are
+   loaded nor run.  Loading modules is almost always problem, because
+   a lot of codebases run initialization code in the global namespace,
+   which often requires additional setup.  Snakefood is guaranteed not
+   to have this problem: it just runs on your code;  the worst thing
+   that can happen is that it misses some dependencies.
+
+   A problem with dependency trackers that run code is that they are
+   unreliable too, due to the dynamic nature of Python: the presence
+   of imports within function calls and ``__import__`` hooks makes it
+   almost impossible to always do the right thing.  This script aims
+   at being right 95% of the time, and we think that given the
+   trade-offs, 95% is good enough for 95% of its uses.
+
+
+How Packages Are Automatically Found
+------------------------------------
+
+For each file that it processes, ``snakefood`` automatically figures
+out which package it comes from.  It does this by walk up the
+directory hierarchy of each file until it finds a directory without a
+``__init__.py`` file.
+
+All of the package roots found this way are automatically prepended to
+the Python import path, so you do not have to configure your
+PYTHONPATH before you invoke ``snakefood``.  The roots are also used
+to separate the filename in two parts: the package root, and the
+filename relative to that root (see the section on dependencies format
+below).
+
+
+Following Dependencies
+----------------------
+
+By default, ``snakefood`` does not *follow* dependencies, that is, if
+you ask it to process ``a.py`` and it finds that it has a dependency
+on ``b.py``, the file ``b.py`` does not get processed for its
+dependencies.
+
+.. note::  (FUTURE FEATURE)
+
+   Use the ``--follow`` option to tell ``snakefood`` to follow its
+   dependencies.  Files for each target dependency that were found are
+   automatically examined for dependencies, and the process continues
+   until all leaves are found (we check for cycles too).
+
+
+Restricting Dependencies
+------------------------
+
+Normally you will want to find out the relationships only between
+files in the packages that you provide on the command-line.  For
+example, you will probably not be interested to find out about
+dependencies to the modules in the standard library that comes with
+Python.
+
+You can filter out the dependencies by yourself using the usual UNIX
+tools, like ``grep`` or ``sed``, but since this is a typical case,
+there is a convenient ``--internal-only`` option to ``snakefood`` that
+automatically filters out dependencies to modules found outside of the
+package roots that you specify on the command-line.
+
+
+The Format of Dependencies Files
+--------------------------------
+
+The format of dependencies is really simple::
+
+  ((<source_package_root>, <source_file.py>), (<dest_package_root>, <dest_file.py>))
+
+where the ``package_root`` files are the directory names at the root
+where the module files are found, and the ``file.py`` names are the
+Python filenames relative to the corresponding root.  
+
+Each line is a valid Python tuple expression, so you can easily write
+a Python script to process them using a line like::
+
+  for dep in map(eval, sys.stdin.xreadlines()):
+      ...
+
+and output them like::
+
+      dep = (froot, fn), (troot, tn)
+      print repr(dep)
+
+
+Caching Raw Dependencies
+------------------------
+
+The process of building a nicely filtered dependency graph is
+iterative, you will typically massage the dependencies to highlight
+the relationships that you care about.  Since calculating the
+dependencies can be a slow process (and filtering and graph generation
+is not), we recommend to save the output of ``snakefood`` to a file
+and work from that.
+
+
+Nodes Without Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To insure that all the file nodes show up in the graph, for each
+processed file we output a line like this::
+
+  ((<source_package_root>, <source_file.py>), (None, None))
+
+The graphing tool interprets that to mean it has to at least create a
+node for ``<source_file>.py``, even if it has no dependency.  Scripts
+you write to filter the dependencies need to be able to interpret
+those lines appropriately.
+
+
+Filtering and Clustering Dependencies
+=====================================
+
+Using Standard UNIX Tools
+-------------------------
+
+Since dependencies are simple line-based Python expressions, you can
+use ``grep`` or ``sed`` to filter out or modify unwanted lines::
+
+  cat raw.deps | grep -v /usr/lib/python | snakefood-graph > out.dot
+
+There is no formula for filtering or reformatting the dependencies; it
+depends on your codebase and what you want the graph to show.
+
+
+Using ``snakefood-cluster``
+---------------------------
+
+A useful operation is to transform the relative filenames into logical
+groups and to remove redundant lines.  We call this “clustering”.  A
+common example is to lump together all the filenames that start with a
+particular directory prefix.
+
+You could do this with ``sed`` but you also need to remove redundant
+lines to do it properly, i.e. after simplification of the relative
+filenames, multiple lines will be equivalent.  ``snakefood-cluster``
+does that automatically.  You create a file of cluster names::
+
+   pack1
+   pack2
+   
+and a dependency file will be transformed from this::
+
+  (('/myproject', 'pack1/person.py'), ('/myproject', 'pack1/employee.py'))
+  (('/myproject', 'pack1/person.py'), ('/myproject', 'pack1/manager.py'))
+  (('/myproject', 'pack1/person.py'), ('/myproject', 'pack2/boss.py'))
+
+to this::
+
+  (('/myproject', 'pack1'), ('/myproject', 'pack1'))
+  (('/myproject', 'pack1'), ('/myproject', 'pack2'))
+
+Here is how to use the ``snakefood-cluster`` tool::
+
+   snakefood /myproject | snakefood-cluster -f clusters | snakefood-graph > myproject.dot
+
+.. figure:: programs2.png
+
+   Pipeline for dependency graph with clustering.
+
+You can either create the ``clusters`` file manually to with a
+``find`` or ``ls`` command in your source tree.
+
+
+Using a Makefile
+================
+
+If you will repeatedly compute the dependencies for a codebase that
+you maintain, you could write a simple script to do all the custom
+things that you need to, for example::
+
+  # Generate the raw dependencies.
+  snakefood /myproject > /tmp/raw.deps
+
+  # Filter and cluster.
+  cd /myproject ; ls -1d * > /tmp/clusters
+  cat /tmp/raw.deps | grep -v test_widget | snakefood-cluster -f /tmp/clusters > /tmp/filt.deps
+
+  # Generate the graph.
+  cat /tmp/filt.deps | snakefood-graph -p | dot -Tps | pstopdf -i -o /tmp/myproject.pdf
+
+While this will work, a better way to write such a script is to use a
+makefile.  
+
+Here is an example for a simple self-contained ``Makefile`` that will
+process the relevant dependencies as above::
+
+  ROOT = /myproject
+  PDFS = myproject.pdf
+
+  .SUFFIXES: .deps .dot .pdf .clusters
+
+  all: $(PDFS)
+
+  raw.deps: $(ROOT)
+          snakefood -i $(ROOT) $(FOOD_FLAGS) > $@
+
+  clusters: $(ROOT)
+          cd $(ROOT) ; ls -1d * > $@
+  
+  filt.deps: clusters raw.deps 
+          cat raw.deps | snakefood-cluster -f $< > $@
+
+  .deps.pdf:
+          cat $< | snakefood-graph -p | dot -Tps | pstopdf -i -o $@
+
+  clean:
+          rm -f *.clusters *.dot *.pdf
+          ls -1 *.deps | grep -v ^raw.deps | xargs rm -f
+
+  realclean: clean
+          rm -f raw.deps
+
+For a set of more reusable make rules, take a look at
+``snakefood/test/Makefile.rules`` and the Makefiles that we use to run
+out tests on existing codebases.  You can probably leverage this for
+your project (feel free to copy and modify it as needed).
+
+
+Feedback and Comments
+=====================
+
+I wrote this script in may 2007.  I had previously tried to write a
+reliable dependency grapher about 4 or 5 times, giving up each time on
+the various intricacies of the Python import semantics.  I'm pretty
+happy this time that I've found something reasonably reliable that
+works everywhere.  Comments, feedback and donations are welcome.  I
+hope you find this program useful.
+
