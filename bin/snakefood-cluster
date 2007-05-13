@@ -7,6 +7,7 @@ for relative filenames.
 """
 
 import sys
+from itertools import imap
 from collections import defaultdict
 from operator import itemgetter
 
@@ -43,6 +44,16 @@ def apply_cluster(cdirs, root, fn):
     else:
         return root, fn  # no change.
 
+def read_clusters(fn):
+    "Return a list of cluster prefixes read from the file 'fn'."
+    f = open(fn)
+    clusters = []
+    for x in imap(str.strip, f.xreadlines()):
+        if not x:
+            continue
+        clusters.append(x)
+    return clusters
+
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
@@ -53,8 +64,7 @@ def main():
     opts, clusters = parser.parse_args()
 
     if opts.from_file:
-        f = open(opts.from_file)
-        clusters.extend(x.strip() for x in f.xreadlines())
+        clusters.extend(read_clusters(opts.from_file))
 
     depends = read_depends(sys.stdin)
 

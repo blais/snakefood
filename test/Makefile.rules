@@ -11,14 +11,20 @@
 # Define new file types.
 .SUFFIXES: .deps .dot .pdf .clusters
 
-# Allow including this file from anywhere. 
+# Allow including this file from anywhere.
 ## (only works with GNU make-3.81)
 ##.SECONDEXPANSION:
 
 # Do not delete intermediate dot files from chained implicit rules.
 .PRECIOUS: %.dot %.deps .clusters
 
-PSTOPDF=pstopdf -i -o
+OS = $(shell uname)
+ifeq ($(OS),Darwin)
+   PSTOPDF=pstopdf -i -o
+else
+   PSTOPDF=ps2pdf -
+endif
+
 
 all: $(PDFS)
 
@@ -35,7 +41,7 @@ raw.deps: $(ROOT)
 
 # Implicit rule to convert the raw.deps file simply from the existence of a
 # .clusters file.
-%.deps: %.clusters raw.deps 
+%.deps: %.clusters raw.deps
 	cat raw.deps | snakefood-cluster -f $< > $@
 
 # Clean everything but the costly raw dependencies.
