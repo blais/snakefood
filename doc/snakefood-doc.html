@@ -343,8 +343,9 @@ makefile.</p>
 <p>Here is an example for a simple self-contained <tt class="docutils literal"><span class="pre">Makefile</span></tt> that will
 process the relevant dependencies as above:</p>
 <pre class="literal-block">
-ROOT = /myproject
-PDFS = myproject.pdf
+NAME = myproject
+ROOT = /path/to/myproject
+PDFS = $(NAME).pdf
 
 .SUFFIXES: .deps .dot .pdf .clusters
 
@@ -353,14 +354,14 @@ all: $(PDFS)
 raw.deps: $(ROOT)
         snakefood -i $(ROOT) $(FOOD_FLAGS) &gt; $&#64;
 
-clusters: $(ROOT)
-        cd $(ROOT) ; ls -1d * &gt; $&#64;
+$(NAME).clusters: $(ROOT)
+        cd $(ROOT) ; ls -1d * &gt; $(shell pwd)/$&#64;
 
-filt.deps: clusters raw.deps
+$(NAME).deps: $(NAME).clusters raw.deps
         cat raw.deps | snakefood-cluster -f $&lt; &gt; $&#64;
 
 .deps.pdf:
-        cat $&lt; | snakefood-graph -p | dot -Tps | pstopdf -i -o $&#64;
+        cat $&lt; | snakefood-graph | dot -Tps | ps2pdf - $&#64;
 
 clean:
         rm -f *.clusters *.dot *.pdf

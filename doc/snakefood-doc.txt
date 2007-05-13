@@ -327,8 +327,9 @@ makefile.
 Here is an example for a simple self-contained ``Makefile`` that will
 process the relevant dependencies as above::
 
-  ROOT = /myproject
-  PDFS = myproject.pdf
+  NAME = myproject
+  ROOT = /path/to/myproject
+  PDFS = $(NAME).pdf
 
   .SUFFIXES: .deps .dot .pdf .clusters
 
@@ -337,14 +338,14 @@ process the relevant dependencies as above::
   raw.deps: $(ROOT)
           snakefood -i $(ROOT) $(FOOD_FLAGS) > $@
 
-  clusters: $(ROOT)
-          cd $(ROOT) ; ls -1d * > $@
-  
-  filt.deps: clusters raw.deps 
+  $(NAME).clusters: $(ROOT)
+          cd $(ROOT) ; ls -1d * > $(shell pwd)/$@
+
+  $(NAME).deps: $(NAME).clusters raw.deps
           cat raw.deps | snakefood-cluster -f $< > $@
 
   .deps.pdf:
-          cat $< | snakefood-graph -p | dot -Tps | pstopdf -i -o $@
+          cat $< | snakefood-graph | dot -Tps | ps2pdf - $@
 
   clean:
           rm -f *.clusters *.dot *.pdf
@@ -352,6 +353,7 @@ process the relevant dependencies as above::
 
   realclean: clean
           rm -f raw.deps
+
 
 For a set of more reusable make rules, take a look at
 ``snakefood/test/Makefile.rules`` and the Makefiles that we use to run
