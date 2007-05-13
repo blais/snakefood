@@ -5,7 +5,7 @@ ROOT=$(HOME)/p/enthought.mt/experiments/signal
 PDFS =						\
 	signal.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 raw.deps: 
 	snakefood --debug $(FOOD_FLAGS) $(ROOT) > $@

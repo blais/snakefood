@@ -8,7 +8,7 @@ PDFS =						\
 	core.pdf				\
 	apps.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # diamond, clustered.
 diamond.clusters:

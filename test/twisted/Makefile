@@ -5,7 +5,7 @@ ROOT=/usr/lib/python2.5/site-packages/twisted
 PDFS =						\
 	twisted.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # Cluster at least the first level of subdirectories.
 twisted.clusters:

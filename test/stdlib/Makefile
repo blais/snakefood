@@ -5,7 +5,7 @@ ROOT=/usr/lib/python2.5
 PDFS =						\
 	stdlib.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # Remove anything that is not simply from the root of the package dir (including
 # site-packages).

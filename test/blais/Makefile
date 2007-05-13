@@ -5,7 +5,7 @@ ROOT=$(PROJECTS)
 PDFS = 						\
 	projects.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 raw.deps:
 	snakefood -i $(shell projects lsco -s | cut -d: -f1) | grep -v /test | grep -v /old > $(shell pwd)/$@

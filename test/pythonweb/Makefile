@@ -5,7 +5,7 @@ ROOT=$(HOME)/src/PythonWeb.org
 PDFS =						\
 	pythonweb.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # Cluster at least the first level of subdirectories.
 pythonweb.clusters:

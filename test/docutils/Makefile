@@ -5,7 +5,7 @@ ROOT=$(HOME)/src/docutils/docutils/docutils
 PDFS =						\
 	docutils.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 
 docutils.clusters:

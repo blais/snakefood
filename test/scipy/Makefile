@@ -5,7 +5,7 @@ ROOT=$(HOME)/src/scipy/build/lib.linux-i686-2.5
 PDFS =						\
 	scipy.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 scipy.clusters: 
 	(cd $(ROOT); find scipy/* -type d ) > $(shell pwd)/$@

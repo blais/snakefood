@@ -6,7 +6,7 @@ PDFS =						\
 	numpy.pdf				\
 	numpy-simple.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 numpy.deps: raw.deps
 	cp $< $@

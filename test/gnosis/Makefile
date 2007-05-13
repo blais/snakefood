@@ -5,7 +5,7 @@ ROOT=$(HOME)/src/Gnosis_Utils-1.2.1
 PDFS =						\
 	gnosis.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # Hand-coded clusters file.
 gnosis.clusters: clusters

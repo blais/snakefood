@@ -5,7 +5,7 @@ ROOT=$(HOME)/src/pyutil-1.0.5
 PDFS =						\
 	pyutil.pdf
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # No clusters.
 pyutil.deps: raw.deps

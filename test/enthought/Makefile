@@ -8,7 +8,7 @@ PDFS =							\
 	traits.pdf					\
 	traits_simplified.pdf			
 
-include ../Makefile.common
+include ../Makefile.rules
 
 # Enthought, clustered.
 enthought.clusters:
