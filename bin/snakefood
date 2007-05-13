@@ -86,7 +86,7 @@ def process_file(fn, verbose):
 
         if modfile is None:
             continue
-        files.append(modfile)
+        files.append(realpath(modfile))
 
     return files, file_errors
 
@@ -172,7 +172,7 @@ def is_python(fn):
         file_head = open(fn).read(48)
         if re.match("#!.*\\bpython", file_head):
             return True
-    
+
 _iter_ignores = ['.svn', 'CVS', 'build']
 # Note: 'build' is for those packages which have been installed with setup.py.
 # It is pretty common to forget these around.
@@ -260,6 +260,10 @@ def main():
     parser.add_option('-v', '--verbose', action='count', default=0,
                       help="Output more debugging information")
 
+    parser.add_option('-f', '--follow', action='store_true',
+                      help="Follow the modules depended upon and trace their dependencies. "
+                      "WARNING: This can be slow.  Use --internal to limit the scope.")
+
     opts, args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
                         format=LOG_FORMAT)
@@ -282,6 +286,7 @@ def main():
     sys.path = inroots + sys.path
     for dn in sys.path:
         info("  %s" % dn)
+    inroots = frozenset(inroots)
 
     # Find all the dependencies.
     info("")
@@ -289,26 +294,50 @@ def main():
     info("")
     allfiles = defaultdict(set)
     allerrors = []
-    for fn in iter_pyfiles(args, opts.ignores):
-        info("  %s" % fn)
-        files, errors = process_file(fn, opts.verbose)
-        allerrors.extend(errors)
+    processed_files = set()
 
-        # When packages are the source of dependencies, remove the __init__
-        # file.  This is important because the targets also do not include the
-        # __init__ (i.e. when "from <package> import <subpackage>" is seen).
-        if basename(fn) == '__init__.py':
-            fn = dirname(fn)
+    fiter = iter_pyfiles(args, opts.ignores)
+    while 1:
+        newfiles = set()
+        for fn in fiter:
+            if fn in processed_files:
+                continue # Make sure we process each file only once.
 
-        # Make sure all the files at least appear.
-        allfiles[relfile(fn)].add((None, None))
+            info("  %s" % fn)
+            processed_files.add(fn)
+            files, errors = process_file(fn, opts.verbose)
+            allerrors.extend(errors)
+            
+            # When packages are the source of dependencies, remove the __init__
+            # file.  This is important because the targets also do not include the
+            # __init__ (i.e. when "from <package> import <subpackage>" is seen).
+            if basename(fn) == '__init__.py':
+                fn = dirname(fn)
 
-        # Add the dependencies.
-        for xfn in files:
-            if basename(xfn) == '__init__.py':
-                xfn = dirname(xfn)
+            # Make sure all the files at least appear in the output, even if it has
+            # no dependency.
+            from_ = relfile(fn)
+            if opts.internal and from_[0] not in inroots:
+                continue
+            allfiles[from_].add((None, None))
 
-            allfiles[relfile(fn)].add(relfile(xfn))
+            # Add the dependencies.
+            for xfn in files:
+                if basename(xfn) == '__init__.py':
+                    xfn = dirname(xfn)
+
+                to_ = relfile(xfn)
+                if opts.internal and to_[0] not in inroots:
+                    continue
+                allfiles[from_].add(to_)
+                newfiles.add(xfn)
+
+
+        if not (opts.follow and newfiles):
+            break
+        else:
+            fiter = iter(sorted(newfiles))
+
 
     info("")
     info("SUMMARY")
@@ -339,20 +368,6 @@ def main():
     found_roots.remove(None)
     for root in sorted(found_roots):
         info("  %s" % root)
-
-    if opts.internal:
-        # Filter out the dependencies that lie outside of the package roots of
-        # the input files.
-        #
-        # Note: this *could* be moved to another script.
-        inroots = frozenset(inroots)
-        for from_, targets in allfiles.items():
-            if from_[0] not in inroots:
-                del allfiles[from_]
-                continue
-            for to_ in set(targets):
-                if to_[0] and to_[0] not in inroots:
-                    targets.remove(to_)
 
     # Output the dependencies.
     info("")

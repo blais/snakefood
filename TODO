@@ -5,10 +5,7 @@
 snakefood
 =========
 
-- Implement --follow, an option to follow all the dependencies for all
-  the files specified on the command-line.  This should be easy.
-
-- Add the missing codebases to tests.
+- Add new popular codebases to tests.
 
 
 snakefood-cluster
@@ -28,16 +25,13 @@ snakefood-cluster
 snakefood-graph
 ===============
 
-- By default, it should ignore redundant dependencies (right now it
-  does not).  Add an option to disable that feature.
-
 - Make the graphs a lot prettier.  I'm not a Graphviz expert by any
-  measure and I generally don't care much about pretty, but if someone
+  measure and I generally don't care much about pretty, so if someone
   wants to contribute that could be a good area.
 
-  - Support dot subgraphs somehow.  This program should be able to take
-    some prefixes on the command-line and group the nodes together
-    somehow.
+  - Support dot subgraphs somehow.  snakefood-graph should be able to
+    take some prefixes on the command-line and group the nodes
+    together somehow.
 
   - Support coloring: the program should take some prefixes on the
     command-line and colour the related nodes together.
