@@ -9,14 +9,14 @@
 #   from a .clusters if required).
 
 # Define new file types.
-.SUFFIXES: .deps .dot .pdf .clusters
+.SUFFIXES: .log .deps .dot .pdf .clusters
 
 # Allow including this file from anywhere.
 ## (only works with GNU make-3.81)
 ##.SECONDEXPANSION:
 
 # Do not delete intermediate dot files from chained implicit rules.
-.PRECIOUS: %.dot %.deps .clusters
+.PRECIOUS: %.log %.deps %.dot %.clusters
 
 OS = $(shell uname)
 ifeq ($(OS),Darwin)
@@ -30,7 +30,7 @@ all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps: $(ROOT)
-	snakefood -vv --internal-only $(ROOT) $(FOOD_FLAGS) > $@
+	snakefood -vv --internal-only $(ROOT) $(FOOD_FLAGS) 2>&1 > $@ | tee raw.log
 
 # Implicit rules.
 .deps.dot:
@@ -46,12 +46,10 @@ raw.deps: $(ROOT)
 
 # Clean everything but the costly raw dependencies.
 clean:
-	rm -f *.clusters
 	ls -1 *.deps | grep -v ^raw.deps | xargs rm -f
-	rm -f *.dot
-	rm -f *.pdf
+	rm -f *.dot *.pdf *.clusters
 
 # Really clean everything.
 realclean: clean
-	rm -f raw.deps
+	rm -f raw.deps raw.log
 

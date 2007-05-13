@@ -9,8 +9,6 @@ snakefood
   modules that were not found, and if in debug mode, of all the
   symbols that were not modules, in one list.
 
-- Modify the makefiles to keep the log files around.
-
 - Implement --follow, an option to follow all the dependencies for all
   the files specified on the command-line.  This should be easy.
 
