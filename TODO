@@ -60,25 +60,6 @@ snakefood-graph
 Documentation
 =============
 
-- Add this documentation before 1.0:
-
-  * The simplest possible run.
-
-      “but this probably won't do what you want it to.”
-      “there is not formula for filtering, that has to be a custom
-       process.  See the Makefile provided in the test directory.”
-
-  * Show the makefile rules.
-
-  * Create a flow diagram of the different kinds of types generated.
-
-    - Show what the various scripts do.
-
-  * Explain the format of the deps file, including the special case of
-    None, None.
-
-  * Explain --internal
-
 - Prepare submission and slides for PyCon presentation
 
   Talk outline:

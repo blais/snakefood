@@ -18,7 +18,7 @@
 # Do not delete intermediate dot files from chained implicit rules.
 .PRECIOUS: %.dot %.deps .clusters
 
-PSTOPDF=pstopdf
+PSTOPDF=pstopdf -i -o
 
 all: $(PDFS)
 
@@ -31,7 +31,7 @@ raw.deps: $(ROOT)
 	cat $< | snakefood-graph -p > $@
 
 .dot.pdf:
-	cat $< | dot -Tps | $(PSTOPDF) - $@
+	cat $< | dot -Tps | $(PSTOPDF) $@
 
 # Implicit rule to convert the raw.deps file simply from the existence of a
 # .clusters file.
