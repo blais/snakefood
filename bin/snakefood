@@ -17,7 +17,7 @@ dependencies on anything.
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging, traceback
+import sys, os, logging, traceback, re
 import imp, compiler
 from os.path import *
 from collections import defaultdict
@@ -164,6 +164,15 @@ def find_dotted(names, parentdir=None):
 
 
 
+def is_python(fn):
+    "Return true if the file is a Python file."
+    if fn.endswith('.py'):
+        return True
+    else:
+        file_head = open(fn).read(48)
+        if re.match("#!.*\\bpython", file_head):
+            return True
+    
 _iter_ignores = ['.svn', 'CVS', 'build']
 # Note: 'build' is for those packages which have been installed with setup.py.
 # It is pretty common to forget these around.
@@ -179,7 +188,7 @@ def iter_pyfiles(dirsorfns, ignores=None):
         dn = realpath(dn)
 
         if not isdir(dn):
-            if dn.endswith('.py'):
+            if is_python(dn):
                 yield dn
 
         else:
@@ -190,11 +199,9 @@ def iter_pyfiles(dirsorfns, ignores=None):
                     except ValueError:
                         pass
 
-                pyfiles = [fn for fn in files if fn.endswith('.py')]
-                if not pyfiles:
-                    continue
-                for fn in pyfiles:
-                    yield join(root, fn)
+                afiles = [join(root, x) for x in files]
+                for fn in filter(is_python, afiles):
+                    yield fn
 
 
 def find_roots(list_dirofn, ignores):
@@ -265,19 +272,21 @@ def main():
     # Get the list of package roots for our input files and prepend them to the
     # module search path to insure localized imports.
     inroots = find_roots(args, opts.ignores)
-    info("Roots of input:")
+    info("")
+    info("Roots of the input files:")
     for root in inroots:
         info('  %s' % root)
 
     info("")
-    info("Using path:")
+    info("Using the following import path to search for modules:")
     sys.path = inroots + sys.path
     for dn in sys.path:
         info("  %s" % dn)
 
     # Find all the dependencies.
     info("")
-    info("Processing files")
+    info("Processing files:")
+    info("")
     allfiles = defaultdict(set)
     allerrors = []
     for fn in iter_pyfiles(args, opts.ignores):
@@ -322,8 +331,14 @@ def main():
     # Output the list of roots found.
     info("")
     info("Found roots:")
-    for root in sorted(frozenset(x[0] for x in allfiles.iterkeys())):
-        info('  %s' % root)
+
+    found_roots = set()
+    for key, files in allfiles.iteritems():
+        found_roots.add(key[0])
+        found_roots.update(map(itemgetter(0),files))
+    found_roots.remove(None)
+    for root in sorted(found_roots):
+        info("  %s" % root)
 
     if opts.internal:
         # Filter out the dependencies that lie outside of the package roots of
@@ -336,7 +351,7 @@ def main():
                 del allfiles[from_]
                 continue
             for to_ in set(targets):
-                if to_[0] not in inroots:
+                if to_[0] and to_[0] not in inroots:
                     targets.remove(to_)
 
     # Output the dependencies.
