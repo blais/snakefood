@@ -16,6 +16,18 @@ def read_depends(f):
         except Exception:
             logging.warning("Invalid line: '%s'" % line)
 
+def eliminate_redundant_depends(depends):
+    "Remove the redundant dependencies."
+    alluniq = set()
+    outdeps = []
+    for dep in depends:
+        if dep in alluniq:
+            continue
+        alluniq.add(dep)
+        outdeps.append(dep)
+    return outdeps
+
+
 prefix = '''
 
 digraph "source tree" {
@@ -78,6 +90,9 @@ def main():
                       help="Remove filename extensions in the graph and "
                       "replace slashes with dots.")
 
+    parser.add_option('-r', '--redundant', action='store_false', default=True,
+                      help="Do not eliminate redundant dependencies.")
+
     global opts
     opts, args = parser.parse_args()
 
@@ -86,6 +101,8 @@ def main():
     for fn in args:
         f = sys.stdin if fn == '-' else open(fn)
         depends = read_depends(f)
+        if opts.redundant:
+            depends = eliminate_redundant_depends(depends)
         graph(depends, sys.stdout.write)
 
 

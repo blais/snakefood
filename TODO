@@ -8,13 +8,6 @@ snakefood
 - Implement --follow, an option to follow all the dependencies for all
   the files specified on the command-line.  This should be easy.
 
-- Non .py files: check that it can load file without the .py extension
-  (i.e. a script).  Feature: When recursing through files, check for
-  non .py files that may be Python code too and include them.
-
-- Create a new snakefood-filter script that does the same as
-  --internal (use the set of roots from the dependency sources).
-
 - Add the missing codebases to tests.
 
 
@@ -48,6 +41,14 @@ snakefood-graph
 
   - Support coloring: the program should take some prefixes on the
     command-line and colour the related nodes together.
+
+
+Other
+=====
+
+- Create a new snakefood-filter script that does the same as
+  --internal (use the set of roots from the dependency sources).
+
 
 
 Documentation

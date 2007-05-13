@@ -1,0 +1,3 @@
+(('/home/blais/p/snakefood/test/snakefood/simple', 'redundant.py'), (None, None))
+(('/home/blais/p/snakefood/test/snakefood/simple', 'redundant.py'), ('/home/blais/p/snakefood/test/snakefood/simple', 'target.py'))
+(('/home/blais/p/snakefood/test/snakefood/simple', 'redundant.py'), ('/home/blais/p/snakefood/test/snakefood/simple', 'target.py'))
