@@ -5,28 +5,23 @@
 snakefood
 =========
 
-- Implement --follow, an option to follow all the dependencies for all
-  the files specified on the command-line.  This should be easy.
-
-- Feature: When recursing through files, check for non .py files that
-  may be Python code too and include them.
-
-- Create a new snakefood-filter script that does the same as
-  --internal.
-
 - At the end of the run, you should output a clean list of all the
   modules that were not found, and if in debug mode, of all the
   symbols that were not modules, in one list.
 
 - Modify the makefiles to keep the log files around.
 
-- Add the missing codebases to tests
+- Implement --follow, an option to follow all the dependencies for all
+  the files specified on the command-line.  This should be easy.
 
-- Move --debug to --verbose, with type 'count'.  -v should enable
-  DEBUG logging.  -vv should also print the offending code lines (see
-  if the AST has a reference to the source code somehow).
+- Non .py files: check that it can load file without the .py extension
+  (i.e. a script).  Feature: When recursing through files, check for
+  non .py files that may be Python code too and include them.
 
-- Check that it can load file without the .py extension.
+- Create a new snakefood-filter script that does the same as
+  --internal (use the set of roots from the dependency sources).
+
+- Add the missing codebases to tests.
 
 
 snakefood-cluster
@@ -46,20 +41,19 @@ snakefood-cluster
 snakefood-graph
 ===============
 
+- By default, it should ignore redundant dependencies (right now it
+  does not).  Add an option to disable that feature.
+
 - Make the graphs a lot prettier.  I'm not a Graphviz expert by any
   measure and I generally don't care much about pretty, but if someone
   wants to contribute that could be a good area.
 
-- Support dot subgraphs somehow.  This program should be able to take
-  some prefixes on the command-line and group the nodes together
-  somehow.
+  - Support dot subgraphs somehow.  This program should be able to take
+    some prefixes on the command-line and group the nodes together
+    somehow.
 
-- Support coloring: the program should take some prefixes on the
-  command-line and colour the related nodes together.
-
-- By default, it should ignore redundant dependencies (right now it
-  does not).  Add an option to disable that feature.
-
+  - Support coloring: the program should take some prefixes on the
+    command-line and colour the related nodes together.
 
 
 Documentation

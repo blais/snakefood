@@ -31,18 +31,18 @@ class ImportVisitor(object):
         self.modules = []
 
     def visitImport(self, node):
-        self.modules.extend((x[0], None) for x in node.names)
+        self.modules.extend((x[0], None, node.lineno) for x in node.names)
 
     def visitFrom(self, node):
         modname = node.modname
         for name, as_ in node.names:
             if name != '*':
-                mod = (modname, name)
+                mod = (modname, name, node.lineno)
             else:
-                mod = (modname, None)
+                mod = (modname, None, node.lineno)
             self.modules.append(mod)
 
-def process_file(fn):
+def process_file(fn, verbose):
     "Returns a list of the files it depends on."
     try:
         mod = compiler.parseFile(fn)
@@ -54,6 +54,11 @@ def process_file(fn):
     vis = ImportVisitor()
     compiler.walk(mod, vis)
 
+    output_code = (verbose >= 2)
+    source_lines = None
+    if output_code:
+        source_lines = open(fn).read().splitlines()
+
     files = []
     assert not isdir(fn)
     dn = dirname(fn)
@@ -62,9 +67,9 @@ def process_file(fn):
         if x in seenset:
             continue
         seenset.add(x)
-        mod, sub = x
+        mod, sub, lineno = x
 
-        modfile = find_dotted_module(mod, sub, dn)
+        modfile = find_dotted_module(mod, sub, dn, lineno, source_lines)
         if modfile is None:
             continue
         files.append(modfile)
@@ -84,7 +89,7 @@ libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
 exceptions = ('os.path',)
 builtin_module_names = sys.builtin_module_names + exceptions
 
-def find_dotted_module(modname, sub, parentdir):
+def find_dotted_module(modname, sub, parentdir, lineno, source_lines):
     """
     A version of find_module that supports dotted module names (packages).  This
     function returns the filename of the module if found, otherwise returns
@@ -109,7 +114,9 @@ def find_dotted_module(modname, sub, parentdir):
         fn = find_dotted(names)
 
         if not fn:
-            logging.warning("    Could not import module: '%s'" % modname)
+            logging.warning("    Line %d: Could not import module '%s'" % (lineno, modname))
+            if source_lines:
+                logging.warning("       %s" % source_lines[lineno-1].rstrip())
             return None
 
     # If this is a from-form, try the target symbol as a module.
@@ -118,7 +125,9 @@ def find_dotted_module(modname, sub, parentdir):
         if fn2:
             fn = fn2
         else:
-            logging.debug("    from %s import %s: Symbol '%s' is not a module." % (modname, sub, sub))
+            logging.debug("    Line %d: Symbol is not a module: '%s'" % (lineno, sub))
+            if source_lines:
+                logging.debug("       %s" % source_lines[lineno-1].strip())
             # Pass-thru and return the filename of the parent, which was found.
 
     return fn
@@ -229,10 +238,11 @@ def main():
     parser.add_option('-I', '--ignore', dest='ignores', action='append', default=[],
                       help="Add the given directory name to the list to be ignored.")
 
-    parser.add_option('--debug', action='store_true', help="Turn on debugging")
+    parser.add_option('-v', '--verbose', action='count', default=0,
+                      help="Output more debugging information")
 
     opts, args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if opts.debug else logging.INFO,
+    logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
                         format=LOG_FORMAT)
     if not args:
         logging.warning("Searching for files from root directory.")
@@ -257,7 +267,7 @@ def main():
     allfiles = defaultdict(set)
     for fn in iter_pyfiles(args, opts.ignores):
         logging.info("  %s" % fn)
-        files = process_file(fn)
+        files = process_file(fn, opts.verbose)
 
         # When packages are the source of dependencies, remove the __init__
         # file.  This is important because the targets also do not include the
@@ -280,7 +290,7 @@ def main():
     logging.info("Found roots:")
     for root in sorted(frozenset(x[0] for x in allfiles.iterkeys())):
         logging.info('  %s' % root)
-        
+
     if opts.internal:
         # Filter out the dependencies that lie outside of the package roots of
         # the input files.
