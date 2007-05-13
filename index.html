@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
 <title>snakefood: Python Dependency Graphs</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -18,12 +18,13 @@
 
 <div class="document" id="snakefood-python-dependency-graphs">
 <h1 class="title">snakefood: Python Dependency Graphs</h1>
-<div class="section">
-<h1><a id="description" name="description">Description</a></h1>
+
+<div class="section" id="description">
+<h1>Description</h1>
 <p>Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:</p>
 <ul class="simple">
-<li>It uses the AST to parse the Python files.</li>
+<li>It uses the AST to parse the Python files.  This is pretty reliable.</li>
 <li>No module is loaded.  Loading modules to figure out dependencies is
 almost always problem, because a lot of codebases run initialization
 code in the global namespace, which often requires additional setup.
@@ -36,17 +37,17 @@ files.  It finds all the Python files recursively automatically.</li>
 package roots.  It figures out the paths that are required from the
 files/directories given as input.  You should not have to setup
 ANYTHING.</li>
-<li>It does not automatically 'follow' dependencies between modules,
-i.e. it only considers the files and directories you specify on the
-command-line and their immediate dependencies.  It has an option to
-automatically include only the dependencies within the packages of
-the files you specify.</li>
+<li>It does not have to automatically 'follow' dependencies between
+modules, i.e. by default it only considers the files and directories
+you specify on the command-line and their immediate dependencies.
+It also has an option to automatically include only the dependencies
+within the packages of the files you specify.</li>
 <li>It follows the UNIX philosophy of small programs that do one thing
 well: it consists of a few simple programs whose outputs you combine
 via pipes.  Graphing dependencies always requires the user to filter
 and cluster the filenames, so this is appropriate.  You can combine
 it with your favourite tools, grep, sed, etc.</li>
-<li>The code is damn simple and there very little of it.  We have run it
+<li>The code is darn simple and there very little of it.  We have run it
 on a variety of popular Python packages.</li>
 </ul>
 <p>A problem with dependency trackers that run code is that they are
@@ -55,38 +56,41 @@ imports within function calls and __import__ hooks makes it almost
 impossible to always do the right thing).  This script aims at being
 right 99% of the time, and we think that given the trade-offs, 99% is
 good enough for 99% of the uses.</p>
+<p>I fully intend that this program work on all codebases.  It has been
+tested on a number of popular open source codes (see the test
+directory).</p>
 </div>
-<div class="section">
-<h1><a id="dependencies" name="dependencies">Dependencies</a></h1>
+<div class="section" id="dependencies">
+<h1>Dependencies</h1>
 <ul class="simple">
 <li>Python 2.5 or higher.  That's it.</li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="documentation" name="documentation">Documentation</a></h1>
+<div class="section" id="documentation">
+<h1>Documentation</h1>
 <ul class="simple">
-<li><a class="reference" href="CHANGES">CHANGES</a></li>
-<li><a class="reference" href="TODO">TODO</a></li>
-<li><a class="reference" href="/snakefood/doc/examples/">Example Outputs</a></li>
+<li><a class="reference external" href="CHANGES">CHANGES</a></li>
+<li><a class="reference external" href="TODO">TODO</a></li>
+<li><a class="reference external" href="/snakefood/doc/examples/">Example Outputs</a></li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="download" name="download">Download</a></h1>
+<div class="section" id="download">
+<h1>Download</h1>
 <ul class="simple">
-<li><a class="reference" href="/downloads/snakefood/">Download</a></li>
+<li><a class="reference external" href="/downloads/snakefood/">Download</a></li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="copyright-and-license" name="copyright-and-license">Copyright and License</a></h1>
+<div class="section" id="copyright-and-license">
+<h1>Copyright and License</h1>
 <p>Copyright (C) 2001-2007  Martin Blais.  All Rights Reserved.</p>
-<p>This code is distributed under the <a class="reference" href="COPYING">GNU General Public License</a>;</p>
+<p>This code is distributed under the <a class="reference external" href="COPYING">GNU General Public License</a>;</p>
 <blockquote>
 Special thanks for EWT LLC/Madison Tyler for supporting some of this
 work through time on the job.</blockquote>
 </div>
-<div class="section">
-<h1><a id="author" name="author">Author</a></h1>
-<p>Martin Blais &lt;<a class="reference" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</p>
+<div class="section" id="author">
+<h1>Author</h1>
+<p>Martin Blais &lt;<a class="reference external" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</p>
 </div>
 </div>
 </body>

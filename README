@@ -9,7 +9,7 @@ Description
 Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:
 
-- It uses the AST to parse the Python files. 
+- It uses the AST to parse the Python files.  This is pretty reliable.
 
 - No module is loaded.  Loading modules to figure out dependencies is
   almost always problem, because a lot of codebases run initialization
@@ -26,11 +26,11 @@ package has a few distinguishing characteristics:
   files/directories given as input.  You should not have to setup
   ANYTHING.
 
-- It does not automatically 'follow' dependencies between modules,
-  i.e. it only considers the files and directories you specify on the
-  command-line and their immediate dependencies.  It has an option to
-  automatically include only the dependencies within the packages of
-  the files you specify.
+- It does not have to automatically 'follow' dependencies between
+  modules, i.e. by default it only considers the files and directories
+  you specify on the command-line and their immediate dependencies.
+  It also has an option to automatically include only the dependencies
+  within the packages of the files you specify.
 
 - It follows the UNIX philosophy of small programs that do one thing
   well: it consists of a few simple programs whose outputs you combine
@@ -38,7 +38,7 @@ package has a few distinguishing characteristics:
   and cluster the filenames, so this is appropriate.  You can combine
   it with your favourite tools, grep, sed, etc.
 
-- The code is damn simple and there very little of it.  We have run it
+- The code is darn simple and there very little of it.  We have run it
   on a variety of popular Python packages.
 
 A problem with dependency trackers that run code is that they are
@@ -46,7 +46,12 @@ unreliable, due to the dynamic nature of Python (the presence of
 imports within function calls and __import__ hooks makes it almost
 impossible to always do the right thing).  This script aims at being
 right 99% of the time, and we think that given the trade-offs, 99% is
-good enough for 99% of the uses.
+good enough for 99% of the uses.  
+
+I fully intend that this program work on all codebases.  It has been
+tested on a number of popular open source codes (see the test
+directory).
+
 
 
 Dependencies
