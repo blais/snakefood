@@ -18,10 +18,12 @@
 # Do not delete intermediate dot files from chained implicit rules.
 .PRECIOUS: %.dot %.deps .clusters
 
+PSTOPDF=pstopdf
+
 all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
-raw.deps:
+raw.deps: $(ROOT)
 	snakefood --debug --internal-only $(ROOT) $(FOOD_FLAGS) > $@
 
 # Implicit rules.
@@ -29,7 +31,7 @@ raw.deps:
 	cat $< | snakefood-graph -p > $@
 
 .dot.pdf:
-	cat $< | dot -Tps | ps2pdf - > $@
+	cat $< | dot -Tps | $(PSTOPDF) - $@
 
 # Implicit rule to convert the raw.deps file simply from the existence of a
 # .clusters file.

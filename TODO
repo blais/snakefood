@@ -5,6 +5,9 @@
 snakefood
 =========
 
+- Implement --follow, an option to follow all the dependencies for all
+  the files specified on the command-line.  This should be easy.
+
 - Feature: When recursing through files, check for non .py files that
   may be Python code too and include them.
 
@@ -40,6 +43,10 @@ snakefood-cluster
 
 snakefood-graph
 ===============
+
+- Make the graphs a lot prettier.  I'm not a Graphviz expert by any
+  measure and I generally don't care much about pretty, but if someone
+  wants to contribute that could be a good area.
 
 - Support dot subgraphs somehow.  This program should be able to take
   some prefixes on the command-line and group the nodes together
