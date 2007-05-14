@@ -8,4 +8,7 @@ PDFS =						\
 include ../Makefile.rules
 
 
+# Handmade clusters list.
+matplotlib.clusters: clusters
+	cp $< $@
 
