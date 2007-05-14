@@ -1,4 +1,4 @@
-# Graph the dependencies for Twisted Matrix.
+# Graph the dependencies for Zope-3.
 
 ROOT=$(HOME)/src/Zope-3.3.1
 
