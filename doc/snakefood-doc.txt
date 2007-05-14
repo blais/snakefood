@@ -144,8 +144,9 @@ dependencies for each of them.
    loaded nor run.  Loading modules is almost always problem, because
    a lot of codebases run initialization code in the global namespace,
    which often requires additional setup.  Snakefood is guaranteed not
-   to have this problem: it just runs on your code;  the worst thing
-   that can happen is that it misses some dependencies.
+   to have this problem: it does not run your code, it just looks at
+   it; the worst thing that can happen is that it misses some
+   dependencies.
 
    A problem with dependency trackers that run code is that they are
    unreliable too, due to the dynamic nature of Python: the presence
@@ -195,10 +196,10 @@ dependencies to the modules in the standard library that comes with
 Python.
 
 You can filter out the dependencies by yourself using the usual UNIX
-tools, like ``grep`` or ``sed``, but since this is a typical case,
-there is a convenient ``--internal-only`` option to ``snakefood`` that
-automatically filters out dependencies to the package roots that
-correspond to fthe files that you specify on the command-line.
+tools, like grep or sed.  But since this is a typical case, there is a
+convenient --internal-only option to snakefood that automatically
+limits dependencies to the package roots corresponding to the files
+that you specify on the command-line.
 
 .. note:: 
 
@@ -225,7 +226,7 @@ Python filenames relative to the corresponding root.
 Each line is a valid Python tuple expression, so you can easily write
 a Python script to process them using a line like::
 
-  for dep in map(eval, sys.stdin.xreadlines()):
+  for dep in map(eval, sys.stdin):
       ...
 
 and output them like::
@@ -332,8 +333,8 @@ Here is how to use the ``snakefood-cluster`` tool::
 
    Pipeline for dependency graph with clustering.
 
-You can either create the ``clusters`` file manually to with a
-``find`` or ``ls`` command in your source tree.
+You can either create the ``clusters`` file manually, or with a
+``find`` or ``ls`` command in your source tree."
 
 
 Using a Makefile
