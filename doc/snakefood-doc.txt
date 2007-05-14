@@ -17,7 +17,8 @@
       5.3  Restricting Dependencies
       5.4  The Format of Dependencies Files
       5.5  Caching Raw Dependencies
-        5.5.1  Nodes Without Dependencies
+      5.6  Warnings
+        5.6.1  Nodes Without Dependencies
     6  Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
       6.2  Using ``snakefood-cluster``
@@ -242,6 +243,29 @@ the relationships that you care about.  Since calculating the
 dependencies can be a slow process (and filtering and graph generation
 is not), we recommend to save the output of ``snakefood`` to a file
 and work from that.
+
+
+Warnings
+--------
+
+You may see a lot of warnings when you run ``snakefood``.  This is
+normal.  There are a few reasons for this:
+
+- The code you are analyzing requires some external packages that are
+  not installed or not in your PYTHONPATH;
+
+- The ``from-import`` Python syntax is ambiguous; for example, in the
+  following code, it is not clear whether ``table`` is a module or an
+  object defined in the ``database`` module::
+
+     from database import table
+
+  Therefore, ``snakefood`` does not normally print out warnings for
+  these.  If you want to see a list of those failed imports, run it
+  with the ``--verbose`` option.
+
+In eitehr case ``snakefood`` keeps running and produces all the other
+dependencies that it finds.
 
 
 Nodes Without Dependencies
