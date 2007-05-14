@@ -5,7 +5,7 @@
 snakefood
 =========
 
-- Add new popular codebases to tests.
+- Add more new popular codebases to tests.
 
 
 snakefood-cluster
@@ -41,23 +41,5 @@ Other
 
 - Create a new snakefood-filter script that does the same as
   --internal (use the set of roots from the dependency sources).
-
-
-
-Documentation
-=============
-
-- Prepare submission and slides for PyCon presentation
-
-  Talk outline:
-
-  - intro/motivation: the use of dependencies
-  - implementation details
-    * zero config
-    * does not run code
-  - makefile + dataflow chart for deps/clusters/dot, etc.
-  - examples
-  - enforcing specific dependencies in a subversion hook
-
 
 
