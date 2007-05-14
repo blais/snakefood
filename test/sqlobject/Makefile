@@ -4,7 +4,6 @@ ROOT=$(HOME)/src/SQLObject
 
 PDFS =						\
 	sqlobject.pdf
-# 	sqlobject-simple.pdf
 
 include ../Makefile.rules
 
