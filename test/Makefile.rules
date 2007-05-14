@@ -47,7 +47,7 @@ raw.deps: $(ROOT)
 # Clean everything but the costly raw dependencies.
 clean:
 	ls -1 *.deps | grep -v ^raw.deps | xargs rm -f
-	rm -f *.dot *.pdf *.clusters
+	rm -f *.dot *.ps *.pdf *.clusters
 
 # Really clean everything.
 realclean: clean

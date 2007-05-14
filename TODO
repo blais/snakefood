@@ -12,13 +12,12 @@ snakefood-cluster
 =================
 
 - Support non-prefix clusters: We could try clustering a variety of
-  modules by hand, according to the documentation groupings, but that
-  would require supporting cluster groups that do not depend on a
-  filename prefix.  Do that for stdlib analysis.
+  modules that do not share a common filename prefix.  Each of these
+  clusters should be called "cluster groups".  Maybe we could extend
+  the cluster file format slightly to support that instead of forcing
+  it to be multiple files.
 
-  Each of these clusters should be called "cluster groups".
-
-- Add an option filter out/ignore all the files that are not in the
+- Add an option to filter out/ignore all the files that are not in the
   declared clusters.
 
 

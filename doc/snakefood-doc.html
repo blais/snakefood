@@ -191,10 +191,10 @@ trade-offs, 95% is good enough for 95% of its uses.</p>
 </div>
 <div class="section">
 <h2><a class="toc-backref" href="#id7" id="how-packages-are-automatically-found" name="how-packages-are-automatically-found">How Packages Are Automatically Found</a></h2>
-<p>For each file that it processes, <tt class="docutils literal"><span class="pre">snakefood</span></tt> automatically figures
-out which package it comes from.  It does this by walk up the
-directory hierarchy of each file until it finds a directory without a
-<tt class="docutils literal"><span class="pre">__init__.py</span></tt> file.</p>
+<p>For each file or directory that you specify on the command-line,
+<tt class="docutils literal"><span class="pre">snakefood</span></tt> automatically figures out which package it lives in.  It
+does this by walking up the directory hierarchy of each file until it
+finds a directory without a <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file.</p>
 <p>All of the package roots found this way are automatically prepended to
 the Python import path, so you do not have to configure your
 PYTHONPATH before you invoke <tt class="docutils literal"><span class="pre">snakefood</span></tt>.  The roots are also used
@@ -208,14 +208,10 @@ below).</p>
 you ask it to process <tt class="docutils literal"><span class="pre">a.py</span></tt> and it finds that it has a dependency
 on <tt class="docutils literal"><span class="pre">b.py</span></tt>, the file <tt class="docutils literal"><span class="pre">b.py</span></tt> does not get processed for its
 dependencies.</p>
-<div class="note">
-<p class="first admonition-title">Note</p>
-<p>(FUTURE FEATURE)</p>
-<p class="last">Use the <tt class="docutils literal"><span class="pre">--follow</span></tt> option to tell <tt class="docutils literal"><span class="pre">snakefood</span></tt> to follow its
+<p>Use the <tt class="docutils literal"><span class="pre">--follow</span></tt> option to tell <tt class="docutils literal"><span class="pre">snakefood</span></tt> to follow its
 dependencies.  Files for each target dependency that were found are
 automatically examined for dependencies, and the process continues
 until all leaves are found (we check for cycles too).</p>
-</div>
 </div>
 <div class="section">
 <h2><a class="toc-backref" href="#id9" id="restricting-dependencies" name="restricting-dependencies">Restricting Dependencies</a></h2>
@@ -227,8 +223,18 @@ Python.</p>
 <p>You can filter out the dependencies by yourself using the usual UNIX
 tools, like <tt class="docutils literal"><span class="pre">grep</span></tt> or <tt class="docutils literal"><span class="pre">sed</span></tt>, but since this is a typical case,
 there is a convenient <tt class="docutils literal"><span class="pre">--internal-only</span></tt> option to <tt class="docutils literal"><span class="pre">snakefood</span></tt> that
-automatically filters out dependencies to modules found outside of the
-package roots that you specify on the command-line.</p>
+automatically filters out dependencies to the package roots that
+correspond to fthe files that you specify on the command-line.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Subdirectories that live under a package root but which do not have
+an appropriate <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file are considered external to the
+containing package root (because they are distinct).  Large
+codebases often have such directories containing test scripts,
+installation code and what not, which cannot be imported directly.
+Add those directories to the command-line if you want to include
+them while using the <tt class="docutils literal"><span class="pre">--internal</span></tt> option.</p>
+</div>
 </div>
 <div class="section">
 <h2><a class="toc-backref" href="#id10" id="the-format-of-dependencies-files" name="the-format-of-dependencies-files">The Format of Dependencies Files</a></h2>

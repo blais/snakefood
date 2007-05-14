@@ -157,10 +157,10 @@ dependencies for each of them.
 How Packages Are Automatically Found
 ------------------------------------
 
-For each file that it processes, ``snakefood`` automatically figures
-out which package it comes from.  It does this by walk up the
-directory hierarchy of each file until it finds a directory without a
-``__init__.py`` file.
+For each file or directory that you specify on the command-line,
+``snakefood`` automatically figures out which package it lives in.  It
+does this by walking up the directory hierarchy of each file until it
+finds a directory without a ``__init__.py`` file.
 
 All of the package roots found this way are automatically prepended to
 the Python import path, so you do not have to configure your
@@ -178,12 +178,10 @@ you ask it to process ``a.py`` and it finds that it has a dependency
 on ``b.py``, the file ``b.py`` does not get processed for its
 dependencies.
 
-.. note::  (FUTURE FEATURE)
-
-   Use the ``--follow`` option to tell ``snakefood`` to follow its
-   dependencies.  Files for each target dependency that were found are
-   automatically examined for dependencies, and the process continues
-   until all leaves are found (we check for cycles too).
+Use the ``--follow`` option to tell ``snakefood`` to follow its
+dependencies.  Files for each target dependency that were found are
+automatically examined for dependencies, and the process continues
+until all leaves are found (we check for cycles too).
 
 
 Restricting Dependencies
@@ -198,8 +196,18 @@ Python.
 You can filter out the dependencies by yourself using the usual UNIX
 tools, like ``grep`` or ``sed``, but since this is a typical case,
 there is a convenient ``--internal-only`` option to ``snakefood`` that
-automatically filters out dependencies to modules found outside of the
-package roots that you specify on the command-line.
+automatically filters out dependencies to the package roots that
+correspond to fthe files that you specify on the command-line.
+
+.. note:: 
+
+   Subdirectories that live under a package root but which do not have
+   an appropriate ``__init__.py`` file are considered external to the
+   containing package root (because they are distinct).  Large
+   codebases often have such directories containing test scripts,
+   installation code and what not, which cannot be imported directly.
+   Add those directories to the command-line if you want to include
+   them while using the ``--internal`` option.
 
 
 The Format of Dependencies Files

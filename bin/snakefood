@@ -104,6 +104,8 @@ libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
 exceptions = ('os.path',)
 builtin_module_names = sys.builtin_module_names + exceptions
 
+module_cache = {}
+
 def find_dotted_module(modname, sub, parentdir):
     """
     A version of find_module that supports dotted module names (packages).  This
@@ -127,7 +129,11 @@ def find_dotted_module(modname, sub, parentdir):
     # Try relative import, then global imports.
     fn = find_dotted(names, parentdir)
     if not fn:
-        fn = find_dotted(names)
+        try:
+            fn = module_cache[modname]
+        except KeyError:
+            fn = find_dotted(names)
+            module_cache[modname] = fn
 
         if not fn:
             errors.append((ERROR_IMPORT, modname))
@@ -204,13 +210,13 @@ def iter_pyfiles(dirsorfns, ignores=None):
                     yield fn
 
 
-def find_roots(list_dirofn, ignores):
+def find_roots(list_dirofn, _):
     """
     Given a list of directories or filenames, find Python files and calculate
     the entire list of roots.
     """
     inroots = set()
-    for fn in iter_pyfiles(list_dirofn, ignores):
+    for fn in list_dirofn:
         inroots.add(find_package_root(fn))
     return sorted(inroots)
 
