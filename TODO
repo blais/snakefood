@@ -36,6 +36,27 @@ snakefood-graph
     command-line and colour the related nodes together.
 
 
+
+snakefood-sweep
+===============
+
+- Create this new program, which reads dependencies from stdin and
+  takes filenames arguments, and follows the nodes that match the
+  filenames and marks them as it sweeps the graph.  It outputs
+  the list of dependencies that were marked and drops the other ones.  
+
+  * You don't even have to include the package root code, just by
+    concatenating the filenames in the dependency list, you can match
+    the nodes.
+
+  * This can be used to visualize what a graph would look like without
+    a few dependencies: edit the depends file to remove the offending
+    onces and sweep that file to clean up the graph.
+
+- Implement a similar tool that only traces the dependencies between a
+  source and a sink node.
+
+
 Other
 =====
 
