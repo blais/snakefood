@@ -328,7 +328,8 @@ def main():
             allfiles[from_].add((None, None))
 
             # Add the dependencies.
-            for xfn in files:
+            for dfn in files:
+                xfn = dfn
                 if basename(xfn) == '__init__.py':
                     xfn = dirname(xfn)
 
@@ -336,7 +337,7 @@ def main():
                 if opts.internal and to_[0] not in inroots:
                     continue
                 allfiles[from_].add(to_)
-                newfiles.add(xfn)
+                newfiles.add(dfn)
 
 
         if not (opts.follow and newfiles):
