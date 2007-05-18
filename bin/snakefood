@@ -282,6 +282,10 @@ def main():
     # Get the list of package roots for our input files and prepend them to the
     # module search path to insure localized imports.
     inroots = find_roots(args, opts.ignores)
+    if opts.internal and not inroots:
+        parser.error("No package roots found from the given files or directories. "
+                     "Using --internal with these roots will generate no dependencies.")
+                     
     info("")
     info("Roots of the input files:")
     for root in inroots:
@@ -372,7 +376,8 @@ def main():
     for key, files in allfiles.iteritems():
         found_roots.add(key[0])
         found_roots.update(map(itemgetter(0),files))
-    found_roots.remove(None)
+    if None in found_roots:
+        found_roots.remove(None)
     for root in sorted(found_roots):
         info("  %s" % root)
 

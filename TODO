@@ -5,6 +5,12 @@
 snakefood
 =========
 
+- BUG IMPORTANT: You need to figure out how to deal with --internal when
+  snakefood is being run on directories above the parent dir.
+
+  - Remove important note in documentation.
+
+
 - Add more new popular codebases to tests.
 
 
