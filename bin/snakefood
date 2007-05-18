@@ -167,9 +167,6 @@ def find_dotted(names, parentdir=None):
     else:
         return filename
 
-
-
-
 def is_python(fn):
     "Return true if the file is a Python file."
     if fn.endswith('.py'):
@@ -264,7 +261,7 @@ def is_package_root(dn):
         return False
     else:
         files = os.listdir(dn)
-        pyfiles = [x for x in files if x.endswith('.py')]
+        pyfiles = [x for x in files if x.endswith('.py') or x.endswith('.so')]
 
         # Note: we skip directories which only contain a single distutils
         # setup.py file.
@@ -399,7 +396,7 @@ def main():
                 xfn = dfn
                 if basename(xfn) == '__init__.py':
                     xfn = dirname(xfn)
-
+                
                 to_ = relfile(xfn)
                 if opts.internal and to_[0] not in inroots:
                     continue

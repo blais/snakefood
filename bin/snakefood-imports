@@ -1,0 +1,347 @@
+#!/usr/bin/env python
+"""
+Parse Python files and output a unified list of imported symbols.
+
+See http://furius.ca/snakefood for details.
+"""
+
+import sys, os, logging, traceback, re
+import imp, compiler
+from os.path import *
+from collections import defaultdict
+from operator import itemgetter
+
+
+class ImportVisitor(object):
+    "AST visitor for grabbing the import statements."
+
+    def __init__(self):
+        self.modules = []
+
+    def visitImport(self, node):
+        self.modules.extend((x[0], None, node.lineno) for x in node.names)
+
+    def visitFrom(self, node):
+        modname = node.modname
+        for name, as_ in node.names:
+            if name != '*':
+                mod = (modname, name, node.lineno)
+            else:
+                mod = (modname, None, node.lineno)
+            self.modules.append(mod)
+
+ERROR_IMPORT = "    Line %d: Could not import module '%s'"
+ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
+ERROR_SOURCE = "       %s"
+
+def process_file(fn, verbose):
+    "Returns a list of the files it depends on."
+    file_errors = []
+
+    try:
+        mod = compiler.parseFile(fn)
+    except Exception, e:
+        logging.error("Error processing file '%s':\n\n%s" %
+                      (fn, traceback.format_exc(sys.stderr)))
+        return [], file_errors
+
+    vis = ImportVisitor()
+    compiler.walk(mod, vis)
+
+    for modname, name, lineno in vis.modules:
+        print modname, name, lineno
+## Look for local import first and adjust module name if necessary.
+
+
+
+
+
+
+## # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.
+## try:
+##     from imp import ImpImporter
+## except ImportError:
+##     from pkgutil import ImpImporter
+## 
+## libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
+## 
+## exceptions = ('os.path',)
+## builtin_module_names = sys.builtin_module_names + exceptions
+## 
+## module_cache = {}
+## 
+## def find_dotted_module(modname, sub, parentdir):
+##     """
+##     A version of find_module that supports dotted module names (packages).  This
+##     function returns the filename of the module if found, otherwise returns
+##     None.
+## 
+##     If 'sub' is not None, it first attempts to import 'modname.sub', and if it
+##     fails, it must therefore not be a module, so we look up 'modname' and return
+##     that instead.
+## 
+##     'parentdir' is the directory of the file that attempts to do the import.  We
+##     attempt to do a local import there first.
+##     """
+##     # Check for builtins.
+##     if modname in builtin_module_names:
+##         return join(libpath, modname), None
+## 
+##     errors = []
+##     names = modname.split('.')
+## 
+##     # Try relative import, then global imports.
+##     fn = find_dotted(names, parentdir)
+##     if not fn:
+##         try:
+##             fn = module_cache[modname]
+##         except KeyError:
+##             fn = find_dotted(names)
+##             module_cache[modname] = fn
+## 
+##         if not fn:
+##             errors.append((ERROR_IMPORT, modname))
+##             return None, errors
+## 
+##     # If this is a from-form, try the target symbol as a module.
+##     if sub:
+##         fn2 = find_dotted([sub], dirname(fn))
+##         if fn2:
+##             fn = fn2
+##         else:
+##             errors.append((ERROR_SYMBOL, '.'.join((modname, sub))))
+##             # Pass-thru and return the filename of the parent, which was found.
+## 
+##     return fn, errors
+## 
+## def find_dotted(names, parentdir=None):
+##     """
+##     Dotted import.  'names' is a list of path components, 'parentdir' is the
+##     parent directory.
+##     """
+##     filename = None
+##     for name in names:
+##         mod = ImpImporter(parentdir).find_module(name)
+##         if not mod:
+##             break
+##         filename = mod.get_filename()
+##         if not filename:
+##             break
+##         parentdir = dirname(filename)
+##     else:
+##         return filename
+
+
+
+
+def is_python(fn):
+    "Return true if the file is a Python file."
+    if fn.endswith('.py'):
+        return True
+    else:
+        file_head = open(fn).read(48)
+        if re.match("#!.*\\bpython", file_head):
+            return True
+
+_iter_ignores = ['.svn', 'CVS', 'build']
+# Note: 'build' is for those packages which have been installed with setup.py.
+# It is pretty common to forget these around.
+
+def iter_pyfiles(dirsorfns, ignores=None):
+    """Yield all the files ending with .py recursively.  'dirsorfns' is a list
+    of filenames or directories."""
+    assert isinstance(dirsorfns, (list, tuple))
+    assert isinstance(ignores, list)
+
+    ignores = ignores or _iter_ignores
+    for dn in dirsorfns:
+        dn = realpath(dn)
+
+        if not isdir(dn):
+            if is_python(dn):
+                yield dn
+
+        else:
+            for root, dirs, files in os.walk(dn):
+                for r in ignores:
+                    try:
+                        dirs.remove(r)
+                    except ValueError:
+                        pass
+
+                afiles = [join(root, x) for x in files]
+                for fn in filter(is_python, afiles):
+                    yield fn
+
+
+def find_roots(list_dirofn, _):
+    """
+    Given a list of directories or filenames, find Python files and calculate
+    the entire list of roots.
+    """
+    inroots = set()
+    for fn in list_dirofn:
+        inroots.add(find_package_root(fn))
+    return sorted(inroots)
+
+def find_package_root(fn):
+    "Returns the package root for the given Python file."
+    # Find the root of the packages.
+    packroot = realpath(fn)
+    if not isdir(packroot):
+        packroot = dirname(packroot)
+    while 1:
+        if not exists(join(packroot, '__init__.py')):
+            break
+        packroot = dirname(packroot)
+    return packroot
+
+def relfile(fn):
+    "Return pairs of (package root, relative filename)."
+    root = find_package_root(realpath(fn))
+    return root, fn[len(root)+1:]
+
+# (Refactor candidate.)
+def output_depends(depdict):
+    """Given a dictionary of (from -> list of targets), generate an appropriate
+    output file."""
+
+    # Output the dependencies.
+    write = sys.stdout.write
+    for (from_root, from_), targets in sorted(depdict.iteritems(),
+                                             key=itemgetter(0)):
+        for to_root, to_ in sorted(targets):
+            write(repr( ((from_root, from_), (to_root, to_)) ))
+            write('\n')
+
+LOG_FORMAT = "%(levelname)-12s: %(message)s"
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip())
+
+    parser.add_option('-I', '--ignore', dest='ignores', action='append', default=[],
+                      help="Add the given directory name to the list to be ignored.")
+
+    parser.add_option('-v', '--verbose', action='count', default=0,
+                      help="Output more debugging information")
+
+    opts, args = parser.parse_args()
+    logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
+                        format=LOG_FORMAT)
+    if not args:
+        logging.warning("Searching for files from root directory.")
+        args = ['.']
+
+    info = logging.info
+
+    # Get the list of package roots for our input files and prepend them to the
+    # module search path to insure localized imports.
+    inroots = find_roots(args, opts.ignores)
+    info("")
+    info("Roots of the input files:")
+    for root in inroots:
+        info('  %s' % root)
+
+    info("")
+    info("Using the following import path to search for modules:")
+    sys.path = inroots + sys.path
+    for dn in sys.path:
+        info("  %s" % dn)
+    inroots = frozenset(inroots)
+
+    # Find all the dependencies.
+    info("")
+    info("Processing files:")
+    info("")
+    allfiles = defaultdict(set)
+    allerrors = []
+    processed_files = set()
+
+    fiter = iter_pyfiles(args, opts.ignores)
+    while 1:
+        newfiles = set()
+        for fn in fiter:
+            if fn in processed_files:
+                continue # Make sure we process each file only once.
+
+            info("  %s" % fn)
+            processed_files.add(fn)
+            process_file(fn, opts.verbose)
+
+##             files, errors = process_file(fn, opts.verbose)
+##             allerrors.extend(errors)
+            
+##             # When packages are the source of dependencies, remove the __init__
+##             # file.  This is important because the targets also do not include the
+##             # __init__ (i.e. when "from <package> import <subpackage>" is seen).
+##             if basename(fn) == '__init__.py':
+##                 fn = dirname(fn)
+
+##             # Make sure all the files at least appear in the output, even if it has
+##             # no dependency.
+##             from_ = relfile(fn)
+##             if opts.internal and from_[0] not in inroots:
+##                 continue
+##             allfiles[from_].add((None, None))
+
+##             # Add the dependencies.
+##             for dfn in files:
+##                 xfn = dfn
+##                 if basename(xfn) == '__init__.py':
+##                     xfn = dirname(xfn)
+
+##                 to_ = relfile(xfn)
+##                 if opts.internal and to_[0] not in inroots:
+##                     continue
+##                 allfiles[from_].add(to_)
+##                 newfiles.add(dfn)
+
+
+        if not (opts.follow and newfiles):
+            break
+        else:
+            fiter = iter(sorted(newfiles))
+
+
+    info("")
+    info("SUMMARY")
+    info("=======")
+
+    # Output a list of the symbols that could not be imported as modules.
+    reports = [("Modules that could not be imported:", ERROR_IMPORT, logging.warning)]
+    if opts.verbose >= 2:
+        reports.append(
+            ("Symbols that could not be imported as modules:", ERROR_SYMBOL, logging.debug))
+
+    for msg, errtype, efun in reports:
+        names = frozenset(name for err, name in allerrors if err is errtype)
+        if names:
+            efun("")
+            efun(msg)
+            for name in sorted(names):
+                efun("  %s" % name)
+
+    # Output the list of roots found.
+    info("")
+    info("Found roots:")
+
+    found_roots = set()
+    for key, files in allfiles.iteritems():
+        found_roots.add(key[0])
+        found_roots.update(map(itemgetter(0),files))
+    found_roots.remove(None)
+    for root in sorted(found_roots):
+        info("  %s" % root)
+
+    # Output the dependencies.
+    info("")
+    output_depends(allfiles)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        raise SystemExit("Interrupted.")
+
+
