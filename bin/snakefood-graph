@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """
 Read snakefood dependencies and output a visual graph.
+
+See http://furius.ca/snakefood for details.
 """
 
 import sys, os, logging

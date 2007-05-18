@@ -5,14 +5,16 @@
 snakefood
 =========
 
-- FIXME: Rewrite the automatic root finding to work up and then down
-  automatically.
-- FIXME: Print out the list of given files before the list of roots.
-- FIXME: Write a test for the list of roots.
+- FIXME: Finish tests for the list of roots.
 
 
+snakefood-imports
+=================
 
-- Add more new popular codebases to tests.
+- Build this new script, very simple script, that lists the entire
+  list of imports from the given modules in the command-line.  I think
+  if we do this, we will want to create a snakefood package and
+  finally place the code in common.
 
 
 snakefood-cluster

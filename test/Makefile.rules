@@ -25,12 +25,14 @@ else
    PSTOPDF=ps2pdf -
 endif
 
+FOOD_FLAGS= --internal-only
+
 
 all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps: $(ROOT)
-	snakefood -v --internal-only $(ROOT) $(FOOD_FLAGS) 2>&1 > $@ | tee raw.log
+	snakefood -v $(FOOD_FLAGS) $(ROOT) 2>&1 > $@ | tee raw.log
 
 # Implicit rules.
 .deps.dot:

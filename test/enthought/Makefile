@@ -1,22 +1,37 @@
 # Graph the dependencies for the Enthought Tool Suite.
 
-ROOT=$(HOME)/p/enthought/src/lib
+ROOT=$(HOME)/p/enthought
 
 PDFS =							\
-	enthought.pdf					\
-	enthought-big.pdf				\
-	traits.pdf					\
-	traits_simplified.pdf			
+	enthought.pdf					
+
+# 	traits.pdf					\
+# 	traits_simplified.pdf			
 
 include ../Makefile.rules
 
-# Enthought, clustered.
-enthought.clusters:
-	(cd $(ROOT); find enthought/* -mindepth 0 -maxdepth 0 -type d ! -name .svn > $(shell pwd)/$@)
+# Old ETS, before the split.
+# 
+# ROOT=$(HOME)/p/enthought/src/lib
+# 
+# # Enthought, clustered.
+# enthought.clusters:
+# 	(cd $(ROOT); find enthought/* -mindepth 0 -maxdepth 0 -type d ! -name .svn > $(shell pwd)/$@)
+# 
+# # With more detail.
+# enthought-big.clusters:
+# 	(cd $(ROOT); find enthought/* -mindepth 1 -maxdepth 1 -type d ! -name .svn > $(shell pwd)/$@)
 
-# With more detail.
-enthought-big.clusters:
-	(cd $(ROOT); find enthought/* -mindepth 1 -maxdepth 1 -type d ! -name .svn > $(shell pwd)/$@)
+# New ETS, after split.
+
+FOOD_FLAGS=
+
+enthought.deps: enthought.clusters raw.deps 
+	cat raw.deps | grep enthought/ | grep -vE '(/usr/lib/python|examples|test|demo)' | snakefood-cluster -f $< > $@
+
+enthought.clusters:
+	(cd $(ROOT); find * -mindepth 2 -maxdepth 2 -type d | \
+	             grep -v /.svn | sed -e 's@[^/]*/@@') > $(shell pwd)/$@
 
 # Just traits.
 # We cluster traits differently, we want no details outside of traits, and lots inside.

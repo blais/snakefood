@@ -4,6 +4,8 @@ Read snakefood dependencies from stdin and cluster according to filenames.
 
 You need to call this script with the names of directories to cluster together,
 for relative filenames.
+
+See http://furius.ca/snakefood for details.
 """
 
 import sys

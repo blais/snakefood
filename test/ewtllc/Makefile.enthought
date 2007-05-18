@@ -2,13 +2,12 @@
 
 ROOT=$(HOME)/p/enthought.mt/experiments/signal
 
+FOOD_FLAGS = 
+
 PDFS =						\
 	signal.pdf
 
 include ../Makefile.rules
-
-raw.deps: 
-	snakefood --debug $(FOOD_FLAGS) $(ROOT) > $@
 
 signal.deps: signal.clusters raw.deps
 	cat raw.deps | snakefood-cluster -f $< | grep -v /usr/lib/python > $(shell pwd)/$@
