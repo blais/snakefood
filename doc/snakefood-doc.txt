@@ -160,16 +160,56 @@ How Packages Are Automatically Found
 ------------------------------------
 
 For each file or directory that you specify on the command-line,
-``snakefood`` automatically figures out which package it lives in.  It
-does this by walking up the directory hierarchy of each file until it
-finds a directory without a ``__init__.py`` file.
+``snakefood`` automatically figures out which root it lives in.  What
+we call a “root” in this document is a directory that should be in
+``PYTHONPATH`` if you were to import the given files from a script.
+
+Snakefood finds the root by walking up the directory hierarchy of each
+file until it finds a directory without a ``__init__.py`` file, or by
+walking down the directory hierarchy until it finds such roots.  For
+example, if you have the following files::
+
+  FIXME TODO [2007-05-18] add tree, see TODO.
 
 All of the package roots found this way are automatically prepended to
 the Python import path, so you do not have to configure your
-PYTHONPATH before you invoke ``snakefood``.  The roots are also used
-to separate the filename in two parts: the package root, and the
-filename relative to that root (see the section on dependencies format
-below).
+PYTHONPATH before you invoke ``snakefood``.  ``sys.path`` is in effect
+when processing imports.  It is simply augmented to include the roots
+that snakefood found
+
+The roots used to separate the filename in two parts: the package
+root, and the filename relative to that root (see the section on
+dependencies format below).
+
+
+.. .. important::
+.. 
+..    Also, if you run ``snakefood`` on a directory **above a package
+..    root** with the ``--internal-only`` option, since the directory
+..    does not belong to a root that lives beneath that directory, all
+..    the files will be filtered out.  You need to run snakefood on at
+..    least a package root if you're using the ``--internal-only``
+..    option.
+.. 
+..      NOTE: This is a funny quirk that I'm planning on fixing soon.  It
+..      can be figured out automatically I think [blais, 2007-05-18].
+.. 
+..    For example, if you have the following file hierarchy::
+.. 
+..       /data/proj1/
+..       /data/proj1/root1/
+..       /data/proj1/root1/pack1/
+..       /data/proj1/root1/pack1/__init__.py
+..       /data/proj1/root1/pack1/mod1.py
+..       /data/proj1/root1/pack1/mod2.py
+.. 
+..    If you use ``--internal-only``, you need to run it at least
+..    ``/data/proj1/root1`` or below.  If you run it in ``/data/proj1``,
+..    no package root is found and the internal restriction will output
+..    nothing and you will get a warning.
+.. 
+
+
 
 
 Following Dependencies
@@ -209,33 +249,8 @@ that you specify on the command-line.
    codebases often have such directories containing test scripts,
    installation code and what not, which cannot be imported directly.
    Add those directories to the command-line if you want to include
-   them while using the ``--internal`` option.
-
-.. important::
-
-   Also, if you run ``snakefood`` on a directory **above a package
-   root** with the ``--internal-only`` option, since the directory
-   does not belong to a root that lives beneath that directory, all
-   the files will be filtered out.  You need to run snakefood on at
-   least a package root if you're using the ``--internal-only``
-   option.
-
-     NOTE: This is a funny quirk that I'm planning on fixing soon.  It
-     can be figured out automatically I think [blais, 2007-05-18].
-
-   For example, if you have the following file hierarchy::
-
-      /data/proj1/
-      /data/proj1/root1/
-      /data/proj1/root1/pack1/
-      /data/proj1/root1/pack1/__init__.py
-      /data/proj1/root1/pack1/mod1.py
-      /data/proj1/root1/pack1/mod2.py
-
-   If you use ``--internal-only``, you need to run it at least
-   ``/data/proj1/root1`` or below.  If you run it in ``/data/proj1``,
-   no package root is found and the internal restriction will output
-   nothing and you will get a warning.
+   them while using the ``--internal`` option, or generate raw
+   dependencies and filter with grep.
 
 
 The Format of Dependencies Files

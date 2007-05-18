@@ -5,10 +5,11 @@
 snakefood
 =========
 
-- BUG IMPORTANT: You need to figure out how to deal with --internal when
-  snakefood is being run on directories above the parent dir.
+- FIXME: Rewrite the automatic root finding to work up and then down
+  automatically.
+- FIXME: Print out the list of given files before the list of roots.
+- FIXME: Write a test for the list of roots.
 
-  - Remove important note in documentation.
 
 
 - Add more new popular codebases to tests.
