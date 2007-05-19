@@ -95,10 +95,6 @@ def process_file(fn, verbose):
 
 
 # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.
-try:
-    from imp import ImpImporter
-except ImportError:
-    from pkgutil import ImpImporter
 
 libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
 
@@ -150,6 +146,11 @@ def find_dotted_module(modname, sub, parentdir):
             # Pass-thru and return the filename of the parent, which was found.
 
     return fn, errors
+
+try:
+    from imp import ImpImporter
+except ImportError:
+    from pkgutil import ImpImporter
 
 def find_dotted(names, parentdir=None):
     """
