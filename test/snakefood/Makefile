@@ -1,7 +1,13 @@
 # Run the automated tests.
 
-.SUFFIXES: .py .deps .log
+.SUFFIXES: .py .deps .log .expect .roots
 
+all: $(ROOTS)
+## all: $(TARGETS)
+
+
+
+# Tests comparing actual output with expected output.
 TARGETS =					\
 	simple/stdlib				\
 	simple/invalid				\
@@ -9,24 +15,26 @@ TARGETS =					\
 	project/foo_import			\
 	project/foo_from
 
-ROOTTESTS =					\
-	roots
-
-all: $(ROOTTESTS)
-## all: $(TARGETS) $(ROOTTESTS)
-
 $(TARGETS):
 	@echo "Testing $@"
 	@snakefood $@.py > $@.deps 2> $@.log
 	@diff $@.expect $@.deps
 
-FIXME contineue
 
-.roots:
+
+# Testing the root identification, against expect files.
+REXPECTS := $(shell find roots -name '*.expect')
+ROOTS = $(REXPECTS:.expect=.roots)
+
+.expect.roots:
 	@echo "Testing root $@"
-	snakefood --print-roots > /tmp/roots
-	@diff $<.expect
+	snakefood --print-roots $(dir $<) > $@
+	diff $< $@
+
+viewroots:
+	@for i in $(REXPECTS) ; do echo ; echo $$PWD/$$(dirname $$i) ; cat $$i ; done
+
 
 clean:
 	rm -f *.deps *.log
-
+	rm $(ROOTS)
