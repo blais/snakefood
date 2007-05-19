@@ -198,47 +198,22 @@ trade-offs, 95% is good enough for 95% of its uses.</p>
 <tt class="docutils literal"><span class="pre">snakefood</span></tt> automatically figures out which root it lives in.  What
 we call a &#8220;root&#8221; in this document is a directory that should be in
 <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt> if you were to import the given files from a script.</p>
-<p>Snakefood finds the root by walking up the directory hierarchy of each
-file until it finds a directory without a <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file, or by
-walking down the directory hierarchy until it finds such roots.  For
-example, if you have the following files:</p>
-<pre class="literal-block">
-FIXME TODO [2007-05-18] add tree, see TODO.
-</pre>
+<p>Snakefood finds the package roots,</p>
+<ol class="arabic simple">
+<li>by walking <strong>up</strong> the directory hierarchy of each file until it
+finds a directory without a <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file, or if no package
+root is found this way,</li>
+<li>by walking <strong>down</strong> the directory hierarchy until it finds such
+roots.</li>
+</ol>
 <p>All of the package roots found this way are automatically prepended to
 the Python import path, so you do not have to configure your
 PYTHONPATH before you invoke <tt class="docutils literal"><span class="pre">snakefood</span></tt>.  <tt class="docutils literal"><span class="pre">sys.path</span></tt> is in effect
 when processing imports.  It is simply augmented to include the roots
 that snakefood found</p>
-<p>The roots used to separate the filename in two parts: the package
-root, and the filename relative to that root (see the section on
-dependencies format below).</p>
-<!-- .. important:: -->
-<!--  -->
-<!-- Also, if you run ``snakefood`` on a directory **above a package -->
-<!-- root** with the ``- -internal-only`` option, since the directory -->
-<!-- does not belong to a root that lives beneath that directory, all -->
-<!-- the files will be filtered out.  You need to run snakefood on at -->
-<!-- least a package root if you're using the ``- -internal-only`` -->
-<!-- option. -->
-<!--  -->
-<!-- NOTE: This is a funny quirk that I'm planning on fixing soon.  It -->
-<!-- can be figured out automatically I think [blais, 2007-05-18]. -->
-<!--  -->
-<!-- For example, if you have the following file hierarchy:: -->
-<!--  -->
-<!-- /data/proj1/ -->
-<!-- /data/proj1/root1/ -->
-<!-- /data/proj1/root1/pack1/ -->
-<!-- /data/proj1/root1/pack1/__init__.py -->
-<!-- /data/proj1/root1/pack1/mod1.py -->
-<!-- /data/proj1/root1/pack1/mod2.py -->
-<!--  -->
-<!-- If you use ``- -internal-only``, you need to run it at least -->
-<!-- ``/data/proj1/root1`` or below.  If you run it in ``/data/proj1``, -->
-<!-- no package root is found and the internal restriction will output -->
-<!-- nothing and you will get a warning. -->
-<!--  -->
+<p>The roots are added to the module path and used to separate the
+filename in two parts: the package root, and the filename relative to
+that root (see the section on dependencies format below).</p>
 </div>
 <div class="section">
 <h2><a class="toc-backref" href="#id8" id="following-dependencies" name="following-dependencies">Following Dependencies</a></h2>
