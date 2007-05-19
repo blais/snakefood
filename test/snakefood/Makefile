@@ -25,8 +25,14 @@ $(TARGETS):
 
 
 # Testing the root identification, against expect files.
-REXPECTS := $(shell find roots -name '*.expect')
-ROOTS = $(REXPECTS:.expect=.roots)
+RDIRS := $(shell find roots -type d | grep -v /.svn)
+REXPECTS := $(RDIRS:=/.expect)
+ROOTS = $(RDIRS:=/.roots)
+
+debug:
+	echo $(RDIRS)
+	echo $(REXPECTS)
+	echo $(ROOTS)
 
 TESTROOT = $(PWD)
 
