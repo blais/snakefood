@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+"""
+Read a snakefood dependencies file and copy all the files to a new root.
+
+Provide the new root on the command-line.
+"""
+
+import sys, os, logging, shutil
+from os.path import *
+
+
+# (Refactor candidate.)
+def read_depends(f):
+    "Generator for the dependencies read from the given file object."
+    for line in f.xreadlines():
+        try:
+            yield eval(line)
+        except Exception:
+            logging.warning("Invalid line: '%s'" % line)
+
+def flatten_depends(depends):
+    """Yield the list of dependency pairs to a single list of (root, relfn)
+    pairs, in the order that they appear."""
+    seen = set([(None, None)])
+    for dep in depends:
+        for pair in dep:
+            if pair in seen:
+                continue
+            seen.add(pair)
+            yield pair
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip())
+
+    parser.add_option('-o', '--overwrite', action='store_true',
+                      help="Overwrite the destination files. "
+                      "If this is not set, an error is generated if "
+                      "the destination file exists.")
+
+    parser.add_option('-i', '--insert-package-inits', action='store_true',
+                      help="Automatically create missing __init__.py in intervening directories.")
+
+    opts, args = parser.parse_args()
+
+    if len(args) != 1:
+        parser.error("You must specify the destination root.")
+    dest, = args
+
+    depends = read_depends(sys.stdin)
+    
+    for droot, drel in flatten_depends(depends):
+        srcfn = join(droot, drel)
+        if isdir(srcfn):
+            drel = join(drel, '__init__.py')
+            srcfn = join(droot, drel)
+        dstfn = join(dest, drel)
+
+        if not opts.overwrite and exists(dstfn):
+            logging.error("Cannot overwrite '%s'." % dstfn)
+            raise SystemExit(1)
+
+        destdir = dirname(dstfn)
+        if not exists(destdir):
+            os.makedirs(destdir)
+            
+        print 'Copying: %s' % srcfn
+        shutil.copyfile(srcfn, dstfn)
+
+    if opts.insert_package_inits:
+        for root, dirs, files in os.walk(dest):
+            if root == dest:
+                continue  # Not needed at the very root.
+            initfn = join(root, '__init__.py')
+            if not exists(initfn):
+                print 'Creating: %s' % initfn
+                f = open(initfn, 'w')
+                f.close()
+            
+if __name__ == '__main__':
+    main()
+
+

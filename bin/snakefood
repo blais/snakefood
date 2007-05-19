@@ -270,9 +270,10 @@ def is_package_root(dn):
         return False
     else:
         # Check if the directory contains Python files.
-        files = [join(dn, x) for x in listdir(dn)]
+        files = listdir(dn)
         pyfiles = []
-        for x in files:
+        for x in [join(dn, x) for x in files]:
+            ## FIXME: should we use opts.ignore here too?
             if x.endswith('.so') or is_python(x):
                 pyfiles.append(x)
                 if len(pyfiles) > maxlen_filesets:
@@ -285,7 +286,12 @@ def is_package_root(dn):
 
         # Note: We make use of the fact that dotted directory names cannot be
         # imported as packaged.
-        for sub in filter(lambda x: '.' not in x and isdir(x), files):
+        for sub in files:
+            if '.' in sub:
+                continue
+            sub = join(dn, sub)
+            if not isdir(sub):
+                continue
             if exists(join(sub, '__init__.py')):
                 return True
 

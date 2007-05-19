@@ -1,3 +1,28 @@
+# Conversion to filenames, this should work fine.
+
+def depend_to_filename(dep):
+    """Convert a dependency to a filename. 'dep' is expected to be a single pair
+    of the form (dir, filename-or-dir)."""
+    fn = join(*dep)
+    if isdir(fn):
+        fn = join(fn, '__init__.py')
+    return fn
+
+def depends_to_files(depends, do_from=True, do_to=True):
+    """Convert dependencies to a set of files."""
+    allfiles = set()
+    for from_, to_ in depends:
+        if do_from:
+            allfiles.add(depend_to_filename(from_))
+        if do_to and to_ != (None, None):
+            allfiles.add(depend_to_filename(to_))
+
+    return sorted(allfiles)
+
+
+
+
+
 # Filtering code (use grep instead).
 
 

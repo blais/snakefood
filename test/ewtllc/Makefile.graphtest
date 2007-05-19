@@ -11,6 +11,6 @@ FOOD_FLAGS= --internal --follow
 
 
 graphtest.clusters:
-	(cd $(ROOT); ls -1d mt/{gui,apps}/* | grep -v \\. | grep -v graphtest ; echo mt ) > $(shell pwd)/$@
+	(cd $(ROOT)/../../..; ls -1d mt/* | grep -v \\. | grep -vE '(apps|gui)' ) > $(shell pwd)/$@
 
 

@@ -6,4 +6,4 @@
 # Bash configuration for this project.
 #
 
-complete -F _optcomplete pydeps-gen2
+alias snakegraph='snakefood-graph | dot -Tps | ps2pdf - | xargf acroread'
