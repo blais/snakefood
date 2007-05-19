@@ -2,8 +2,8 @@
 
 .SUFFIXES: .py .deps .log .expect .roots
 
-all: $(ROOTS)
-## all: $(TARGETS)
+
+all: roots depends
 
 
 
@@ -14,6 +14,8 @@ TARGETS =					\
 	simple/notfound				\
 	project/foo_import			\
 	project/foo_from
+
+depends: $(TARGETS)
 
 $(TARGETS):
 	@echo "Testing $@"
@@ -26,15 +28,28 @@ $(TARGETS):
 REXPECTS := $(shell find roots -name '*.expect')
 ROOTS = $(REXPECTS:.expect=.roots)
 
+TESTROOT = $(PWD)
+
+roots: $(ROOTS)
+
 .expect.roots:
-	@echo "Testing root $@"
-	snakefood --print-roots $(dir $<) > $@
+	@echo "-- Testing root $@"
+	snakefood --print-roots $(dir $<) | sed -e "s@$(PWD)@@" > $@
 	diff $< $@
+
+genexpect: $(REXPECTS)
+
+.PHONY: $(REXPECTS)
+$(REXPECTS):
+	@echo "-- Generating expect file for $@"
+	snakefood --print-roots $(dir $@) | sed -e "s@$(PWD)@@" > $@
 
 viewroots:
 	@for i in $(REXPECTS) ; do echo ; echo $$PWD/$$(dirname $$i) ; cat $$i ; done
 
 
+
 clean:
 	rm -f *.deps *.log
-	rm $(ROOTS)
+	rm -f $(ROOTS)
+
