@@ -1,0 +1,16 @@
+# Graph the dependencies for extracting the graphtest tool.
+
+ROOT=$(HOME)/p/diamond/src/mt/apps/graphtest
+
+PDFS =						\
+	graphtest.pdf
+
+include ../Makefile.rules
+
+FOOD_FLAGS= --internal --follow
+
+
+graphtest.clusters:
+	(cd $(ROOT); ls -1d mt/{gui,apps}/* | grep -v \\. | grep -v graphtest ; echo mt ) > $(shell pwd)/$@
+
+

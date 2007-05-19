@@ -22,6 +22,7 @@ import imp, compiler
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
+from dircache import listdir
 
 
 class ImportVisitor(object):
@@ -172,9 +173,12 @@ def is_python(fn):
     if fn.endswith('.py'):
         return True
     else:
-        file_head = open(fn).read(48)
-        if re.match("#!.*\\bpython", file_head):
-            return True
+        try:
+            file_head = open(fn).read(64)
+            if re.match("#!.*\\bpython", file_head):
+                return True
+        except IOError:
+            return False
 
 _iter_ignores = ['.svn', 'CVS', 'build']
 # Note: 'build' is for those packages which have been installed with setup.py.
@@ -213,6 +217,7 @@ def find_roots(list_dirofn, _):
     """
     inroots = set()
     for fn in map(realpath, list_dirofn):
+
         # Search up the directory tree for a root.
         root = find_package_root(fn)
         if root:
@@ -253,6 +258,10 @@ def is_package_dir(dn):
     """Return true if this is a directory within a package."""
     return exists(join(dn, '__init__.py'))
 
+
+filesets_ignore = (['setup.py'],)
+maxlen_filesets = max(map(len, filesets_ignore))
+
 def is_package_root(dn):
     """Return true if this is a package root.  A package root is a directory
     that could be used as a PYTHONPATH entry."""
@@ -260,24 +269,32 @@ def is_package_root(dn):
     if exists(join(dn, '__init__.py')):
         return False
     else:
-        files = os.listdir(dn)
-        pyfiles = [x for x in files if x.endswith('.py') or x.endswith('.so')]
+        # Check if the directory contains Python files.
+        files = [join(dn, x) for x in listdir(dn)]
+        pyfiles = []
+        for x in files:
+            if x.endswith('.so') or is_python(x):
+                pyfiles.append(x)
+                if len(pyfiles) > maxlen_filesets:
+                    break
 
         # Note: we skip directories which only contain a single distutils
         # setup.py file.
-        if pyfiles and pyfiles != ['setup.py']:
+        if pyfiles and pyfiles not in filesets_ignore:
             return True
 
         # Note: We make use of the fact that dotted directory names cannot be
         # imported as packaged.
-        for sub in filter(isdir, (join(dn, x) for x in files if '.' not in x)):
+        for sub in filter(lambda x: '.' not in x and isdir(x), files):
             if exists(join(sub, '__init__.py')):
                 return True
+
     return False
 
 def relfile(fn):
     "Return pairs of (package root, relative filename)."
     root = find_package_root(realpath(fn))
+    assert root is not None, fn
     return root, fn[len(root)+1:]
 
 # (Refactor candidate.)
@@ -445,11 +462,13 @@ def main():
     info("")
     output_depends(allfiles)
 
+
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
     
+
 
 

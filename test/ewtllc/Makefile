@@ -19,8 +19,10 @@ mt.deps: diamond.deps
 	cat $< | grep -v mtt/ > $@
 
 # With the core package exploded.
-core.clusters: 
+core.clusters:
 	(cd $(ROOT); ls -1d */* | grep -v \\. | grep -v /core > $(shell pwd)/$@)
 
 apps.clusters:
 	(cd $(ROOT); ls -1d mt/{gui,apps}/* | grep -v \\. ; echo mt ) > $(shell pwd)/$@
+
+
