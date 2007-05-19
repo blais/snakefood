@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Install script for the snakefood dependency graph tool.
 """
@@ -10,8 +9,11 @@ import sys, os, os.path
 from distutils.core import setup
 
 
-allscripts = [os.path.join('bin', x) for x in os.listdir('bin')
-              if x.startswith('snakefood')]
+scripts = [
+    'bin/snakefood',
+    'bin/snakefood-graph',
+    'bin/snakefood-cluster'
+    ]
 
 def read_version():
     try:
@@ -32,7 +34,7 @@ from the dependency list.
       author="Martin Blais",
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
-      scripts = allscripts
+      scripts=scripts
      )
 
 
