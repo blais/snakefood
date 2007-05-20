@@ -429,6 +429,28 @@ essentially replaces grepping the files for imports.
 looking for files below the level of the file that is imported, in the
 same way that ``snakefood`` does.
 
+For example, to list the imports from ``snakefood``, I do this::
+
+  sivananda:~/p/snakefood/bin$ snakefood-imports snakefood
+  snakefood:20: sys
+  snakefood:20: os
+  snakefood:20: logging
+  snakefood:20: traceback
+  snakefood:20: re
+  snakefood:21: imp
+  snakefood:21: compiler
+  snakefood:22: os.path
+  snakefood:23: collections.defaultdict
+  snakefood:24: operator.itemgetter
+  snakefood:25: dircache.listdir
+  snakefood:151: imp.ImpImporter
+  snakefood:153: pkgutil.ImpImporter
+  snakefood:324: optparse
+
+Also, see the ``--unified`` option which will output a single set of
+unique imports for a set of files.
+
+
 
 Feedback and Comments
 =====================
