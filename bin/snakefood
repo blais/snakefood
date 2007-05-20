@@ -185,7 +185,7 @@ _iter_ignores = ['.svn', 'CVS', 'build']
 # Note: 'build' is for those packages which have been installed with setup.py.
 # It is pretty common to forget these around.
 
-def iter_pyfiles(dirsorfns, ignores=None):
+def iter_pyfiles(dirsorfns, ignores=None, abspaths=False):
     """Yield all the files ending with .py recursively.  'dirsorfns' is a list
     of filenames or directories."""
     assert isinstance(dirsorfns, (list, tuple))
@@ -193,7 +193,8 @@ def iter_pyfiles(dirsorfns, ignores=None):
 
     ignores = ignores or _iter_ignores
     for dn in dirsorfns:
-        dn = realpath(dn)
+        if abspaths:
+            dn = realpath(dn)
 
         if not isdir(dn):
             if is_python(dn):
@@ -390,7 +391,7 @@ def main():
     allerrors = []
     processed_files = set()
 
-    fiter = iter_pyfiles(args, opts.ignores)
+    fiter = iter_pyfiles(args, opts.ignores, True)
     while 1:
         newfiles = set()
         for fn in fiter:

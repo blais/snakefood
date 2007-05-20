@@ -12,7 +12,8 @@ from distutils.core import setup
 scripts = [
     'bin/snakefood',
     'bin/snakefood-graph',
-    'bin/snakefood-cluster'
+    'bin/snakefood-cluster',
+    'bin/snakefood-imports',
     ]
 
 def read_version():

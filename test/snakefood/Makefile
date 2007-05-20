@@ -25,16 +25,10 @@ $(TARGETS):
 
 
 # Testing the root identification, against expect files.
+TESTROOT = $(PWD)
 RDIRS := $(shell find roots -type d | grep -v /.svn)
 REXPECTS := $(RDIRS:=/.expect)
 ROOTS = $(RDIRS:=/.roots)
-
-debug:
-	echo $(RDIRS)
-	echo $(REXPECTS)
-	echo $(ROOTS)
-
-TESTROOT = $(PWD)
 
 roots: $(ROOTS)
 
@@ -58,4 +52,3 @@ viewroots:
 clean:
 	rm -f *.deps *.log
 	rm -f $(ROOTS)
-

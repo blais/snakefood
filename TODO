@@ -8,16 +8,6 @@ All
 - Refactor the code and create a snakefood.py module.
 
 
-snakefood
-=========
-
-
-snakefood-imports
-=================
-
-- Build this new script, very simple script, that lists the entire
-  list of imports from the given modules in the command-line.
-
 snakefood-cluster
 =================
 

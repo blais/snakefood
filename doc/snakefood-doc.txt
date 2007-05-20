@@ -23,7 +23,8 @@
       6.1  Using Standard UNIX Tools
       6.2  Using ``snakefood-cluster``
     7  Using a Makefile
-    8  Feedback and Comments
+    8  Links
+    9  Feedback and Comments
 
 
 Introduction
@@ -62,9 +63,9 @@ of your code and allow to improve modularity and reusability.
 
 (For the impatient.)  You will need Graphviz.  Snakefood generates a
 dot file (Graphviz input file).  Here is the simplest way to generate
-a graph::
+a graph [#]_::
 
-   snakefood /myproject | snakefood-graph | dot -Tps | pstopdf -i -o myproject.pdf
+   snakefood /myproject | snakefood-graph | dot -Tps | pstopdf -i | xargf acroread
 
 However **this will probably not do what you want**, unless your
 project is pretty small.  The dependency graphs for reasonably sized
@@ -74,6 +75,8 @@ files or by directory (see the text for the ``snakefood-cluster``
 tool).
 
 Read on for more details on how to use these tools.
+
+.. [#] See http://furius.ca/pubcode/ for the ``xargf`` tool.
 
 
 Installation
@@ -94,7 +97,7 @@ Installation
 Overview
 ========
 
-Snakefood provides three main tools:
+Snakefood provides a few main tools:
 
 1. ``snakefood``: Given a set of input files or root directories,
    generate a list of dependencies between the files;
@@ -107,9 +110,13 @@ Snakefood provides three main tools:
    a list of file clusters, and output a list of simplified
    (clustered) dependencies.
 
-Typically, you will use ``snakefood`` to generate the dependencies,
-pass those on to ``snakefood-graph`` and pass its output to ``dot`` to
-generate your output PDF file.
+4. ``snakefood-imports`` (complementary): A tool that given a set of
+   files and directories, finds and lists all the import statements
+   that are found, regardless of whether they can be imported or not.
+
+Typically, you will use ``snakefood`` to generate the dependencies and
+pass those on to ``snakefood-graph``, then pass its output to ``dot``
+to generate your output PDF file.
 
 .. figure:: programs1.png
 
