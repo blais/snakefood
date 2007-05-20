@@ -5,6 +5,8 @@
 All
 ===
 
+- Document snakefood-imports
+
 - Refactor the code and create a snakefood.py module.
 
 

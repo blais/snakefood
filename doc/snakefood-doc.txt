@@ -23,7 +23,7 @@
       6.1  Using Standard UNIX Tools
       6.2  Using ``snakefood-cluster``
     7  Using a Makefile
-    8  Links
+    8  Listing the Imports
     9  Feedback and Comments
 
 
@@ -415,6 +415,19 @@ For a set of more reusable make rules, take a look at
 ``snakefood/test/Makefile.rules`` and the Makefiles that we use to run
 out tests on existing codebases.  You can probably leverage this for
 your project (feel free to copy and modify it as needed).
+
+
+Listing the Imports
+===================
+
+If you only want to list the imported symbols and modules, without
+having the tool try to find the file where the modules are to be
+found, you can use the complementary tool ``snakefood-imports``, which
+essentially replaces grepping the files for imports.
+
+``snakefood-imports`` also disambiguates local imports from globals by
+looking for files below the level of the file that is imported, in the
+same way that ``snakefood`` does.
 
 
 Feedback and Comments
