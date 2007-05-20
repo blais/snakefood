@@ -122,6 +122,9 @@ to generate your output PDF file.
 
    Simple pipeline for generating a full dependency graph.
 
+For details on using the tools, call each program with the ``--help``
+option.
+
 
 Generating Dependencies
 =======================
