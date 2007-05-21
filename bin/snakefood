@@ -19,10 +19,13 @@ See http://furius.ca/snakefood for details.
 
 import sys, os, logging, traceback, re
 import imp, compiler
+from compiler.visitor import ASTVisitor
+from compiler.ast import Discard, Const
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
 from dircache import listdir
+
 
 
 class ImportVisitor(object):
@@ -30,24 +33,56 @@ class ImportVisitor(object):
 
     def __init__(self):
         self.modules = []
-
+        self.recent = []
+        
     def visitImport(self, node):
-        self.modules.extend((x[0], None, node.lineno) for x in node.names)
+        self.accept_imports()
+        self.recent.extend((x[0], None, node.lineno) for x in node.names)
 
     def visitFrom(self, node):
+        self.accept_imports()
         modname = node.modname
         for name, as_ in node.names:
             if name != '*':
                 mod = (modname, name, node.lineno)
             else:
                 mod = (modname, None, node.lineno)
-            self.modules.append(mod)
+            self.recent.append(mod)
+
+    def default(self, node):
+        pragma = None
+        if self.recent:
+            if isinstance(node, Discard):
+                children = node.getChildren()
+                if len(children) == 1 and isinstance(children[0], Const):
+                    const_node = children[0]
+                    pragma = const_node.value
+                        
+        self.accept_imports(pragma)
+
+    def accept_imports(self, pragma=None):
+        self.modules.extend((m, n, l, pragma) for (m, n, l) in self.recent)
+        self.recent = []
+        
+
+class ImportWalker(ASTVisitor):
+    "AST walker that we use to dispatch to a default method on the visitor."
+
+    def __init__(self, visitor):
+        ASTVisitor.__init__(self)
+        self._visitor = visitor
+
+    def default(self, node, *args):
+        self._visitor.default(node)
+        ASTVisitor.default(self, node, *args)
+
 
 ERROR_IMPORT = "    Line %d: Could not import module '%s'"
 ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
 ERROR_SOURCE = "       %s"
+WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
-def process_file(fn, verbose):
+def process_file(fn, verbose, process_pragmas):
     "Returns a list of the files it depends on."
     file_errors = []
 
@@ -59,7 +94,8 @@ def process_file(fn, verbose):
         return [], file_errors
 
     vis = ImportVisitor()
-    compiler.walk(mod, vis)
+    compiler.walk(mod, vis, ImportWalker(vis))
+    vis.accept_imports()
 
     output_code = (verbose >= 2)
     source_lines = None
@@ -71,10 +107,16 @@ def process_file(fn, verbose):
     dn = dirname(fn)
     seenset = set()
     for x in vis.modules:
-        if x in seenset:
+        mod, sub, lineno, pragma = x
+        if process_pragmas and pragma == 'OPTIONAL':
+            logging.warning(WARNING_OPTIONAL %
+                            (lineno, mod if sub is None else '%s.%s' % (mod, sub)))
             continue
-        seenset.add(x)
-        mod, sub, lineno = x
+            
+        sig = (mod, sub)
+        if sig in seenset:
+            continue
+        seenset.add(sig)
 
         modfile, errors = find_dotted_module(mod, sub, dn)
         if errors:
@@ -342,6 +384,10 @@ def main():
                       help="Only print the package roots corresponding to the input files."
                       "This is mostly used for testing and troubleshooting.")
 
+    parser.add_option('-d', '--disable-pragmas', action='store_false',
+                      dest='do_pragmas', default=True,
+                      help="Disable processing of pragma directives as strings after imports.")
+
     opts, args = parser.parse_args()
     logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
                         format=LOG_FORMAT)
@@ -400,7 +446,7 @@ def main():
 
             info("  %s" % fn)
             processed_files.add(fn)
-            files, errors = process_file(fn, opts.verbose)
+            files, errors = process_file(fn, opts.verbose, opts.do_pragmas)
             allerrors.extend(errors)
 
             # When packages are the source of dependencies, remove the __init__

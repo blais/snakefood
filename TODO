@@ -10,6 +10,14 @@ All
 - Refactor the code and create a snakefood.py module.
 
 
+snakefood
+=========
+
+- Support pragmas as strings.
+- Support pragmas as comments.
+- Document pragmas.
+
+
 snakefood-cluster
 =================
 
