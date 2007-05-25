@@ -229,13 +229,14 @@ _iter_ignores = ['.svn', 'CVS', 'build']
 
 def iter_pyfiles(dirsorfns, ignores=None, abspaths=False):
     """Yield all the files ending with .py recursively.  'dirsorfns' is a list
-    of filenames or directories."""
+    of filenames or directories.  If 'abspaths' is true, we assumethe paths are
+    absolute paths."""
     assert isinstance(dirsorfns, (list, tuple))
     assert isinstance(ignores, list)
 
     ignores = ignores or _iter_ignores
     for dn in dirsorfns:
-        if abspaths:
+        if not abspaths:
             dn = realpath(dn)
 
         if not isdir(dn):
