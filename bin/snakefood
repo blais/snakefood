@@ -438,7 +438,7 @@ def main():
     allerrors = []
     processed_files = set()
 
-    fiter = iter_pyfiles(args, opts.ignores, True)
+    fiter = iter_pyfiles(args, opts.ignores, False)
     while 1:
         newfiles = set()
         for fn in fiter:
