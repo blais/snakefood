@@ -7,26 +7,7 @@ See http://furius.ca/snakefood for details.
 import sys, os, logging
 from os.path import *
 
-
-# (Refactor candidate.)
-def read_depends(f):
-    "Generator for the dependencies read from the given file object."
-    for line in f.xreadlines():
-        try:
-            yield eval(line)
-        except Exception:
-            logging.warning("Invalid line: '%s'" % line)
-
-def eliminate_redundant_depends(depends):
-    "Remove the redundant dependencies."
-    alluniq = set()
-    outdeps = []
-    for dep in depends:
-        if dep in alluniq:
-            continue
-        alluniq.add(dep)
-        outdeps.append(dep)
-    return outdeps
+from depends import read_depends, eliminate_redundant_depends
 
 
 prefix = '''

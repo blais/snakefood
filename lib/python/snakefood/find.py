@@ -9,7 +9,96 @@ from compiler.visitor import ASTVisitor
 from compiler.ast import Discard, Const
 from os.path import *
 
-__all__ = ('find_dependencies', 'ERROR_IMPORT', 'ERROR_SYMBOL')
+__all__ = ('find_dependencies', 'find_imports',
+           'ERROR_IMPORT', 'ERROR_SYMBOL')
+
+
+
+ERROR_IMPORT = "    Line %d: Could not import module '%s'"
+ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
+ERROR_SOURCE = "       %s"
+WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
+
+def find_dependencies(fn, verbose, process_pragmas):
+    "Returns a list of the files it depends on."
+    file_errors = []
+
+    found_modules = parse_python_source(fn)
+    if found_modules is None:
+        return [], file_errors
+
+    output_code = (verbose >= 2)
+    source_lines = None
+    if output_code:
+        source_lines = open(fn).read().splitlines()
+
+    files = []
+    assert not isdir(fn)
+    dn = dirname(fn)
+    seenset = set()
+    for x in found_modules:
+        mod, sub, lineno, pragma = x
+        if process_pragmas and pragma == 'OPTIONAL':
+            logging.warning(WARNING_OPTIONAL %
+                            (lineno, mod if sub is None else '%s.%s' % (mod, sub)))
+            continue
+            
+        sig = (mod, sub)
+        if sig in seenset:
+            continue
+        seenset.add(sig)
+
+        modfile, errors = find_dotted_module(mod, sub, dn)
+        if errors:
+            file_errors.extend(errors)
+            for err, name in errors:
+                efun = logging.warning if err is ERROR_IMPORT else logging.debug
+                efun(err % (lineno, name))
+                if output_code:
+                    efun(ERROR_SOURCE % source_lines[lineno-1].rstrip())
+
+        if modfile is None:
+            continue
+        files.append(realpath(modfile))
+
+    return files, file_errors
+
+def find_imports(fn, verbose):
+    "Returns a list of the module names the file 'fn' depends on."
+
+    found_modules = find.parse_python_source(fn)
+    if found_modules is None:
+        return []
+
+    symnames = []
+    dn = dirname(fn)
+
+    packroot = None
+    for modname, name, lineno in found_modules:
+        islocal = False
+        names = modname.split('.')
+        if find_dotted(names, dn):
+            # This is a local import, we need to find the root in order to
+            # compute the absolute module name.
+            if packroot is None:
+                packroot = find_package_root(fn)
+                if not packroot:
+                    logging.warning(
+                        "%d: Could not find package root for local import '%s' from '%s'." %
+                        (lineno, modname, fn))
+                    continue
+
+            reldir = dirname(fn)[len(packroot)+1:]
+
+            modname = '%s.%s' % (reldir.replace(os.sep, '.'), modname)
+            islocal = True
+
+        if name is not None:
+            modname = '%s.%s' % (modname, name)
+        symnames.append( (modname, lineno, islocal) )
+
+    return symnames
+
 
 
 
@@ -62,15 +151,11 @@ class ImportWalker(ASTVisitor):
         ASTVisitor.default(self, node, *args)
 
 
-ERROR_IMPORT = "    Line %d: Could not import module '%s'"
-ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
-ERROR_SOURCE = "       %s"
-WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
+def parse_python_source(fn):
+    """Parse the file 'fn' and return a list of module tuples, in the form:
 
-def find_dependencies(fn, verbose, process_pragmas):
-    "Returns a list of the files it depends on."
-    file_errors = []
-
+        (modname, name, lineno, pragma)
+    """
     try:
         mod = compiler.parseFile(fn)
     except Exception, e:
@@ -82,41 +167,9 @@ def find_dependencies(fn, verbose, process_pragmas):
     compiler.walk(mod, vis, ImportWalker(vis))
     vis.accept_imports()
 
-    output_code = (verbose >= 2)
-    source_lines = None
-    if output_code:
-        source_lines = open(fn).read().splitlines()
+    return vis.modules
 
-    files = []
-    assert not isdir(fn)
-    dn = dirname(fn)
-    seenset = set()
-    for x in vis.modules:
-        mod, sub, lineno, pragma = x
-        if process_pragmas and pragma == 'OPTIONAL':
-            logging.warning(WARNING_OPTIONAL %
-                            (lineno, mod if sub is None else '%s.%s' % (mod, sub)))
-            continue
-            
-        sig = (mod, sub)
-        if sig in seenset:
-            continue
-        seenset.add(sig)
 
-        modfile, errors = find_dotted_module(mod, sub, dn)
-        if errors:
-            file_errors.extend(errors)
-            for err, name in errors:
-                efun = logging.warning if err is ERROR_IMPORT else logging.debug
-                efun(err % (lineno, name))
-                if output_code:
-                    efun(ERROR_SOURCE % source_lines[lineno-1].rstrip())
-
-        if modfile is None:
-            continue
-        files.append(realpath(modfile))
-
-    return files, file_errors
 
 
 # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.

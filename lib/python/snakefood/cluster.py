@@ -12,27 +12,8 @@ from itertools import imap
 from collections import defaultdict
 from operator import itemgetter
 
+from depends import read_depends, output_depends
 
-# (Refactor candidate.)
-def read_depends(f):
-    "Generator for the dependencies read from the given file object."
-    for line in f.xreadlines():
-        try:
-            yield eval(line)
-        except Exception:
-            logging.warning("Invalid line: '%s'" % line)
-
-# (Refactor candidate.)
-def output_depends(depdict):
-    """Given a dictionary of (from -> list of targets), generate an appropriate
-    output file."""
-    # Output the dependencies.
-    write = sys.stdout.write
-    for (from_root, from_), tolist in sorted(depdict.iteritems(),
-                                             key=itemgetter(0)):
-        for to_root, to_ in sorted(tolist):
-            write(repr( ((from_root, from_), (to_root, to_)) ))
-            write('\n')
 
 def apply_cluster(cdirs, root, fn):
     "If a cluster exists in 'cdirs' for the root/fn filename, reduce the filename."
@@ -82,7 +63,4 @@ def main():
 
     output_depends(clusfiles)
 
-
-if __name__ == '__main__':
-    main()
 

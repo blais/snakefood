@@ -16,16 +16,12 @@ dependencies on anything.
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging, traceback, re
-import imp, compiler
-from compiler.visitor import ASTVisitor
-from compiler.ast import Discard, Const
+import sys, os, logging
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
-from dircache import listdir
 
-from util import iter_pyfiles, is_python
+from util import iter_pyfiles
 from depends import output_depends
 from find import find_dependencies, ERROR_IMPORT, ERROR_SYMBOL
 from roots import *

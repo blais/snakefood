@@ -40,8 +40,9 @@ def find_package_root(dn):
     if not isdir(dn):
         dn = dirname(dn)
     while is_package_dir(dn):
+        assert dn
         dn = dirname(dn)
-    if is_package_root(dn):
+    if dn and is_package_root(dn):
         return dn
 
 def search_for_roots(dn):

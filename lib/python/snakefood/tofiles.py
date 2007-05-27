@@ -7,26 +7,9 @@ Provide the new root on the command-line.
 import sys, os, logging, shutil
 from os.path import *
 
+from depends import read_depends, flatten_depends
 
-# (Refactor candidate.)
-def read_depends(f):
-    "Generator for the dependencies read from the given file object."
-    for line in f.xreadlines():
-        try:
-            yield eval(line)
-        except Exception:
-            logging.warning("Invalid line: '%s'" % line)
 
-def flatten_depends(depends):
-    """Yield the list of dependency pairs to a single list of (root, relfn)
-    pairs, in the order that they appear."""
-    seen = set([(None, None)])
-    for dep in depends:
-        for pair in dep:
-            if pair in seen:
-                continue
-            seen.add(pair)
-            yield pair
 
 def main():
     import optparse
@@ -80,4 +63,3 @@ if __name__ == '__main__':
     main()
 
 
-FIXME convert it
