@@ -83,8 +83,10 @@ def find_package_root(dn):
     "Search up the directory tree for a package root."
     if not isdir(dn):
         dn = dirname(dn)
+
 ## FIXME: review the "if dn" condition, remove 'dn' and run it on traits_handler.py to reproduce the bug.
-    while dn and is_package_dir(dn):
+##    while dn and is_package_dir(dn):
+    while is_package_dir(dn):
         dn = dirname(dn)
     if dn and is_package_root(dn):
         return dn
@@ -180,6 +182,10 @@ def iter_pyfiles(dirsorfns, ignores=None, abspaths=False):
     for dn in dirsorfns:
         if not abspaths:
             dn = realpath(dn)
+            
+        if not exists(dn):
+            logging.warning("File '%s' does not exist." % dn)
+            continue
 
         if not isdir(dn):
             if is_python(dn):

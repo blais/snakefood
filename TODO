@@ -2,30 +2,26 @@
    TODO: snakefood
 =====================
 
-All
-===
+
+- Fix snakefood-imports potential bug (see FIXME).
 
 - Refactor the code and create a snakefood.py module.
 
-- Check if there is a directly enclosing try/except Importerror block
-  for ignoring deps.
+  - Rename all the script names to 'sfood-*' instead of 'snakefood-*',
+    it is shorter and looks nicer on a long pipeline of commands.
 
-- Document pragmas
-
-- Write a script to detect useless imports.
-
-- Rename all the script names to 'sfood-*' instead of 'snakefood-*',
-  it is shorter and looks nicer on a long pipeline of commands.
-
-
+- Document 'OPTIONAL' pragma directive
 
 
 snakefood
 =========
 
-- Support pragmas as strings.
 - Support pragmas as comments.
 - Document pragmas.
+
+
+- Check if there is a directly enclosing try/except Importerror block
+  for ignoring deps.
 
 
 snakefood-imports
@@ -63,8 +59,16 @@ snakefood-graph
 
 
 
+snakefood-checker
+=================
+(new program)
+
+- Write a script to detect useless imports (a mini checker)
+
+
 snakefood-sweep
 ===============
+(new program)
 
 - Create this new program, which reads dependencies from stdin and
   takes filenames arguments, and follows the nodes that match the
