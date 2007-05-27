@@ -14,9 +14,6 @@ sfood
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
 
-- Document the pragma directives ('OPTIONAL', 'CAUGHT')
-
-
 
 sfood-cluster
 =============
@@ -51,7 +48,8 @@ sfood-checker
 =============
 (new program)
 
-- Write a script to detect useless imports (a mini checker)
+- Write a script to detect useless imports (a mini pychecker using our
+  AST parser, that does this one job well)
 
 
 sfood-sweep
@@ -75,8 +73,8 @@ sfood-sweep
   source and a sink node.
 
 
-Other
-=====
+Other Ideas
+===========
 
 - Create a new sfood-filter script that does the same as
   --internal (use the set of roots from the dependency sources).

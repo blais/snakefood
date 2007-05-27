@@ -9,6 +9,8 @@ import sys, os, os.path
 from distutils.core import setup
 
 
+# Note: not all the scripts are installed. This is on purpose, to keep it clean,
+# we like to install just the essential.
 scripts = [
     'bin/sfood',
     'bin/sfood-graph',

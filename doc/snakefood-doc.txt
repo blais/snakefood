@@ -19,7 +19,7 @@
       5.5  Caching Raw Dependencies
       5.6  Warnings
       5.7  Nodes Without Dependencies
-      5.8  Pragmas: Ignoring Dependencies
+      5.8  Pragmas: Marking Dependencies as Ignored
     6   Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
       6.2  Using ``sfood-cluster``
@@ -310,8 +310,8 @@ you write to filter the dependencies need to be able to interpret
 those lines appropriately.
 
 
-Pragmas: Ignoring Dependencies
-------------------------------
+Pragmas: Marking Dependencies as Ignored
+----------------------------------------
 
 Sometimes when an import statement is wrapped in a conditional, you
 may want to avoid generating a dependency for that statement, for
