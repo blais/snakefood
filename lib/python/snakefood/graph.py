@@ -4,7 +4,7 @@ Read snakefood dependencies and output a visual graph.
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging
+import sys, os
 from os.path import *
 
 from depends import read_depends, eliminate_redundant_depends

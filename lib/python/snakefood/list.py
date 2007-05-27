@@ -8,16 +8,11 @@ AST to obtain the list of imports.)
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging, traceback, re
-import imp, compiler
+import os, logging
 from os.path import *
-from dircache import listdir
 
+from util import iter_pyfiles
 from find import find_imports
-from util import iter_pyfiles, is_python
-from roots import find_package_root, is_package_dir, is_package_root
-
-
 
 
 
@@ -51,14 +46,14 @@ def list_imports():
     if opts.unified:
         all_symnames = set()
         for fn in iter_pyfiles(args, opts.ignores):
-            all_symnames.update(x[0] for x in process_file(fn, opts.verbose))
+            all_symnames.update(x[0] for x in find_imports(fn, opts.verbose))
         for symname in sorted(all_symnames):
             print symname
     else:
         for fn in iter_pyfiles(args, opts.ignores):
             if opts.verbose:
                 lines = list(open(fn))
-            for symname, lineno, islocal in process_file(fn, opts.verbose):
+            for symname, lineno, islocal in find_imports(fn, opts.verbose):
                 print '%s:%d: %s' % (fn, lineno, symname)
                 if opts.verbose:
                     for no in xrange(lineno-1, len(lines)):

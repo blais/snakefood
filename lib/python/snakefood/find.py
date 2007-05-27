@@ -9,6 +9,8 @@ from compiler.visitor import ASTVisitor
 from compiler.ast import Discard, Const
 from os.path import *
 
+from roots import find_package_root
+
 __all__ = ('find_dependencies', 'find_imports',
            'ERROR_IMPORT', 'ERROR_SYMBOL')
 
@@ -66,7 +68,7 @@ def find_dependencies(fn, verbose, process_pragmas):
 def find_imports(fn, verbose):
     "Returns a list of the module names the file 'fn' depends on."
 
-    found_modules = find.parse_python_source(fn)
+    found_modules = parse_python_source(fn)
     if found_modules is None:
         return []
 
@@ -74,7 +76,7 @@ def find_imports(fn, verbose):
     dn = dirname(fn)
 
     packroot = None
-    for modname, name, lineno in found_modules:
+    for modname, name, lineno, _ in found_modules:
         islocal = False
         names = modname.split('.')
         if find_dotted(names, dn):
