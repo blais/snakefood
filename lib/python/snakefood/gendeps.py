@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Detect import statements using the AST parser.
 
@@ -7,7 +6,7 @@ This script outputs a comma-separated list of tuples:
   ((from_root, from_filename), (to_root, to_filename))
 
 The roots are the root directories where the modules lie.  You can use
-snakefood-graph or some other tool to filter, cluster and generate a meaningful
+sfood-graph or some other tool to filter, cluster and generate a meaningful
 graph from this list of dependencies.
 
 As a special case, if the 'to' tuple is (None, None), this means to at least
@@ -367,7 +366,7 @@ def output_depends(depdict):
 
 LOG_FORMAT = "%(levelname)-12s: %(message)s"
 
-def main():
+def gendeps():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
 
@@ -522,9 +521,9 @@ def main():
     output_depends(allfiles)
 
 
-if __name__ == '__main__':
+def main():
     try:
-        main()
+        gendeps()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
     

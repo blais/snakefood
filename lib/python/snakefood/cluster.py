@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Read snakefood dependencies from stdin and cluster according to filenames.
 

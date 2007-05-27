@@ -7,9 +7,21 @@
   - Rename all the script names to 'sfood-*' instead of 'snakefood-*',
     it is shorter and looks nicer on a long pipeline of commands.
 
+- Run sfood-imports on a large set of code, make sure not inf loop.
 
-snakefood
-=========
+- BUG: running it at the root of snakefood does not recurse anymore,
+  see what's up with the setup.py exception not working anymore.
+
+
+sfood-flatten
+=============
+
+- sfood-flatten: Implement this using the contents of tofiles.py.
+
+
+
+sfood
+=====
 
 - Support pragmas as comments.
 
@@ -18,10 +30,14 @@ snakefood
 
 - Document the pragma directives ('OPTIONAL', 'CAUGHT')
 
+- Move tools/rep... into sfood-files script that flattens a list of
+  deps into a list of files, and add it to the “Original uses” section
+  of the docs.
 
 
-snakefood-cluster
-=================
+
+sfood-cluster
+=============
 
 - Support non-prefix clusters: We could try clustering a variety of
   modules that do not share a common filename prefix.  Each of these
@@ -33,14 +49,14 @@ snakefood-cluster
   declared clusters.
 
 
-snakefood-graph
-===============
+sfood-graph
+===========
 
 - Make the graphs a lot prettier.  I'm not a Graphviz expert by any
   measure and I generally don't care much about pretty, so if someone
   wants to contribute that could be a good area.
 
-  - Support dot subgraphs somehow.  snakefood-graph should be able to
+  - Support dot subgraphs somehow.  sfood-graph should be able to
     take some prefixes on the command-line and group the nodes
     together somehow.
 
@@ -49,15 +65,15 @@ snakefood-graph
 
 
 
-snakefood-checker
-=================
+sfood-checker
+=============
 (new program)
 
 - Write a script to detect useless imports (a mini checker)
 
 
-snakefood-sweep
-===============
+sfood-sweep
+===========
 (new program)
 
 - Create this new program, which reads dependencies from stdin and
@@ -80,7 +96,7 @@ snakefood-sweep
 Other
 =====
 
-- Create a new snakefood-filter script that does the same as
+- Create a new sfood-filter script that does the same as
   --internal (use the set of roots from the dependency sources).
 
 

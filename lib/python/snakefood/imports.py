@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Parse Python files and output a unified list of imported symbols.
 

@@ -12,7 +12,7 @@ numpy.deps: raw.deps
 	cp $< $@
 
 numpy-simple.deps: numpy-simple.clusters raw.deps
-	cat raw.deps | grep -v test | snakefood-cluster -f $<  > $@
+	cat raw.deps | grep -v test | sfood-cluster -f $<  > $@
 
 numpy-simple.clusters:
 	( cd $(ROOT); find numpy -mindepth 1 -maxdepth 3 -type d | grep -v /.svn | sort -r ) > $(shell pwd)/$@

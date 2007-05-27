@@ -58,7 +58,7 @@ def filter_p(opts, root, fn):
 
 
 
-# Clustering code (use snakefood-cluster instead).
+# Clustering code (use sfood-cluster instead).
 
 
 def apply_cluster(cdirs, root, fn):

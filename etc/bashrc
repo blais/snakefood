@@ -6,4 +6,4 @@
 # Bash configuration for this project.
 #
 
-alias sgraph='snakefood-graph | dot -Tps | ps2pdf - | xargf acroread'
+alias sgraph='sfood-graph | dot -Tps | ps2pdf - | xargf acroread'

@@ -21,11 +21,12 @@
         5.6.1  Nodes Without Dependencies
     6   Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
-      6.2  Using ``snakefood-cluster``
+      6.2  Using ``sfood-cluster``
     7   Using a Makefile
     8   Listing the Imports
     9   Original Uses
       9.1  Enforcing Dependency Relationships on Commit
+      9.2  Splitting a Codebase
     10  Feedback and Comments
 
 
@@ -67,13 +68,13 @@ of your code and allow to improve modularity and reusability.
 dot file (Graphviz input file).  Here is the simplest way to generate
 a graph [#]_::
 
-   snakefood /myproject | snakefood-graph | dot -Tps | pstopdf -i | xargf acroread
+   sfood /myproject | sfood-graph | dot -Tps | pstopdf -i | xargf acroread
 
 However **this will probably not do what you want**, unless your
 project is pretty small.  The dependency graphs for reasonably sized
 projects are generally complex, and you will want to filter out some
 of the dependencies, and cluster some of them in logical groups of
-files or by directory (see the text for the ``snakefood-cluster``
+files or by directory (see the text for the ``sfood-cluster``
 tool).
 
 Read on for more details on how to use these tools.
@@ -101,23 +102,23 @@ Overview
 
 Snakefood provides a few main tools:
 
-1. ``snakefood``: Given a set of input files or root directories,
+1. ``sfood``: Given a set of input files or root directories,
    generate a list of dependencies between the files;
 
-2. ``snakefood-graph``: Read a list of dependencies and produce a
+2. ``sfood-graph``: Read a list of dependencies and produce a
    Graphviz dot file.  This file can be run through the Graphviz
    ``dot`` tool to produce a viewable/printable PDF file;
 
-3. ``snakefood-cluster`` (optional use): Read a list of dependencies,
+3. ``sfood-cluster`` (optional use): Read a list of dependencies,
    a list of file clusters, and output a list of simplified
    (clustered) dependencies.
 
-4. ``snakefood-imports`` (complementary): A tool that given a set of
+4. ``sfood-imports`` (complementary): A tool that given a set of
    files and directories, finds and lists all the import statements
    that are found, regardless of whether they can be imported or not.
 
-Typically, you will use ``snakefood`` to generate the dependencies and
-pass those on to ``snakefood-graph``, then pass its output to ``dot``
+Typically, you will use ``sfood`` to generate the dependencies and
+pass those on to ``sfood-graph``, then pass its output to ``dot``
 to generate your output PDF file.
 
 .. figure:: programs1.png
@@ -131,21 +132,21 @@ option.
 Generating Dependencies
 =======================
 
-To generate the dependencies, you use the ``snakefood`` tool, giving
+To generate the dependencies, you use the ``sfood`` tool, giving
 it a list of filenames::
 
-  snakefood file1.py file2.py file3.py
+  sfood file1.py file2.py file3.py
 
 You can also use directories::
 
-  snakefood /path/to/my/project
+  sfood /path/to/my/project
 
-If you specify directories, ``snakefood`` will recurse through them
+If you specify directories, ``sfood`` will recurse through them
 and automatically find all the Python source files and process them.
-Each file is processed independently, giving the file to ``snakefood``
+Each file is processed independently, giving the file to ``sfood``
 means “output the dependencies of this file”.
 
-``snakefood`` finds the dependencies in your source files using the
+``sfood`` finds the dependencies in your source files using the
 AST parser.  It does not figure out which ``import`` statements run
 conditionally; it simply finds all the imports in the file and outputs
 dependencies for each of them.
@@ -172,7 +173,7 @@ How Packages Are Automatically Found
 ------------------------------------
 
 For each file or directory that you specify on the command-line,
-``snakefood`` automatically figures out which root it lives in.  What
+``sfood`` automatically figures out which root it lives in.  What
 we call a “root” in this document is a directory that should be in
 ``PYTHONPATH`` if you were to import the given files from a script.
 
@@ -187,7 +188,7 @@ Snakefood finds the package roots,
 
 All of the package roots found this way are automatically prepended to
 the Python import path, so you do not have to configure your
-PYTHONPATH before you invoke ``snakefood``.  ``sys.path`` is in effect
+PYTHONPATH before you invoke ``sfood``.  ``sys.path`` is in effect
 when processing imports.  It is simply augmented to include the roots
 that snakefood found
 
@@ -199,12 +200,12 @@ that root (see the section on dependencies format below).
 Following Dependencies
 ----------------------
 
-By default, ``snakefood`` does not *follow* dependencies, that is, if
+By default, ``sfood`` does not *follow* dependencies, that is, if
 you ask it to process ``a.py`` and it finds that it has a dependency
 on ``b.py``, the file ``b.py`` does not get processed for its
 dependencies.
 
-Use the ``--follow`` option to tell ``snakefood`` to follow its
+Use the ``--follow`` option to tell ``sfood`` to follow its
 dependencies.  Files for each target dependency that were found are
 automatically examined for dependencies, and the process continues
 until all leaves are found (we check for cycles too).
@@ -221,7 +222,7 @@ Python.
 
 You can filter out the dependencies by yourself using the usual UNIX
 tools, like grep or sed.  But since this is a typical case, there is a
-convenient --internal-only option to snakefood that automatically
+convenient --internal-only option to sfood that automatically
 limits dependencies to the package roots corresponding to the files
 that you specify on the command-line.
 
@@ -267,14 +268,14 @@ The process of building a nicely filtered dependency graph is
 iterative, you will typically massage the dependencies to highlight
 the relationships that you care about.  Since calculating the
 dependencies can be a slow process (and filtering and graph generation
-is not), we recommend to save the output of ``snakefood`` to a file
+is not), we recommend to save the output of ``sfood`` to a file
 and work from that.
 
 
 Warnings
 --------
 
-You may see a lot of warnings when you run ``snakefood``.  This is
+You may see a lot of warnings when you run ``sfood``.  This is
 normal.  There are a few reasons for this:
 
 - The code you are analyzing requires some external packages that are
@@ -286,11 +287,11 @@ normal.  There are a few reasons for this:
 
      from database import table
 
-  Therefore, ``snakefood`` does not normally print out warnings for
+  Therefore, ``sfood`` does not normally print out warnings for
   these.  If you want to see a list of those failed imports, run it
   with the ``--verbose`` option.
 
-In eitehr case ``snakefood`` keeps running and produces all the other
+In eitehr case ``sfood`` keeps running and produces all the other
 dependencies that it finds.
 
 
@@ -317,14 +318,14 @@ Using Standard UNIX Tools
 Since dependencies are simple line-based Python expressions, you can
 use ``grep`` or ``sed`` to filter out or modify unwanted lines::
 
-  cat raw.deps | grep -v /usr/lib/python | snakefood-graph > out.dot
+  cat raw.deps | grep -v /usr/lib/python | sfood-graph > out.dot
 
 There is no formula for filtering or reformatting the dependencies; it
 depends on your codebase and what you want the graph to show.
 
 
-Using ``snakefood-cluster``
----------------------------
+Using ``sfood-cluster``
+-----------------------
 
 A useful operation is to transform the relative filenames into logical
 groups and to remove redundant lines.  We call this “clustering”.  A
@@ -333,7 +334,7 @@ particular directory prefix.
 
 You could do this with ``sed`` but you also need to remove redundant
 lines to do it properly, i.e. after simplification of the relative
-filenames, multiple lines will be equivalent.  ``snakefood-cluster``
+filenames, multiple lines will be equivalent.  ``sfood-cluster``
 does that automatically.  You create a file of cluster names::
 
    pack1
@@ -350,9 +351,9 @@ to this::
   (('/myproject', 'pack1'), ('/myproject', 'pack1'))
   (('/myproject', 'pack1'), ('/myproject', 'pack2'))
 
-Here is how to use the ``snakefood-cluster`` tool::
+Here is how to use the ``sfood-cluster`` tool::
 
-   snakefood /myproject | snakefood-cluster -f clusters | snakefood-graph > myproject.dot
+   sfood /myproject | sfood-cluster -f clusters | sfood-graph > myproject.dot
 
 .. figure:: programs2.png
 
@@ -370,14 +371,14 @@ you maintain, you could write a simple script to do all the custom
 things that you need to, for example::
 
   # Generate the raw dependencies.
-  snakefood /myproject > /tmp/raw.deps
+  sfood /myproject > /tmp/raw.deps
 
   # Filter and cluster.
   cd /myproject ; ls -1d * > /tmp/clusters
-  cat /tmp/raw.deps | grep -v test_widget | snakefood-cluster -f /tmp/clusters > /tmp/filt.deps
+  cat /tmp/raw.deps | grep -v test_widget | sfood-cluster -f /tmp/clusters > /tmp/filt.deps
 
   # Generate the graph.
-  cat /tmp/filt.deps | snakefood-graph -p | dot -Tps | pstopdf -i -o /tmp/myproject.pdf
+  cat /tmp/filt.deps | sfood-graph -p | dot -Tps | pstopdf -i -o /tmp/myproject.pdf
 
 While this will work, a better way to write such a script is to use a
 makefile.  
@@ -394,16 +395,16 @@ process the relevant dependencies as above::
   all: $(PDFS)
 
   raw.deps: $(ROOT)
-          snakefood -i $(ROOT) $(FOOD_FLAGS) > $@
+          sfood -i $(ROOT) $(FOOD_FLAGS) > $@
 
   $(NAME).clusters: $(ROOT)
           cd $(ROOT) ; ls -1d * > $(shell pwd)/$@
 
   $(NAME).deps: $(NAME).clusters raw.deps
-          cat raw.deps | snakefood-cluster -f $< > $@
+          cat raw.deps | sfood-cluster -f $< > $@
 
   .deps.pdf:
-          cat $< | snakefood-graph | dot -Tps | ps2pdf - $@
+          cat $< | sfood-graph | dot -Tps | ps2pdf - $@
 
   clean:
           rm -f *.clusters *.dot *.pdf
@@ -424,30 +425,30 @@ Listing the Imports
 
 If you only want to list the imported symbols and modules, without
 having the tool try to find the file where the modules are to be
-found, you can use the complementary tool ``snakefood-imports``, which
+found, you can use the complementary tool ``sfood-imports``, which
 essentially replaces grepping the files for imports.
 
-``snakefood-imports`` also disambiguates local imports from globals by
+``sfood-imports`` also disambiguates local imports from globals by
 looking for files below the level of the file that is imported, in the
-same way that ``snakefood`` does.
+same way that ``sfood`` does.
 
-For example, to list the imports from ``snakefood``, I do this::
+For example, to list the imports from ``sfood``, I do this::
 
-  sivananda:~/p/snakefood/bin$ snakefood-imports snakefood
-  snakefood:20: sys
-  snakefood:20: os
-  snakefood:20: logging
-  snakefood:20: traceback
-  snakefood:20: re
-  snakefood:21: imp
-  snakefood:21: compiler
-  snakefood:22: os.path
-  snakefood:23: collections.defaultdict
-  snakefood:24: operator.itemgetter
-  snakefood:25: dircache.listdir
-  snakefood:151: imp.ImpImporter
-  snakefood:153: pkgutil.ImpImporter
-  snakefood:324: optparse
+  sivananda:~/p/snakefood/bin$ sfood-imports sfood
+  sfood:20: sys
+  sfood:20: os
+  sfood:20: logging
+  sfood:20: traceback
+  sfood:20: re
+  sfood:21: imp
+  sfood:21: compiler
+  sfood:22: os.path
+  sfood:23: collections.defaultdict
+  sfood:24: operator.itemgetter
+  sfood:25: dircache.listdir
+  sfood:151: imp.ImpImporter
+  sfood:153: pkgutil.ImpImporter
+  sfood:324: optparse
 
 Also, see the ``--unified`` option which will output a single set of
 unique imports for a set of files.
@@ -466,10 +467,24 @@ If a codebase has some package dependency relationships that should be
 enforced, for example, that anything in package ``root.core`` should
 not depend on anything in package ``root.util``, you can easily write
 a post-commit hook in your favorite source code versioning system that
-will run ``snakefood`` on an up-to-date checkout and grep for the
+will run ``sfood`` on an up-to-date checkout and grep for the
 offending relationships.  Such a script could send an email to the
 checkins list, or even refuse to commit if the offending dependency
 occurs.
+
+Splitting a Codebase
+--------------------
+
+It is often required to extract a portion of a codebase outside a
+source tree, in a way that the extracted software will still be
+functional.  In other words, you sometimes have to extract a script
+and all the dependencies that it drags along with it to remain usable.
+
+You can easily use snakefood for this purpose: run ``sfood --follow
+--internal`` on the given script, and it should produce the list of
+dependencies that it needs to continue functioning. Flatten these
+dependencies into a list of filenames with ``sfood-flatten`` and copy
+the files somewhere else.
 
 
 

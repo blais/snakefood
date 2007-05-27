@@ -19,7 +19,7 @@ depends: $(TARGETS)
 
 $(TARGETS):
 	@echo "Testing $@"
-	@snakefood $@.py > $@.deps 2> $@.log
+	@sfood $@.py > $@.deps 2> $@.log
 	@diff $@.expect $@.deps
 
 
@@ -34,7 +34,7 @@ roots: $(ROOTS)
 
 .expect.roots:
 	@echo "-- Testing root $@"
-	snakefood --print-roots $(dir $<) | sed -e "s@$(PWD)@@" > $@
+	sfood --print-roots $(dir $<) | sed -e "s@$(PWD)@@" > $@
 	diff $< $@
 
 genexpect: $(REXPECTS)
@@ -42,7 +42,7 @@ genexpect: $(REXPECTS)
 .PHONY: $(REXPECTS)
 $(REXPECTS):
 	@echo "-- Generating expect file for $@"
-	snakefood --print-roots $(dir $@) | sed -e "s@$(PWD)@@" > $@
+	sfood --print-roots $(dir $@) | sed -e "s@$(PWD)@@" > $@
 
 viewroots:
 	@for i in $(REXPECTS) ; do echo ; echo $$PWD/$$(dirname $$i) ; cat $$i ; done

@@ -27,10 +27,10 @@ include ../Makefile.rules
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps: $(ROOT)
-	snakefood -v $(FOOD_FLAGS) $(ROOT)/enthought.* 2>&1 > $@ | tee raw.log
+	sfood -v $(FOOD_FLAGS) $(ROOT)/enthought.* 2>&1 > $@ | tee raw.log
 
 ## enthought.deps: enthought.clusters raw.deps 
-## 	cat raw.deps | grep enthought/ | grep -vE '(/usr/lib/python|examples|test|demo)' | snakefood-cluster -f $< > $@
+## 	cat raw.deps | grep enthought/ | grep -vE '(/usr/lib/python|examples|test|demo)' | sfood-cluster -f $< > $@
 
 enthought.clusters:
 	(cd $(ROOT); find * -mindepth 2 -maxdepth 2 -type d | \

@@ -6,3 +6,4 @@
 # used as an example for your own settings for development.
 
 USERPATH=$USERPATH:$PROJDIR/bin
+PYTHONPATH=$PYTHONPATH:$PROJDIR/lib/python

@@ -10,10 +10,10 @@ from distutils.core import setup
 
 
 scripts = [
-    'bin/snakefood',
-    'bin/snakefood-graph',
-    'bin/snakefood-cluster',
-    'bin/snakefood-imports',
+    'bin/sfood',
+    'bin/sfood-graph',
+    'bin/sfood-cluster',
+    'bin/sfood-imports',
     ]
 
 def read_version():
@@ -35,6 +35,8 @@ from the dependency list.
       author="Martin Blais",
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
+      package_dir = {'': 'lib/python'},
+      packages = ['snakefood'],
       scripts=scripts
      )
 

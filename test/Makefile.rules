@@ -32,11 +32,11 @@ all: $(PDFS)
 
 # Generate the raw list of dependencies for the entire codebase.
 raw.deps: $(ROOT)
-	snakefood -v $(FOOD_FLAGS) $(ROOT) 2>&1 > $@ | tee raw.log
+	sfood -v $(FOOD_FLAGS) $(ROOT) 2>&1 > $@ | tee raw.log
 
 # Implicit rules.
 .deps.dot:
-	cat $< | snakefood-graph -p > $@
+	cat $< | sfood-graph -p > $@
 
 .dot.pdf:
 	cat $< | dot -Tps | $(PSTOPDF) $@
@@ -44,7 +44,7 @@ raw.deps: $(ROOT)
 # Implicit rule to convert the raw.deps file simply from the existence of a
 # .clusters file.
 %.deps: %.clusters raw.deps
-	cat raw.deps | snakefood-cluster -f $< > $@
+	cat raw.deps | sfood-cluster -f $< > $@
 
 # Clean everything but the costly raw dependencies.
 clean:

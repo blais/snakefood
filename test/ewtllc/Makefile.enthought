@@ -10,7 +10,7 @@ PDFS =						\
 include ../Makefile.rules
 
 signal.deps: signal.clusters raw.deps
-	cat raw.deps | snakefood-cluster -f $< | grep -v /usr/lib/python > $(shell pwd)/$@
+	cat raw.deps | sfood-cluster -f $< | grep -v /usr/lib/python > $(shell pwd)/$@
 
 signal.clusters:
 	(cd $(ROOT); ls -1d * | grep -v \\. > $(shell pwd)/$@)
