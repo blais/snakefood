@@ -65,14 +65,13 @@ def find_dependencies(fn, verbose, process_pragmas):
 
     return files, file_errors
 
-def find_imports(fn, verbose):
-    "Returns a list of the module names the file 'fn' depends on."
+def find_imports(fn, verbose, ignores):
+    "Yields a list of the module names the file 'fn' depends on."
 
     found_modules = parse_python_source(fn)
     if found_modules is None:
-        return []
+        raise StopIteration
 
-    symnames = []
     dn = dirname(fn)
 
     packroot = None
@@ -83,7 +82,7 @@ def find_imports(fn, verbose):
             # This is a local import, we need to find the root in order to
             # compute the absolute module name.
             if packroot is None:
-                packroot = find_package_root(fn)
+                packroot = find_package_root(fn, ignores)
                 if not packroot:
                     logging.warning(
                         "%d: Could not find package root for local import '%s' from '%s'." %
@@ -97,9 +96,8 @@ def find_imports(fn, verbose):
 
         if name is not None:
             modname = '%s.%s' % (modname, name)
-        symnames.append( (modname, lineno, islocal) )
+        yield (modname, lineno, islocal)
 
-    return symnames
 
 
 
@@ -163,7 +161,7 @@ def parse_python_source(fn):
     except Exception, e:
         logging.error("Error processing file '%s':\n\n%s" %
                       (fn, traceback.format_exc(sys.stderr)))
-        return [], file_errors
+        return None
 
     vis = ImportVisitor()
     compiler.walk(mod, vis, ImportWalker(vis))

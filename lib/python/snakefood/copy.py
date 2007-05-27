@@ -1,7 +1,5 @@
 """
-Read a snakefood dependencies file and copy all the files to a new root.
-
-Provide the new root on the command-line.
+Read a snakefood dependencies file and flatten and output the list of all files.
 """
 
 import sys, os, logging, shutil
@@ -59,7 +57,3 @@ def main():
                 f = open(initfn, 'w')
                 f.close()
             
-if __name__ == '__main__':
-    main()
-
-

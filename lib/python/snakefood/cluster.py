@@ -10,9 +10,9 @@ See http://furius.ca/snakefood for details.
 import sys
 from itertools import imap
 from collections import defaultdict
-from operator import itemgetter
 
 from depends import read_depends, output_depends
+
 
 
 def apply_cluster(cdirs, root, fn):

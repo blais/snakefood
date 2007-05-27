@@ -21,14 +21,12 @@ from os.path import *
 from collections import defaultdict
 from operator import itemgetter
 
-from util import iter_pyfiles
+from util import iter_pyfiles, setup_logging, def_ignores
 from depends import output_depends
 from find import find_dependencies, ERROR_IMPORT, ERROR_SYMBOL
 from roots import *
 
 
-
-LOG_FORMAT = "%(levelname)-12s: %(message)s"
 
 def gendeps():
     import optparse
@@ -38,7 +36,8 @@ def gendeps():
                       help="Filter out dependencies that are outside of the "
                       "roots of the input files")
 
-    parser.add_option('-I', '--ignore', dest='ignores', action='append', default=[],
+    parser.add_option('-I', '--ignore', dest='ignores', action='append',
+                      default=def_ignores,
                       help="Add the given directory name to the list to be ignored.")
 
     parser.add_option('-v', '--verbose', action='count', default=0,
@@ -57,8 +56,8 @@ def gendeps():
                       help="Disable processing of pragma directives as strings after imports.")
 
     opts, args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
-                        format=LOG_FORMAT)
+    setup_logging(opts.verbose)
+
     if not args:
         logging.warning("Searching for files from root directory.")
         args = ['.']
@@ -125,7 +124,9 @@ def gendeps():
 
             # Make sure all the files at least appear in the output, even if it has
             # no dependency.
-            from_ = relfile(fn)
+            from_ = relfile(fn, opts.ignores)
+            if from_ is None:
+                continue
             if opts.internal and from_[0] not in inroots:
                 continue
             allfiles[from_].add((None, None))
@@ -136,7 +137,7 @@ def gendeps():
                 if basename(xfn) == '__init__.py':
                     xfn = dirname(xfn)
                 
-                to_ = relfile(xfn)
+                to_ = relfile(xfn, opts.ignores)
                 if opts.internal and to_[0] not in inroots:
                     continue
                 allfiles[from_].add(to_)

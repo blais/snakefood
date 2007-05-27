@@ -1,23 +1,40 @@
 """
-Various utilities, to iterate among files, for example.
+Various utilities, to iterate among files, global stuff, etc.
 """
 
 import os, logging, re
 from os.path import *
 
+__all__ = ('is_python', 'def_ignores', 'iter_pyfiles', 'setup_logging',
+           'filter_separate')
 
-_iter_ignores = ['.svn', 'CVS', 'build']
+
+
+def is_python(fn):
+    "Return true if the file is a Python file."
+    if fn.endswith('.py'):
+        return True
+    else:
+        try:
+            file_head = open(fn).read(64)
+            if re.match("#!.*\\bpython", file_head):
+                return True
+        except IOError:
+            return False
+
+
+def_ignores = ['.svn', 'CVS', 'build']
 # Note: 'build' is for those packages which have been installed with setup.py.
 # It is pretty common to forget these around.
 
-def iter_pyfiles(dirsorfns, ignores=None, abspaths=False):
+def iter_pyfiles(dirsorfns, ignores, abspaths=False):
     """Yield all the files ending with .py recursively.  'dirsorfns' is a list
     of filenames or directories.  If 'abspaths' is true, we assumethe paths are
     absolute paths."""
     assert isinstance(dirsorfns, (list, tuple))
     assert isinstance(ignores, list)
 
-    ignores = ignores or _iter_ignores
+    ignores = ignores or def_ignores
     for dn in dirsorfns:
         if not abspaths:
             dn = realpath(dn)
@@ -42,15 +59,27 @@ def iter_pyfiles(dirsorfns, ignores=None, abspaths=False):
                 for fn in filter(is_python, afiles):
                     yield fn
 
-def is_python(fn):
-    "Return true if the file is a Python file."
-    if fn.endswith('.py'):
-        return True
-    else:
-        try:
-            file_head = open(fn).read(64)
-            if re.match("#!.*\\bpython", file_head):
-                return True
-        except IOError:
-            return False
+
+LOG_FORMAT = "%(levelname)-12s: %(message)s"
+
+def setup_logging(verbose):
+    "Initialize the logger."
+    logging.basicConfig(level=logging.DEBUG if verbose >= 1 else logging.INFO,
+                        format=LOG_FORMAT)
+    
+
+
+def filter_separate(pred, seq):
+    """Generic filter function that produces two lists, one for which the
+    predicate is true, and the other elements."""
+    inlist = []
+    outlist = []
+    for e in seq:
+        if pred(e):
+            inlist.append(e)
+        else:
+            outlist.append(e)
+    return inlist, outlist
+
+
 

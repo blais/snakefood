@@ -2,13 +2,14 @@
 Routines that manipulate, read and convert lists of dependencies.
 """
 
-import sys
+import sys, logging
 from operator import itemgetter
+
 
 
 def read_depends(f):
     "Generator for the dependencies read from the given file object."
-    for line in f.xreadlines():
+    for line in f:
         try:
             yield eval(line)
         except Exception:

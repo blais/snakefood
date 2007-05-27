@@ -11,18 +11,17 @@ See http://furius.ca/snakefood for details.
 import os, logging
 from os.path import *
 
-from util import iter_pyfiles
+from util import iter_pyfiles, setup_logging, def_ignores
 from find import find_imports
 
 
-
-LOG_FORMAT = "%(levelname)-12s: %(message)s"
 
 def list_imports():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
 
-    parser.add_option('-I', '--ignore', dest='ignores', action='append', default=[],
+    parser.add_option('-I', '--ignore', dest='ignores', action='append',
+                      default=def_ignores,
                       help="Add the given directory name to the list to be ignored.")
 
     parser.add_option('-u', '--unified', action='store_true',
@@ -35,8 +34,8 @@ def list_imports():
                       help="Output input lines as well.")
 
     opts, args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if opts.verbose >= 1 else logging.INFO,
-                        format=LOG_FORMAT)
+    setup_logging(opts.verbose)
+
     if not args:
         logging.warning("Searching for files from root directory.")
         args = ['.']
@@ -46,14 +45,17 @@ def list_imports():
     if opts.unified:
         all_symnames = set()
         for fn in iter_pyfiles(args, opts.ignores):
-            all_symnames.update(x[0] for x in find_imports(fn, opts.verbose))
+            all_symnames.update(x[0] for x in
+                                find_imports(fn, opts.verbose, opts.ignores))
         for symname in sorted(all_symnames):
             print symname
     else:
         for fn in iter_pyfiles(args, opts.ignores):
             if opts.verbose:
                 lines = list(open(fn))
-            for symname, lineno, islocal in find_imports(fn, opts.verbose):
+            for symname, lineno, islocal in find_imports(fn,
+                                                         opts.verbose,
+                                                         opts.ignores):
                 print '%s:%d: %s' % (fn, lineno, symname)
                 if opts.verbose:
                     for no in xrange(lineno-1, len(lines)):

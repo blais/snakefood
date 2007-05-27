@@ -6,13 +6,13 @@ import os, logging
 from os.path import *
 from dircache import listdir
 
-from util import is_python
+from util import is_python, filter_separate
 
-__all__ = ('find_roots', 'find_package_root', 'search_for_roots',
-           'is_package_dir', 'is_package_root', 'relfile',)
+__all__ = ('find_roots', 'find_package_root', 'relfile',)
 
 
-def find_roots(list_dirofn, _):
+
+def find_roots(list_dirofn, ignores):
     """
     Given a list of directories or filenames, find Python files and calculate
     the entire list of roots.
@@ -21,13 +21,13 @@ def find_roots(list_dirofn, _):
     for fn in map(realpath, list_dirofn):
 
         # Search up the directory tree for a root.
-        root = find_package_root(fn)
+        root = find_package_root(fn, ignores)
         if root:
             inroots.add(root)
         else:
             # If the given file is not sitting within a root, search down the
             # directory tree for available roots.
-            downroots = search_for_roots(fn)
+            downroots = search_for_roots(fn, ignores)
             if downroots:
                 inroots.update(downroots)
             else:
@@ -35,24 +35,27 @@ def find_roots(list_dirofn, _):
                 logging.warning("Directory '%s' does live or include any roots." % fn)
     return sorted(inroots)
 
-def find_package_root(dn):
+def find_package_root(dn, ignores):
     "Search up the directory tree for a package root."
     if not isdir(dn):
         dn = dirname(dn)
     while is_package_dir(dn):
         assert dn
         dn = dirname(dn)
-    if dn and is_package_root(dn):
+    if dn and is_package_root(dn, ignores):
         return dn
 
-def search_for_roots(dn):
+def search_for_roots(dn, ignores):
     """Search down the directory tree for package roots.  The recursive search
     does not move inside the package root when one is found."""
     if not isdir(dn):
         dn = dirname(dn)
     roots = []
     for root, dirs, files in os.walk(dn):
-        if is_package_root(root):
+        for d in list(dirs):
+            if d in ignores:
+                dirs.remove(d)
+        if is_package_root(root, ignores):
             roots.append(root)
             dirs[:] = []
     return roots
@@ -65,20 +68,24 @@ def is_package_dir(dn):
 filesets_ignore = (['setup.py'],)
 maxlen_filesets = max(map(len, filesets_ignore))
 
-def is_package_root(dn):
+def is_package_root(dn, ignores):
     """Return true if this is a package root.  A package root is a directory
     that could be used as a PYTHONPATH entry."""
 
     if exists(join(dn, '__init__.py')):
         return False
     else:
+        dirfiles = (join(dn, x) for x in listdir(dn))
+        subdirs, files = filter_separate(isdir, dirfiles)
+
         # Check if the directory contains Python files.
-        files = listdir(dn)
         pyfiles = []
-        for x in [join(dn, x) for x in files]:
-            ## FIXME: should we use opts.ignore here too?
-            if x.endswith('.so') or is_python(x):
-                pyfiles.append(x)
+        for x in files:
+            bx = basename(x)
+            if bx in ignores:
+                continue
+            if bx.endswith('.so') or is_python(x):
+                pyfiles.append(bx)
                 if len(pyfiles) > maxlen_filesets:
                     break
 
@@ -87,23 +94,25 @@ def is_package_root(dn):
         if pyfiles and pyfiles not in filesets_ignore:
             return True
 
-        # Note: We make use of the fact that dotted directory names cannot be
-        # imported as packaged.
-        for sub in files:
-            if '.' in sub:
-                continue
-            sub = join(dn, sub)
-            if not isdir(sub):
+        # Check if the directory contains Python packages.
+        #
+        for sub in subdirs:
+            bsub = basename(sub)
+            # Note: Make use of the fact that dotted directory names cannot be
+            # imported as packaged for culling branches.
+            if '.' in bsub or bsub in ignores:
                 continue
             if exists(join(sub, '__init__.py')):
                 return True
 
     return False
 
-def relfile(fn):
+def relfile(fn, ignores):
     "Return pairs of (package root, relative filename)."
-    root = find_package_root(realpath(fn))
-    assert root is not None, fn
+    root = find_package_root(realpath(fn), ignores)
+    if root is None:
+        assert basename(fn) in filesets_ignore[0]
+        return
     return root, fn[len(root)+1:]
 
 
