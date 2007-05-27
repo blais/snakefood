@@ -83,10 +83,8 @@ def find_package_root(dn):
     "Search up the directory tree for a package root."
     if not isdir(dn):
         dn = dirname(dn)
-
-## FIXME: review the "if dn" condition, remove 'dn' and run it on traits_handler.py to reproduce the bug.
-##    while dn and is_package_dir(dn):
     while is_package_dir(dn):
+        assert dn
         dn = dirname(dn)
     if dn and is_package_root(dn):
         return dn
