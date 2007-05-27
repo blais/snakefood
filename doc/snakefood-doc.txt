@@ -18,7 +18,8 @@
       5.4  The Format of Dependencies Files
       5.5  Caching Raw Dependencies
       5.6  Warnings
-        5.6.1  Nodes Without Dependencies
+      5.7  Nodes Without Dependencies
+      5.8  Pragmas: Ignoring Dependencies
     6   Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
       6.2  Using ``sfood-cluster``
@@ -296,7 +297,7 @@ dependencies that it finds.
 
 
 Nodes Without Dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 To insure that all the file nodes show up in the graph, for each
 processed file we output a line like this::
@@ -307,6 +308,34 @@ The graphing tool interprets that to mean it has to at least create a
 node for ``<source_file>.py``, even if it has no dependency.  Scripts
 you write to filter the dependencies need to be able to interpret
 those lines appropriately.
+
+
+Pragmas: Ignoring Dependencies
+------------------------------
+
+Sometimes when an import statement is wrapped in a conditional, you
+may want to avoid generating a dependency for that statement, for
+example::
+
+   try:
+       import superhero
+   except ImportError:
+       # superhero not available. We fallback on evilgenius.
+       import evilgenius
+
+In this example, you may want to avoid having snakefood follow
+dependencies to ``superhero``, because your software can run fine
+without it (that is, with ``evilgenius``). To that effect, snakefood
+looks for a string after the import statement, and uses that string as
+a hint to modify its actions, for example, this will tell ``sfood`` to
+not output the dependency for ``superhero``::
+
+   try:
+       import superhero; 'OPTIONAL'
+   ...
+
+This is especially useful with the ``--follow`` option, when you want
+to avoid dragging a large dependency in the dependency list.
 
 
 Filtering and Clustering Dependencies

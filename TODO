@@ -3,23 +3,18 @@
 =====================
 
 - Run sfood-imports on a large set of code, make sure not inf loop.
-- Finish: sfood-copy, sfood-flatten
 
 
 
 sfood
 =====
 
-- Support pragmas as comments.
+- Support pragmas as comments after an import.
 
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
 
 - Document the pragma directives ('OPTIONAL', 'CAUGHT')
-
-- Move tools/rep... into sfood-files script that flattens a list of
-  deps into a list of files, and add it to the “Original uses” section
-  of the docs.
 
 
 
