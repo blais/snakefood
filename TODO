@@ -4,6 +4,9 @@
 
 - Refactor the code and create a snakefood.py module.
 
+  - Refactor gendeps -> <modules>
+  - Remove useless copies from other modules
+
   - Rename all the script names to 'sfood-*' instead of 'snakefood-*',
     it is shorter and looks nicer on a long pipeline of commands.
 
