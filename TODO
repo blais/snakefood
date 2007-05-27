@@ -5,9 +5,19 @@
 All
 ===
 
-- Document snakefood-imports
-
 - Refactor the code and create a snakefood.py module.
+
+- Check if there is a directly enclosing try/except Importerror block
+  for ignoring deps.
+
+- Document pragmas
+
+- Write a script to detect useless imports.
+
+- Rename all the script names to 'sfood-*' instead of 'snakefood-*',
+  it is shorter and looks nicer on a long pipeline of commands.
+
+
 
 
 snakefood

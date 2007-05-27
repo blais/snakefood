@@ -6,12 +6,12 @@
 
 .. contents::
 ..
-    1  Introduction
+    1   Introduction
       1.1  What is a Dependency?
-    2  30-seconds Usage Instructions
-    3  Installation
-    4  Overview
-    5  Generating Dependencies
+    2   30-seconds Usage Instructions
+    3   Installation
+    4   Overview
+    5   Generating Dependencies
       5.1  How Packages Are Automatically Found
       5.2  Following Dependencies
       5.3  Restricting Dependencies
@@ -19,12 +19,14 @@
       5.5  Caching Raw Dependencies
       5.6  Warnings
         5.6.1  Nodes Without Dependencies
-    6  Filtering and Clustering Dependencies
+    6   Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
       6.2  Using ``snakefood-cluster``
-    7  Using a Makefile
-    8  Listing the Imports
-    9  Feedback and Comments
+    7   Using a Makefile
+    8   Listing the Imports
+    9   Original Uses
+      9.1  Enforcing Dependency Relationships on Commit
+    10  Feedback and Comments
 
 
 Introduction
@@ -451,6 +453,25 @@ Also, see the ``--unified`` option which will output a single set of
 unique imports for a set of files.
 
 
+Original Uses
+=============
+
+This section documents original ways in which you can use this
+program.
+
+Enforcing Dependency Relationships on Commit
+--------------------------------------------
+
+If a codebase has some package dependency relationships that should be
+enforced, for example, that anything in package ``root.core`` should
+not depend on anything in package ``root.util``, you can easily write
+a post-commit hook in your favorite source code versioning system that
+will run ``snakefood`` on an up-to-date checkout and grep for the
+offending relationships.  Such a script could send an email to the
+checkins list, or even refuse to commit if the offending dependency
+occurs.
+
+
 
 Feedback and Comments
 =====================
@@ -459,6 +480,9 @@ I wrote this script in may 2007.  I had previously tried to write a
 reliable dependency grapher about 4 or 5 times, giving up each time on
 the various intricacies of the Python import semantics.  I'm pretty
 happy this time that I've found something reasonably reliable that
-works everywhere.  Comments, feedback and donations are welcome.  I
-hope you find this program useful.
+works everywhere, and I'm fully committed to fixing any bugs you may
+find and to bring this project to a stable version 1.0 state, where it
+can be used ubiquitously on all Python projects. Comments, feedback
+and donations are welcome.  I hope you find this program useful.
+
 
