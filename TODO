@@ -2,26 +2,21 @@
    TODO: snakefood
 =====================
 
-
-- Fix snakefood-imports potential bug (see FIXME).
-
 - Refactor the code and create a snakefood.py module.
 
   - Rename all the script names to 'sfood-*' instead of 'snakefood-*',
     it is shorter and looks nicer on a long pipeline of commands.
-
-- Document 'OPTIONAL' pragma directive
 
 
 snakefood
 =========
 
 - Support pragmas as comments.
-- Document pragmas.
-
 
 - Check if there is a directly enclosing try/except Importerror block
-  for ignoring deps.
+  for ignoring deps ('CAUGHT')
+
+- Document the pragma directives ('OPTIONAL', 'CAUGHT')
 
 
 
