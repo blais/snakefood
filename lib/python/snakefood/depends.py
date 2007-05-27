@@ -39,7 +39,8 @@ def eliminate_redundant_depends(depends):
 
 def flatten_depends(depends):
     """Yield the list of dependency pairs to a single list of (root, relfn)
-    pairs, in the order that they appear."""
+    pairs, in the order that they appear. The list is guaranteed to be unique
+    (we remove duplicates)."""
     seen = set([(None, None)])
     for dep in depends:
         for pair in dep:
@@ -48,3 +49,4 @@ def flatten_depends(depends):
             seen.add(pair)
             yield pair
 
+                 

@@ -27,7 +27,11 @@ def main():
         parser.error("You must specify the destination root.")
     dest, = args
 
-    depends = read_depends(sys.stdin)
+    if not opts.overwrite and exists(dest):
+        logging.error("Cannot overwrite '%s'." % dest)
+        sys.exit(1)
+
+    depends = list(read_depends(sys.stdin))
     
     for droot, drel in flatten_depends(depends):
         srcfn = join(droot, drel)
@@ -38,13 +42,16 @@ def main():
 
         if not opts.overwrite and exists(dstfn):
             logging.error("Cannot overwrite '%s'." % dstfn)
-            raise SystemExit(1)
+            sys.exit(1)
 
         destdir = dirname(dstfn)
         if not exists(destdir):
             os.makedirs(destdir)
             
         print 'Copying: %s' % srcfn
+        if not exists(srcfn):
+            logging.error("Could not copy file '%s'." % srcfn)
+            continue
         shutil.copyfile(srcfn, dstfn)
 
     if opts.insert_package_inits:
