@@ -2,18 +2,15 @@
    TODO: snakefood
 =====================
 
-- Run sfood-imports on a large set of code, make sure not inf loop.
-
-
-
 sfood
 =====
+
+- (For 1.0 completion) Integrate modulefinder code and compare results.
 
 - Support pragmas as comments after an import.
 
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
-
 
 sfood-cluster
 =============
