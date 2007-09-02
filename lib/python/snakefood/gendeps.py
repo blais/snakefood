@@ -43,7 +43,7 @@ def gendeps():
     parser.add_option('-v', '--verbose', action='count', default=0,
                       help="Output more debugging information")
 
-    parser.add_option('-f', '--follow', action='store_true',
+    parser.add_option('-f', '--follow', '-r', '--recursive', action='store_true',
                       help="Follow the modules depended upon and trace their dependencies. "
                       "WARNING: This can be slow.  Use --internal to limit the scope.")
 
