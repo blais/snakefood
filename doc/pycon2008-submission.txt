@@ -1,0 +1,193 @@
+===============================================
+    Snakefood: Dependency Graphs for Python
+===============================================
+PyCon 2008 Presentation Submission
+==================================
+
+:Author: Martin Blais <blais@furius.ca>
+:Date: 2005-10-30
+:Abstract:
+
+   Submission overview for a presentation about Snakefood at Pycon
+   2008.
+
+.. contents::
+..
+    1  Author and Contact Information
+    2  Requested Timeslot
+    3  Summary of proposed presentation
+    4  Presentation Outline
+    5  Intended Audience
+
+
+Author and Contact Information
+------------------------------
+
+:Presenter Name: Martin Blais
+
+:Contact: I can be reached via email at <blais@furius.ca>.
+
+:Website: http://furius.ca
+
+:Short Bio: Background in high-end computer graphics. Experience in
+            Python consulting, training, and work in the financial
+            domain. I've been using Python for about 8 years.
+
+:Project Home: More information about the project that I wish to
+               present in this talk can be found at
+               http://furius.ca/snakefood/ .
+
+:Categories: - Developer Tools
+             - Dependency Tracking
+             - Code Analysis
+             - Open Source Project
+
+Requested Timeslot
+------------------
+
+I would like the longest available time slot, with some time for
+questions. I have a fair amount of material and examples to present,
+and I could easily present an hour-long talk on this if needed.
+
+
+Summary of proposed presentation
+--------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+.. Nabu is a simple framework for general extraction of data from documents which
+.. exploits the power of expression of simple text files as a medium to fill a
+.. database with entries of various typed informations.  It leverages
+.. ReStructuredText_ and the docutils_ document tree as a channel to provide
+.. structure for the formatting of the generic input information.
+..
+.. Some of the most important ideas surrounding Nabu are presented:
+..
+.. * Data can be entered **across** files:  There are many types of data that would
+..   be best stored *across* a collection of documents, for example, personal data
+..   such as contact info, bookmarks, book references, etc.  Common patterns of
+..   usage dictate the use of dedicated files and specialized formats to store this
+..   kind of information (e.g. an address book file that contains just addresses, a
+..   bookmarks list just URLs).  We argue that this is due to the absence of a
+..   system that can extract this data out of context.  With Nabu I propose to
+..   avoid such integration and leverage on the simplicity of text files as a more
+..   appropriate context to maintain many kinds of information;
+..
+.. * **Loose data formats**: by embedding specialized information within a casual
+..   generic document structure and relying on specialized parsers for each type of
+..   extracted data, Nabu provides a kind of "loose" data entry model that could be
+..   well-suited for other applications;
+..
+.. * **Local editing for shared information**:  editing files requires powerful
+..   tools.  A problem with Wikis is that there is a trade-off between ubiquity and
+..   the editing power:  browser clients offer a very limited form of editing with
+..   their simple widgets, and we all have had bad experiences at one point or
+..   other editing long documents within a browser client.  Nabu allows you to edit
+..   all source documents locally but to easily publish the extracted information
+..   remotely;
+..
+.. It is difficult to quickly explain what Nabu is all about and why I think it has
+.. great potential of use by the developer community, because it lies between the
+.. boundaries of multiple already well-known applications:  Wikis, file formats,
+.. Blogs, mind-mapping applications.  However, for people who already have
+.. developed the ability to edit text files easily i.e. all programmers, Nabu can
+.. become a powerful platform for easily entering many kinds of organized data.
+..
+.. During this talk I intend to show an example of building a simple publishing
+.. application, probably a blog-like program using a very simple setup (CGI
+.. scripts), a little bit of Python code and text files.
+
+
+Presentation Outline
+--------------------
+
+- Introduction  [2 min]
+
+.. - Overview [3 min]
+..
+..   - This is about the topic of "taking notes"
+..   - Where is the value?  In the notes document, not in the presentation system.
+..
+.. - ReStructuredText_ and docutils_  [5 min]
+..
+..   - Short presentation of ReStructuredText_ (2 slides)
+..   - ReStructuredText_ Provides Structure
+..
+..     - recursive nature of ReStructuredText_ (graphic w/ overlay)
+..
+..   - PseudoXML visualization of docutils structure
+..
+.. - Motivation: A Digression--My Love Affair with Text files  [7 min]
+..
+..   - Text files are forever
+..   - Evolving "down" to ascii
+..
+..     - Address books
+..     - Bookmarks
+..     - Books
+..     - BibTeX and References
+..     - Spreadsheets in text files
+..     - The greatness and the lameness of Wiki systems
+..     - Blogs
+..
+..   - Entering mixed data *across* files
+..
+..     - The "Travel Notes" example
+..     - Mind-mapping applications
+..
+.. - What is Nabu? [18 min]
+..
+..   | From here on, we will present the various components Nabu while building a
+..   | real example, probably a simple blog system with categories.
+..
+..   - System Overview
+..
+..   - Editing
+..
+..     - Mapping files to documents
+..
+..       - Files vs. unique documents
+..       - Marking files with simple unique ids
+..       - Extracted data is tagged with the document's unique id
+..
+..     - The nabu publisher client
+..     - Inspecting the uploaded contents
+..
+..   - Writing a simple content extractor
+..
+..     - Finding stuff in the doctree tree: the extractor
+..     - Storing to a database: the extractor storage
+..
+..   - Setting up a handler on the server
+..
+..     - Example of server-side handler for receiving documents
+..       (using a simple CGI script)
+..
+..   - Publishing content
+..
+..     - Final application example using [probably] a web app
+..
+..   - Shared vs. Merged collaborative document pools
+..
+..   - Cross-referencing extracted information (if time allows)
+..
+.. - Discussion  [2 min]
+..
+.. - Q&A  [8 min]
+
+
+Intended Audience
+-----------------
+
+Python programmers at all levels who are interested in software
+engineering and analyzing their source code.
+
