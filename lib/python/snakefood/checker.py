@@ -16,7 +16,7 @@ __copyright__ = """Copyright (C) 2007 Martin Blais <blais@furius.ca>.
 This code is distributed under the terms of the GNU General Public License."""
 
 # stdlib imports
-import sys
+import sys, __builtin__
 from os.path import *
 import compiler
 
@@ -35,6 +35,10 @@ def main():
                       default=def_ignores,
                       help="Add the given directory name to the list to be ignored.")
 
+    parser.add_option('-m', '--missing', '--enable-missing',
+                      dest='do_missing', action='store_true',
+                      help="Enable experimental heuristic for finding missing imports.")
+
     opts, args = parser.parse_args()
 
     write = sys.stderr.write
@@ -47,7 +51,7 @@ def main():
             write("%s:%s: %s.\n" % (fn, e.lineno, e))
             continue
 
-        # Find all the imports.
+        # Find all the imported names.
         vis = ImportVisitor()
         compiler.walk(mod, vis)
         imported = vis.finalize()
@@ -58,34 +62,63 @@ def main():
         for x in imported:
             modname, lineno = x
             if modname in simp:
-                write("%s:%d: Redundant import '%s'\n" % (fn, lineno, modname))
+                write("%s:%d: Duplicate import '%s'\n" % (fn, lineno, modname))
             else:
                 uimported.append(x)
                 simp.add(modname)
         imported = uimported
 
+        # Find all the names being referenced/used.
         vis = NamesVisitor()
         compiler.walk(mod, vis)
-        names = vis.finalize()
+        dotted_names, simple_names = vis.finalize()
 
-        names = frozenset(names) # uniquify
+        # Check that all imports have been referenced at least once.
+        usednames = frozenset(x[0] for x in dotted_names) # uniquify
         for modname, lineno in imported:
-            if modname not in names:
-                write("%s:%d: Unused symbol '%s'\n" % (fn, lineno, modname))
+            if modname not in usednames:
+                write("%s:%d: Unused import '%s'\n" % (fn, lineno, modname))
 
+        if opts.do_missing:
+            # Find all the names that are being assigned to.
+            vis = AssignVisitor()
+            compiler.walk(mod, vis)
+            assign_names = vis.finalize()
+
+            # Check for potentially missing imports (this cannot be precise, we are
+            # only providing a heuristic here).
+            defined = set(x[0] for x in imported)
+            defined.update(x[0] for x in assign_names)
+            for name, lineno in simple_names:
+                if name not in defined and name not in __builtin__.__dict__:
+                    write("%s:%d: Missing import for '%s'\n" % (fn, lineno, name))
+
+        # Print out all the schmoo for debugging.
         if opts.verbose:
-            print 'Imported names:'
-            for modname, lineno in sorted(imported):
-                print '  [%d] %s' % (lineno, modname)
+            print
+            print
+            print '------ Imported names:'
+            for modname, lineno in imported:
+                print '%s:%d:  %s' % (fn, lineno, modname)
+
+            print
+            print
+            print '------ Used names:'
+            for name, lineno in dotted_names:
+                print '%s:%d:  %s' % (fn, lineno, name)
             print
 
-            print 'Used names:'
-            for name in sorted(names):
-                print '  %s' % name
             print
+            print
+            print '------ Assigned names:'
+            for name, lineno in assign_names:
+                print '%s:%d:  %s' % (fn, lineno, name)
 
-            print 'AST:'
-            print '  ', printAst(mod)
+            print
+            print
+            print '------ AST:'
+            printAst(mod, indent='    ', stream=sys.stdout, initlevel=1)
+            print
 
 
 
@@ -110,11 +143,13 @@ class ImportVisitor(object):
 
 
 class NamesVisitor(object):
-    """AST visitor that finds all the identifier references that are not within
-    import statements. This includes all free names and names with attribute
-    references."""
+    """AST visitor that finds all the identifier references that are defined,
+    including dotted references. This includes all free names and names with
+    attribute references.
+    """
     def __init__(self):
-        self.names = []
+        self.dotted = []
+        self.simple = []
         self.attributes = []
 
     def visitName(self, node):
@@ -122,7 +157,8 @@ class NamesVisitor(object):
         self.attributes.reverse()
         attribs = self.attributes
         for i in xrange(1, len(attribs)+1):
-            self.names.append('.'.join(attribs[0:i]))
+            self.dotted.append(('.'.join(attribs[0:i]), node.lineno))
+        self.simple.append((attribs[0], node.lineno))
         self.attributes = []
 
     def visitGetattr(self, node):
@@ -131,16 +167,40 @@ class NamesVisitor(object):
             self.visit(child)
 
     def finalize(self):
-        return self.names
+        return self.dotted, self.simple
 
 
 class AssignVisitor(object):
-    """AST visitor that builds a list of names being assigned to. This is used
-    later to figure out if a name being refered to is never assigned to nor in
-    the imports."""
+    """AST visitor that builds a list of all potential names that are being
+    assigned to. This is used later to heuristically figure out if a name being
+    refered to is never assigned to nor in the imports."""
 
-    ## FIXME: TODO
+    def __init__(self):
+        self.assnames = []
+        self.in_class = False
 
+    def continue_(self, node):
+        for child in node.getChildNodes():
+            self.visit(child)
+
+    def visitAssName(self, node):
+        self.assnames.append((node.name, node.lineno))
+        self.continue_(node)
+
+    def visitClass(self, node):
+        self.assnames.append((node.name, node.lineno))
+        prev, self.in_class = self.in_class, True
+        self.continue_(node)
+        self.in_class = prev
+
+    def visitFunction(self, node):
+        # Avoid method definitions.
+        if not self.in_class:
+            self.assnames.append((node.name, node.lineno))
+        self.continue_(node)
+
+    def finalize(self):
+        return self.assnames
 
 
 

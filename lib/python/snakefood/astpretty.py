@@ -14,6 +14,7 @@ __all__ = ('printAst',)
 def printAst(ast, indent='  ', stream=sys.stdout, initlevel=0):
     "Pretty-print an AST to the given output stream."
     rec_node(ast, initlevel, indent, stream.write)
+    stream.write('\n')
 
 def rec_node(node, level, indent, write):
     "Recurse through a node, pretty-printing it."
