@@ -5,7 +5,6 @@ Install script for the snakefood dependency graph tool.
 
 __author__ = "Martin Blais <blais@furius.ca>"
 
-import sys, os, os.path
 from distutils.core import setup
 
 
