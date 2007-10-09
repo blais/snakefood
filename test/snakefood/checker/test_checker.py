@@ -29,22 +29,16 @@ _names_tests = (
     ('a = 1; print b.c ; d.e = 3', ['b', 'b.c', 'd']),
     )
 
-_assign_tests = (
-##     ('fn = os.path.join("a", "b")', ['os', 'os.path', 'os.path.join']),
-##     ('a = 1; print b.c ; d.e = 3', ['b', 'b.c', 'd']),
-    )
-
 def test():
     for source, expected in _import_tests:
         symbols = visit_source(source, ImportVisitor)
         actual = [x[0] for x in symbols]
-        print actual
         assert actual == expected, (actual, expected)
 
     for source, expected in _names_tests:
-        names = visit_source(source, NamesVisitor)
-        print names
-        assert names == expected, (names, expected)
+        dotted, simple = visit_source(source, NamesVisitor)
+        actual = [x[0] for x in dotted]
+        assert actual == expected, (actual, expected)
 
 if __name__ == '__main__':
     test()

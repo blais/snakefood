@@ -1,3 +1,4 @@
-/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused symbol 'used1'
-/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused symbol 'un2'
-/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused symbol 'un3'
+/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused import 'used1'
+/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused import 'un2'
+/home/blais/p/snakefood/test/snakefood/checker/simple.py:5: Unused import 'un3'
+/home/blais/p/snakefood/test/snakefood/checker/simple.py:8: Missing import for 'mod1'
