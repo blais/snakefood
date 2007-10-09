@@ -5,17 +5,13 @@ Install script for the snakefood dependency graph tool.
 
 __author__ = "Martin Blais <blais@furius.ca>"
 
+import os
+from os.path import join, isfile
 from distutils.core import setup
 
 
-# Note: not all the scripts are installed. This is on purpose, to keep it clean,
-# we like to install just the essential.
-scripts = [
-    'bin/sfood',
-    'bin/sfood-graph',
-    'bin/sfood-cluster',
-    'bin/sfood-imports',
-    ]
+# Install all scripts under bin.
+scripts = filter(isfile, [join('bin', x) for x in os.listdir('bin')])
 
 def read_version():
     try:
