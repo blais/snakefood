@@ -79,8 +79,9 @@ Tools Included
    files and directories, finds and lists all the import statements
    that are found, regardless of whether they can be imported or not.
 
-5. ``sfood-checker`` (complementary): Analyze the source code with the
-   AST and list unused or redundant imports.
+5. ``sfood-checker`` (complementary): An import checker that always
+   runs: analyze the source code with the AST and list unused or
+   redundant imports.
 
 See `full documentation </snakefood/doc/snakefood-doc.html>`_ for more
 details.
