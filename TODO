@@ -20,7 +20,7 @@ sfood-checker
   imported to be exported...
 
 - You can probably find out a hint about missing imports by doing the
-  name set lookup the other way around...
+  name set lookup the other way around... finish this.
 
 
 sfood-cluster

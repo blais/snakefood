@@ -29,6 +29,11 @@ _names_tests = (
     ('a = 1; print b.c ; d.e = 3', ['b', 'b.c', 'd']),
     )
 
+_assign_tests = (
+##     ('fn = os.path.join("a", "b")', ['os', 'os.path', 'os.path.join']),
+##     ('a = 1; print b.c ; d.e = 3', ['b', 'b.c', 'd']),
+    )
+
 def test():
     for source, expected in _import_tests:
         symbols = visit_source(source, ImportVisitor)

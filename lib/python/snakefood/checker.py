@@ -21,6 +21,7 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
+from snakefood.astpretty import printAst
 
 
 def main():
@@ -84,7 +85,7 @@ def main():
             print
 
             print 'AST:'
-            print '  ', mod
+            print '  ', printAst(mod)
 
 
 
@@ -146,4 +147,5 @@ class AssignVisitor(object):
 if __name__ == '__main__':
     main()
     # For tests, see snakefood/test/snakefood.
+
 
