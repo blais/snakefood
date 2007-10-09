@@ -159,7 +159,7 @@ def gendeps():
     if opts.internal >= 2:
         filtfiles = type(allfiles)()
         for from_, tolist in allfiles.iteritems():
-            filtfiles[from_] = set(ifilter(allfiles.__contains__, tolist))
+            filtfiles[from_] = set(x for x in tolist if x in allfiles or x == (None, None))
         allfiles = filtfiles
         
     info("")
