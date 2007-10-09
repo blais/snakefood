@@ -67,7 +67,7 @@ def main():
             modname, lineno = x
             if modname in simp:
                 if opts.do_dups:
-                    write("%s:%d: Duplicate import '%s'\n" % (fn, lineno, modname))
+                    write("%s:%d:  Duplicate import '%s'\n" % (fn, lineno, modname))
             else:
                 uimported.append(x)
                 simp.add(modname)
@@ -88,7 +88,7 @@ def main():
         usednames.update(x[0] for x in exported)
         for modname, lineno in imported:
             if modname not in usednames:
-                write("%s:%d: Unused import '%s'\n" % (fn, lineno, modname))
+                write("%s:%d:  Unused import '%s'\n" % (fn, lineno, modname))
 
 
         if opts.do_missing or opts.verbose:
@@ -104,7 +104,7 @@ def main():
             defined.update(x[0] for x in assign_names)
             for name, lineno in simple_names:
                 if name not in defined and name not in __builtin__.__dict__:
-                    write("%s:%d: Missing import for '%s'\n" % (fn, lineno, name))
+                    write("%s:%d:  Missing import for '%s'\n" % (fn, lineno, name))
 
 
 
