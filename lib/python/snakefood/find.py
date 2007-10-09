@@ -138,6 +138,9 @@ class ImportVisitor(object):
         self.modules.extend((m, n, l, pragma) for (m, n, l) in self.recent)
         self.recent = []
         
+    def finalize(self):
+        self.accept_imports()
+        return self.modules
 
 class ImportWalker(ASTVisitor):
     "AST walker that we use to dispatch to a default method on the visitor."
@@ -165,9 +168,9 @@ def parse_python_source(fn):
 
     vis = ImportVisitor()
     compiler.walk(mod, vis, ImportWalker(vis))
-    vis.accept_imports()
+    modules = vis.finalize()
 
-    return vis.modules
+    return modules
 
 
 
