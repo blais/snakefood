@@ -1,7 +1,6 @@
 ===========================
    Snakefood User Manual
 ===========================
-:Date: 2007-05-10
 :Author: Martin Blais <blais@furius.ca>
 
 .. contents::
