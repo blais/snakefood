@@ -8,7 +8,7 @@ AST to obtain the list of imports.)
 See http://furius.ca/snakefood for details.
 """
 
-import os, logging
+import logging
 from os.path import *
 
 from util import iter_pyfiles, setup_logging, def_ignores

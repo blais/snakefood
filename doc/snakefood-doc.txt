@@ -25,10 +25,11 @@
       6.2  Using ``sfood-cluster``
     7   Using a Makefile
     8   Listing the Imports
-    9   Original Uses
-      9.1  Enforcing Dependency Relationships on Commit
-      9.2  Splitting a Codebase
-    10  Feedback and Comments
+    9   Snakefood Import Checker
+    10  Original Uses
+      10.1  Enforcing Dependency Relationships on Commit
+      10.2  Splitting a Codebase
+    11  Feedback and Comments
 
 
 Introduction
@@ -227,7 +228,7 @@ convenient --internal-only option to sfood that automatically
 limits dependencies to the package roots corresponding to the files
 that you specify on the command-line.
 
-.. note:: 
+.. note::
 
    Subdirectories that live under a package root but which do not have
    an appropriate ``__init__.py`` file are considered external to the
@@ -248,7 +249,7 @@ The format of dependencies is really simple::
 
 where the ``package_root`` files are the directory names at the root
 where the module files are found, and the ``file.py`` names are the
-Python filenames relative to the corresponding root.  
+Python filenames relative to the corresponding root.
 
 Each line is a valid Python tuple expression, so you can easily write
 a Python script to process them using a line like::
@@ -368,7 +369,7 @@ does that automatically.  You create a file of cluster names::
 
    pack1
    pack2
-   
+
 and a dependency file will be transformed from this::
 
   (('/myproject', 'pack1/person.py'), ('/myproject', 'pack1/employee.py'))
@@ -410,7 +411,7 @@ things that you need to, for example::
   cat /tmp/filt.deps | sfood-graph -p | dot -Tps | pstopdf -i -o /tmp/myproject.pdf
 
 While this will work, a better way to write such a script is to use a
-makefile.  
+makefile.
 
 Here is an example for a simple self-contained ``Makefile`` that will
 process the relevant dependencies as above::
@@ -481,6 +482,21 @@ For example, to list the imports from ``sfood``, I do this::
 
 Also, see the ``--unified`` option which will output a single set of
 unique imports for a set of files.
+
+
+Snakefood Import Checker
+========================
+
+Another tool that comes with Snakefood is a program that checks for
+unused imports.
+
+
+
+
+
+
+
+
 
 
 Original Uses

@@ -13,6 +13,16 @@ sfood
   for ignoring deps ('CAUGHT')
 
 
+sfood-checker
+=============
+
+- Check the contents of __all__ and ignore those missing symbols
+  imported to be exported...
+
+- You can probably find out a hint about missing imports by doing the
+  name set lookup the other way around...
+
+
 sfood-cluster
 =============
 

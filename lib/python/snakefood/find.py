@@ -4,7 +4,7 @@ This could be considered the core of snakefood, and where all the complexity liv
 """
 
 import sys, os, logging, traceback
-import imp, compiler
+import compiler
 from compiler.visitor import ASTVisitor
 from compiler.ast import Discard, Const
 from os.path import *

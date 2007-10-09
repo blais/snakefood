@@ -16,7 +16,7 @@ dependencies on anything.
 See http://furius.ca/snakefood for details.
 """
 
-import sys, os, logging
+import sys, logging
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
