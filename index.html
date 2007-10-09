@@ -19,12 +19,33 @@
 <div class="document" id="snakefood-python-dependency-graphs">
 <h1 class="title">snakefood: Python Dependency Graphs</h1>
 
-<div class="section">
-<h1><a id="description" name="description">Description</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#description" id="id2">Description</a><ul>
+<li><a class="reference internal" href="#tools-included" id="id3">Tools Included</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dependencies" id="id4">Dependencies</a></li>
+<li><a class="reference internal" href="#documentation" id="id5">Documentation</a></li>
+<li><a class="reference internal" href="#download" id="id6">Download</a></li>
+<li><a class="reference internal" href="#copyright-and-license" id="id7">Copyright and License</a></li>
+<li><a class="reference internal" href="#author" id="id8">Author</a></li>
+</ul>
+</div>
+<!-- 1  Description
+  1.1  Tools Included
+2  Dependencies
+3  Documentation
+4  Download
+5  Copyright and License
+6  Author -->
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#id2">Description</a></h1>
 <p>Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:</p>
 <ul class="simple">
-<li>It uses the AST to parse the Python files.  This is pretty reliable.</li>
+<li>It uses the AST to parse the Python files. This is pretty reliable.</li>
 <li>No module is loaded.  Loading modules to figure out dependencies is
 almost always problem, because a lot of codebases run initialization
 code in the global namespace, which often requires additional setup.
@@ -53,45 +74,65 @@ on a variety of popular Python packages.</li>
 <p>A problem with dependency trackers that run code is that they are
 unreliable, due to the dynamic nature of Python (the presence of
 imports within function calls and __import__ hooks makes it almost
-impossible to always do the right thing).  This script aims at being
+impossible to always do the right thing). This script aims at being
 right 99% of the time, and we think that given the trade-offs, 99% is
 good enough for 99% of the uses.</p>
 <p>I fully intend that this program work on all codebases.  It has been
 tested on a number of popular open source codes (see the test
 directory).</p>
+<div class="section" id="tools-included">
+<h2><a class="toc-backref" href="#id3">Tools Included</a></h2>
+<ol class="arabic simple">
+<li><tt class="docutils literal"><span class="pre">sfood</span></tt>: Given a set of input files or root directories,
+generate a list of dependencies between the files;</li>
+<li><tt class="docutils literal"><span class="pre">sfood-graph</span></tt>: Read a list of dependencies and produce a
+Graphviz dot file.  This file can be run through the Graphviz
+<tt class="docutils literal"><span class="pre">dot</span></tt> tool to produce a viewable/printable PDF file;</li>
+<li><tt class="docutils literal"><span class="pre">sfood-cluster</span></tt> (optional use): Read a list of dependencies,
+a list of file clusters, and output a list of simplified
+(clustered) dependencies.</li>
+<li><tt class="docutils literal"><span class="pre">sfood-imports</span></tt> (complementary): A tool that given a set of
+files and directories, finds and lists all the import statements
+that are found, regardless of whether they can be imported or not.</li>
+<li><tt class="docutils literal"><span class="pre">sfood-checker</span></tt> (complementary): Analyze the source code with the
+AST and list unused or redundant imports.</li>
+</ol>
+<p>See <a class="reference external" href="/snakefood/doc/snakefood-doc.html">full documentation</a> for more
+details.</p>
 </div>
-<div class="section">
-<h1><a id="dependencies" name="dependencies">Dependencies</a></h1>
+</div>
+<div class="section" id="dependencies">
+<h1><a class="toc-backref" href="#id4">Dependencies</a></h1>
 <ul class="simple">
 <li>Python 2.5 or higher.  That's it.</li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="documentation" name="documentation">Documentation</a></h1>
+<div class="section" id="documentation">
+<h1><a class="toc-backref" href="#id5">Documentation</a></h1>
 <ul class="simple">
-<li><a class="reference" href="CHANGES">CHANGES</a></li>
-<li><a class="reference" href="TODO">TODO</a></li>
-<li><a class="reference" href="/snakefood/doc/snakefood-doc.html">User's Manual</a></li>
-<li><a class="reference" href="/snakefood/doc/examples/">Example Outputs</a></li>
+<li><a class="reference external" href="CHANGES">CHANGES</a></li>
+<li><a class="reference external" href="TODO">TODO</a></li>
+<li><a class="reference external" href="/snakefood/doc/snakefood-doc.html">User's Manual</a></li>
+<li><a class="reference external" href="/snakefood/doc/examples/">Example Outputs</a></li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="download" name="download">Download</a></h1>
+<div class="section" id="download">
+<h1><a class="toc-backref" href="#id6">Download</a></h1>
 <ul class="simple">
-<li><a class="reference" href="/downloads/snakefood/">Download</a></li>
+<li><a class="reference external" href="/downloads/snakefood/">Download</a></li>
 </ul>
 </div>
-<div class="section">
-<h1><a id="copyright-and-license" name="copyright-and-license">Copyright and License</a></h1>
+<div class="section" id="copyright-and-license">
+<h1><a class="toc-backref" href="#id7">Copyright and License</a></h1>
 <p>Copyright (C) 2001-2007  Martin Blais.  All Rights Reserved.</p>
-<p>This code is distributed under the <a class="reference" href="COPYING">GNU General Public License</a>;</p>
+<p>This code is distributed under the <a class="reference external" href="COPYING">GNU General Public License</a>;</p>
 <blockquote>
 Special thanks for EWT LLC/Madison Tyler for supporting some of this
 work through time on the job.</blockquote>
 </div>
-<div class="section">
-<h1><a id="author" name="author">Author</a></h1>
-<p>Martin Blais &lt;<a class="reference" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</p>
+<div class="section" id="author">
+<h1><a class="toc-backref" href="#id8">Author</a></h1>
+<p>Martin Blais &lt;<a class="reference external" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;</p>
 </div>
 </div>
 </body>

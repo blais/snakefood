@@ -5,6 +5,7 @@
 .. contents::
 ..
     1  Description
+      1.1  Tools Included
     2  Dependencies
     3  Documentation
     4  Download
@@ -17,7 +18,7 @@ Description
 Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:
 
-- It uses the AST to parse the Python files.  This is pretty reliable.
+- It uses the AST to parse the Python files. This is pretty reliable.
 
 - No module is loaded.  Loading modules to figure out dependencies is
   almost always problem, because a lot of codebases run initialization
@@ -52,14 +53,37 @@ package has a few distinguishing characteristics:
 A problem with dependency trackers that run code is that they are
 unreliable, due to the dynamic nature of Python (the presence of
 imports within function calls and __import__ hooks makes it almost
-impossible to always do the right thing).  This script aims at being
+impossible to always do the right thing). This script aims at being
 right 99% of the time, and we think that given the trade-offs, 99% is
-good enough for 99% of the uses.  
+good enough for 99% of the uses.
 
 I fully intend that this program work on all codebases.  It has been
 tested on a number of popular open source codes (see the test
 directory).
 
+Tools Included
+--------------
+
+1. ``sfood``: Given a set of input files or root directories,
+   generate a list of dependencies between the files;
+
+2. ``sfood-graph``: Read a list of dependencies and produce a
+   Graphviz dot file.  This file can be run through the Graphviz
+   ``dot`` tool to produce a viewable/printable PDF file;
+
+3. ``sfood-cluster`` (optional use): Read a list of dependencies,
+   a list of file clusters, and output a list of simplified
+   (clustered) dependencies.
+
+4. ``sfood-imports`` (complementary): A tool that given a set of
+   files and directories, finds and lists all the import statements
+   that are found, regardless of whether they can be imported or not.
+
+5. ``sfood-checker`` (complementary): Analyze the source code with the
+   AST and list unused or redundant imports.
+
+See `full documentation </snakefood/doc/snakefood-doc.html>`_ for more
+details.
 
 
 Dependencies

@@ -119,6 +119,9 @@ Snakefood provides a few main tools:
    files and directories, finds and lists all the import statements
    that are found, regardless of whether they can be imported or not.
 
+5. ``sfood-checker`` (complementary): Analyze the source code with the
+   AST and list unused or redundant imports.
+
 Typically, you will use ``sfood`` to generate the dependencies and
 pass those on to ``sfood-graph``, then pass its output to ``dot``
 to generate your output PDF file.
@@ -488,15 +491,23 @@ Snakefood Import Checker
 ========================
 
 Another tool that comes with Snakefood is a program that checks for
-unused imports.
+unused and redundant imports. Just run it on files or directories (it
+recurses and finds the Python source files). For example::
 
+  ~/p/.../python/xxdiff$ sfood-checker invoke.py
 
+  /home/blais/p/xxdiff/lib/python/xxdiff/invoke.py:290: Redundant import 'optparse'
+  /home/blais/p/xxdiff/lib/python/xxdiff/invoke.py:11: Unused symbol 'os'
 
-
-
-
-
-
+There are other lint-like tools to do import checking out there; a
+problem with most of these tools is that they attempt to import the
+modules they analyze, which often fails because of code with
+side-effects that runs at global module level. ``sfood-checker`` does
+not import the code it analyzes, rather, it uses the AST to perform a
+"good-enough" analysis. The reason for building this import checker is
+the same as the reason for making snakefood: it **always** works on
+your code, no matter what; it provides a "good enough" / 99% accurate
+solution that at least, always "just works".
 
 
 Original Uses
