@@ -257,15 +257,21 @@ example, you will probably not be interested to find out about
 dependencies to the modules in the standard library that comes with
 Python.</p>
 <p>You can filter out the dependencies by yourself using the usual UNIX
-tools, like grep or sed.  But since this is a typical case, there is a
-convenient --internal-only option to sfood that automatically
-limits dependencies to the package roots corresponding to the files
-that you specify on the command-line.</p>
+tools, like grep or sed. But since this is a typical case, there is a
+convenient <tt class="docutils literal"><span class="pre">--internal</span></tt> option to sfood that automatically limits
+dependencies to only those files living in the package roots
+corresponding to the set files that you specify on the command-line.</p>
+<p>You can restrict the dependencies even further, to only the list of
+files that have been processed, that is, the list you specified on the
+command-line in the first place. You enable this by using the
+<tt class="docutils literal"><span class="pre">--internal</span></tt> option twice. This is a convenient feature when you
+want to chart the dependencies of only the files in a subdirectory of
+a larger project.</p>
 <div class="note">
 <p class="first admonition-title">Note</p>
 <p class="last">Subdirectories that live under a package root but which do not have
 an appropriate <tt class="docutils literal"><span class="pre">__init__.py</span></tt> file are considered external to the
-containing package root (because they are distinct).  Large
+containing package root (because they are distinct). Large
 codebases often have such directories containing test scripts,
 installation code and what not, which cannot be imported directly.
 Add those directories to the command-line if you want to include

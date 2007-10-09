@@ -17,6 +17,7 @@ See http://furius.ca/snakefood for details.
 """
 
 import sys, logging
+from itertools import ifilter
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
@@ -32,9 +33,13 @@ def gendeps():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
 
-    parser.add_option('-i', '--internal', '--internal-only', action='store_true',
+    parser.add_option('-i', '--internal', '--internal-only',
+                      default=0, action='count',
                       help="Filter out dependencies that are outside of the "
-                      "roots of the input files")
+                      "roots of the input files. If internal is used twice, we "
+                      "filter down further the dependencies to the # set of "
+                      "files that were processed only, not just to the files "
+                      "that live in the same roots.")
 
     parser.add_option('-I', '--ignore', dest='ignores', action='append',
                       default=def_ignores,
@@ -136,20 +141,27 @@ def gendeps():
                 xfn = dfn
                 if basename(xfn) == '__init__.py':
                     xfn = dirname(xfn)
-                
+
                 to_ = relfile(xfn, opts.ignores)
                 if opts.internal and to_[0] not in inroots:
                     continue
                 allfiles[from_].add(to_)
                 newfiles.add(dfn)
 
-
         if not (opts.follow and newfiles):
             break
         else:
             fiter = iter(sorted(newfiles))
 
-
+    # If internal is used twice, we filter down further the dependencies to the
+    # set of files that were processed only, not just to the files that live in
+    # the same roots.
+    if opts.internal >= 2:
+        filtfiles = type(allfiles)()
+        for from_, tolist in allfiles.iteritems():
+            filtfiles[from_] = set(ifilter(allfiles.__contains__, tolist))
+        allfiles = filtfiles
+        
     info("")
     info("SUMMARY")
     info("=======")
@@ -191,7 +203,7 @@ def main():
         gendeps()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
-    
+
 
 
 
