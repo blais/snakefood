@@ -2,10 +2,14 @@
    CHANGES: snakefood
 ========================
 
-Current
-=======
+Version 1.1 (2007-10-09)
+========================
 
+* Added option for more aggressive filtering, to just the files that
+  have been specified on the cmdline, by specifying the --internal
+  option twice.
 
+* Added new ``sfood-checker`` tool.
 
 
 Version 1.0 (2007-07-28)
