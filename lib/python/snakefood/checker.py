@@ -35,6 +35,10 @@ def main():
                       default=def_ignores,
                       help="Add the given directory name to the list to be ignored.")
 
+    parser.add_option('-d', '--duplicates', '--enable-duplicates',
+                      dest='do_dups', action='store_true',
+                      help="Enable experimental heuristic for finding duplicate imports.")
+
     parser.add_option('-m', '--missing', '--enable-missing',
                       dest='do_missing', action='store_true',
                       help="Enable experimental heuristic for finding missing imports.")
@@ -56,13 +60,14 @@ def main():
         compiler.walk(mod, vis)
         imported = vis.finalize()
 
-        # Check for redundant imports.
+        # Check for duplicate imports.
         uimported = []
         simp = set()
         for x in imported:
             modname, lineno = x
             if modname in simp:
-                write("%s:%d: Duplicate import '%s'\n" % (fn, lineno, modname))
+                if opts.do_dups:
+                    write("%s:%d: Duplicate import '%s'\n" % (fn, lineno, modname))
             else:
                 uimported.append(x)
                 simp.add(modname)
