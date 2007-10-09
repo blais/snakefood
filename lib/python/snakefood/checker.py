@@ -78,18 +78,26 @@ def main():
         compiler.walk(mod, vis)
         dotted_names, simple_names = vis.finalize()
 
+        # Find all the names being exported via __all__.
+        vis = AllVisitor()
+        compiler.walk(mod, vis)
+        exported = vis.finalize()
+
         # Check that all imports have been referenced at least once.
-        usednames = frozenset(x[0] for x in dotted_names) # uniquify
+        usednames = set(x[0] for x in dotted_names)
+        usednames.update(x[0] for x in exported)
         for modname, lineno in imported:
             if modname not in usednames:
                 write("%s:%d: Unused import '%s'\n" % (fn, lineno, modname))
 
-        if opts.do_missing:
+
+        if opts.do_missing or opts.verbose:
             # Find all the names that are being assigned to.
             vis = AssignVisitor()
             compiler.walk(mod, vis)
             assign_names = vis.finalize()
 
+        if opts.do_missing:
             # Check for potentially missing imports (this cannot be precise, we are
             # only providing a heuristic here).
             defined = set(x[0] for x in imported)
@@ -98,13 +106,21 @@ def main():
                 if name not in defined and name not in __builtin__.__dict__:
                     write("%s:%d: Missing import for '%s'\n" % (fn, lineno, name))
 
+
+
         # Print out all the schmoo for debugging.
         if opts.verbose:
             print
             print
             print '------ Imported names:'
-            for modname, lineno in imported:
-                print '%s:%d:  %s' % (fn, lineno, modname)
+            for name, lineno in imported:
+                print '%s:%d:  %s' % (fn, lineno, name)
+
+            print
+            print
+            print '------ Exported names:'
+            for name, lineno in exported:
+                print '%s:%d:  %s' % (fn, lineno, name)
 
             print
             print
@@ -127,7 +143,14 @@ def main():
 
 
 
-class ImportVisitor(object):
+class Visitor(object):
+    "Base class for our visitors."
+    def continue_(self, node):
+        for child in node.getChildNodes():
+            self.visit(child)
+
+
+class ImportVisitor(Visitor):
     """AST visitor that accumulates the target names of import statements."""
     def __init__(self):
         self.symbols = []
@@ -147,7 +170,7 @@ class ImportVisitor(object):
         return self.symbols
 
 
-class NamesVisitor(object):
+class NamesVisitor(Visitor):
     """AST visitor that finds all the identifier references that are defined,
     including dotted references. This includes all free names and names with
     attribute references.
@@ -168,14 +191,13 @@ class NamesVisitor(object):
 
     def visitGetattr(self, node):
         self.attributes.append(node.attrname)
-        for child in node.getChildNodes():
-            self.visit(child)
+        self.continue_(node)
 
     def finalize(self):
         return self.dotted, self.simple
 
 
-class AssignVisitor(object):
+class AssignVisitor(Visitor):
     """AST visitor that builds a list of all potential names that are being
     assigned to. This is used later to heuristically figure out if a name being
     refered to is never assigned to nor in the imports."""
@@ -183,10 +205,6 @@ class AssignVisitor(object):
     def __init__(self):
         self.assnames = []
         self.in_class = False
-
-    def continue_(self, node):
-        for child in node.getChildNodes():
-            self.visit(child)
 
     def visitAssName(self, node):
         self.assnames.append((node.name, node.lineno))
@@ -207,6 +225,33 @@ class AssignVisitor(object):
     def finalize(self):
         return self.assnames
 
+
+class AllVisitor(Visitor):
+    """AST visitor that find an __all__ directive and accumulates the list of
+    constants in it."""
+
+    def __init__(self):
+        self.all = []
+        self.in_assign = False
+        self.in_all = False
+
+    def visitAssign(self, node):
+        prev, self.in_assign = self.in_assign, True
+        self.continue_(node)
+        self.in_assign = prev
+
+    def visitAssName(self, node):
+        if self.in_assign and node.name == '__all__':
+            self.in_all = True
+        self.continue_(node)
+
+    def visitConst(self, node):
+        if self.in_assign and self.in_all:
+            self.all.append((node.value, node.lineno))
+        self.continue_(node)
+
+    def finalize(self):
+        return self.all
 
 
 if __name__ == '__main__':

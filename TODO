@@ -16,11 +16,9 @@ sfood
 sfood-checker
 =============
 
-- Check the contents of __all__ and ignore those missing symbols
-  imported to be exported...
+- Experiment with the missing imports feature... finish this.
 
-- You can probably find out a hint about missing imports by doing the
-  name set lookup the other way around... finish this.
+- Add Emacs integration.
 
 
 sfood-cluster

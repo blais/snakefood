@@ -17,7 +17,6 @@ See http://furius.ca/snakefood for details.
 """
 
 import sys, logging
-from itertools import ifilter
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter

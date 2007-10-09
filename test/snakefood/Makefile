@@ -18,7 +18,8 @@ TARGETS =					\
 CHECK =						\
 	checker/notfound			\
 	checker/simple				\
-	checker/duplicate
+	checker/duplicate			\
+	checker/alllist
 
 FUNCTIONAL = 					\
 	checker/test_checker
