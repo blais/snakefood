@@ -16,7 +16,7 @@ __copyright__ = """Copyright (C) 2007 Martin Blais <blais@furius.ca>.
 This code is distributed under the terms of the GNU General Public License."""
 
 # stdlib imports
-import sys, __builtin__
+import sys, __builtin__, re
 from os.path import *
 import compiler
 
@@ -48,9 +48,17 @@ def main():
     write = sys.stderr.write
     for fn in iter_pyfiles(args or ['.'], opts.ignores, False):
 
+        # Read the file's contents (we will need it later).
+        try:
+            contents = open(fn).read()
+            lines = contents.splitlines()
+        except (IOError, OSError), e:
+            print >> sys.stderr, ("Could not read file '%s'." % fn)
+            continue
+        
         # Convert the file to an AST.
         try:
-            mod = compiler.parseFile(fn)
+            mod = compiler.parse(contents)
         except SyntaxError, e:
             write("%s:%s: %s.\n" % (fn, e.lineno, e))
             continue
@@ -86,10 +94,12 @@ def main():
         # Check that all imports have been referenced at least once.
         usednames = set(x[0] for x in dotted_names)
         usednames.update(x[0] for x in exported)
-        for modname, lineno in imported:
-            if modname not in usednames:
-                write("%s:%d:  Unused import '%s'\n" % (fn, lineno, modname))
-
+        for name, lineno in imported:
+            if name not in usednames:
+                # Search for the column in the relevant line.
+                mo = re.search(r'\b%s\b' % name, lines[lineno-1])
+                colno = mo.start()+1 if mo else 0
+                write("%s:%d:%d:  Unused import '%s'\n" % (fn, lineno, colno, name))
 
         if opts.do_missing or opts.verbose:
             # Find all the names that are being assigned to.
