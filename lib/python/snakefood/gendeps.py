@@ -59,6 +59,9 @@ def gendeps():
                       dest='do_pragmas', default=True,
                       help="Disable processing of pragma directives as strings after imports.")
 
+    parser.add_option('-u', '--ignore-unused-imports', action='store_true',
+                      help="Automatically ignore unused imports. (See sfood-checker.)")
+
     opts, args = parser.parse_args()
     setup_logging(opts.verbose)
 
@@ -160,7 +163,7 @@ def gendeps():
         for from_, tolist in allfiles.iteritems():
             filtfiles[from_] = set(x for x in tolist if x in allfiles or x == (None, None))
         allfiles = filtfiles
-        
+
     info("")
     info("SUMMARY")
     info("=======")

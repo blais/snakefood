@@ -31,7 +31,7 @@ _names_tests = (
 
 def test():
     for source, expected in _import_tests:
-        symbols = visit_source(source, ImportVisitor)
+        symbols = visit_source(source, SimpleImportVisitor)
         actual = [x[0] for x in symbols]
         assert actual == expected, (actual, expected)
 

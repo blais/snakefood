@@ -64,7 +64,7 @@ def main():
             continue
 
         # Find all the imported names.
-        vis = ImportVisitor()
+        vis = SimpleImportVisitor()
         compiler.walk(mod, vis)
         imported = vis.finalize()
 
@@ -160,7 +160,7 @@ class Visitor(object):
             self.visit(child)
 
 
-class ImportVisitor(Visitor):
+class SimpleImportVisitor(Visitor):
     """AST visitor that accumulates the target names of import statements."""
     def __init__(self):
         self.symbols = []

@@ -22,7 +22,7 @@ ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
 def find_dependencies(fn, verbose, process_pragmas):
-    "Returns a list of the files it depends on."
+    "Returns a list of the files 'fn' depends on."
     file_errors = []
 
     found_modules = parse_python_source(fn)
@@ -39,18 +39,18 @@ def find_dependencies(fn, verbose, process_pragmas):
     dn = dirname(fn)
     seenset = set()
     for x in found_modules:
-        mod, sub, lineno, pragma = x
+        mod, rname, lname, lineno, pragma = x
         if process_pragmas and pragma == 'OPTIONAL':
             logging.warning(WARNING_OPTIONAL %
-                            (lineno, mod if sub is None else '%s.%s' % (mod, sub)))
+                            (lineno, mod if rname is None else '%s.%s' % (mod, rname)))
             continue
-            
-        sig = (mod, sub)
+
+        sig = (mod, rname)
         if sig in seenset:
             continue
         seenset.add(sig)
 
-        modfile, errors = find_dotted_module(mod, sub, dn)
+        modfile, errors = find_dotted_module(mod, rname, dn)
         if errors:
             file_errors.extend(errors)
             for err, name in errors:
@@ -75,7 +75,7 @@ def find_imports(fn, verbose, ignores):
     dn = dirname(fn)
 
     packroot = None
-    for modname, name, lineno, _ in found_modules:
+    for modname, rname, lname, lineno, _ in found_modules:
         islocal = False
         names = modname.split('.')
         if find_dotted(names, dn):
@@ -94,8 +94,8 @@ def find_imports(fn, verbose, ignores):
             modname = '%s.%s' % (reldir.replace(os.sep, '.'), modname)
             islocal = True
 
-        if name is not None:
-            modname = '%s.%s' % (modname, name)
+        if rname is not None:
+            modname = '%s.%s' % (modname, rname)
         yield (modname, lineno, islocal)
 
 
@@ -103,24 +103,31 @@ def find_imports(fn, verbose, ignores):
 
 
 class ImportVisitor(object):
-    "AST visitor for grabbing the import statements."
+    """AST visitor for grabbing the import statements.
 
+    This visitor produces a list of
+
+       (module-name, remote-name, local-name, line-no, pragma)
+
+    * remote-name is the name off the symbol in the imported module.
+    * local-name is the name of the object given in the importing module.
+    """
     def __init__(self):
         self.modules = []
         self.recent = []
-        
+
     def visitImport(self, node):
         self.accept_imports()
-        self.recent.extend((x[0], None, node.lineno) for x in node.names)
+        self.recent.extend((x[0], None, x[0], node.lineno) for x in node.names)
 
     def visitFrom(self, node):
         self.accept_imports()
         modname = node.modname
         for name, as_ in node.names:
-            if name != '*':
-                mod = (modname, name, node.lineno)
+            if name == '*':
+                mod = (modname, None, None, node.lineno)
             else:
-                mod = (modname, None, node.lineno)
+                mod = (modname, name, as_ or name, node.lineno)
             self.recent.append(mod)
 
     def default(self, node):
@@ -131,13 +138,13 @@ class ImportVisitor(object):
                 if len(children) == 1 and isinstance(children[0], Const):
                     const_node = children[0]
                     pragma = const_node.value
-                        
+
         self.accept_imports(pragma)
 
     def accept_imports(self, pragma=None):
-        self.modules.extend((m, n, l, pragma) for (m, n, l) in self.recent)
+        self.modules.extend((m, r, l, n, pragma) for (m, r, l, n) in self.recent)
         self.recent = []
-        
+
     def finalize(self):
         self.accept_imports()
         return self.modules
@@ -184,13 +191,13 @@ builtin_module_names = sys.builtin_module_names + exceptions
 
 module_cache = {}
 
-def find_dotted_module(modname, sub, parentdir):
+def find_dotted_module(modname, rname, parentdir):
     """
     A version of find_module that supports dotted module names (packages).  This
     function returns the filename of the module if found, otherwise returns
     None.
 
-    If 'sub' is not None, it first attempts to import 'modname.sub', and if it
+    If 'rname' is not None, it first attempts to import 'modname.rname', and if it
     fails, it must therefore not be a module, so we look up 'modname' and return
     that instead.
 
@@ -218,12 +225,12 @@ def find_dotted_module(modname, sub, parentdir):
             return None, errors
 
     # If this is a from-form, try the target symbol as a module.
-    if sub:
-        fn2 = find_dotted([sub], dirname(fn))
+    if rname:
+        fn2 = find_dotted([rname], dirname(fn))
         if fn2:
             fn = fn2
         else:
-            errors.append((ERROR_SYMBOL, '.'.join((modname, sub))))
+            errors.append((ERROR_SYMBOL, '.'.join((modname, rname))))
             # Pass-thru and return the filename of the parent, which was found.
 
     return fn, errors
