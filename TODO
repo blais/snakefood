@@ -5,12 +5,17 @@
 sfood
 =====
 
+- Integrate sfood-checker features in our module that calculates the
+  dependencies, with an option to automatically ignore unused
+  imports!!!
+
 - (For 1.1) Integrate modulefinder code and compare results.
 
 - Support pragmas as comments after an import.
 
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
+
 
 
 sfood-checker
