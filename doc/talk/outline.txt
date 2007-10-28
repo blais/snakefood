@@ -1,0 +1,73 @@
+=======================================
+   Snakefood PyCon 2008 Talk Outline
+=======================================
+:Abstract:
+
+   Notes and outline for PyCon 2008 talk and proposal.
+
+
+
+      
+
+.. contents::
+.. 
+    
+
+
+
+
+
+Documentation
+=============
+
+- Prepare submission and slides for PyCon presentation
+
+  Talk outline:
+
+  - intro/motivation: the use of dependencies
+
+
+
+ ``I have problems with that code. The reason why?
+  This."''
+one slide with global initializer
+  ``You cannot assume that you can import a module without
+side-effects.''
+
+
+``Good enough'' dependencies (central concept)
+
+
+
+  - implementation details
+    * zero config
+    * does not run code
+  - makefile + dataflow chart for deps/clusters/dot, etc.
+  - examples
+  - enforcing specific dependencies in a subversion hook
+
+``This is all theoretically cool, but in practice, you're trying to
+  answer a question.  For example, you're trying to answer the
+  question like Why does this module depend on this other one? or Why
+  is there a circular dependency here, and how can I remove it?''
+
+
+- checker + integration with sfood-gendeps
+
+  - do stats on typical codebases, number of unused imports
+
+- fully automatic
+- always works (In which cases does it fail?)
+
+
+- my firm intention: to make this a useful, working, never failing
+  tool that all Pythonistas use. Please use it and report problems!
+
+
+
+
+motivation:
+
+- init-time code is bad, you need to know your dependencies
+- tools like Eclipse offer a bad cognitive model
+
