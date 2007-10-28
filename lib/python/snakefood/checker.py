@@ -21,7 +21,7 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
-from snakefood.find import parse_python_source, ImportVisitor, check_duplicate_imports
+from snakefood.find import parse_python_source, check_duplicate_imports
 from snakefood.astpretty import printAst
 
 
@@ -50,7 +50,7 @@ def main():
     for fn in iter_pyfiles(args or ['.'], opts.ignores, False):
 
         # Parse the file.
-        found_imports, mod, lines = parse_python_source(fn)
+        found_imports, ast, lines = parse_python_source(fn)
 
         # Check for duplicate remote names imported.
         if opts.do_dups:
@@ -58,53 +58,38 @@ def main():
             for modname, rname, lname, lineno, pragma in dups:
                 write("%s:%d:  Duplicate import '%s'\n" % (fn, lineno, lname))
 
-        # Find all the names being referenced/used.
-        vis = NamesVisitor()
-        compiler.walk(mod, vis)
-        dotted_names, simple_names = vis.finalize()
+        # Filter out the unused imports.
+        used_imports, unused_imports = filter_unused_imports(ast, found_imports)
 
-        # Find all the names being exported via __all__.
-        vis = AllVisitor()
-        compiler.walk(mod, vis)
-        exported = vis.finalize()
-
-        # Check that all imports have been referenced at least once.
-        usednames = set(x[0] for x in dotted_names)
-        usednames.update(x[0] for x in exported)
-        filtered_imports = []
-        for x in found_imports:
+        # Output warnings for the unused imports.
+        for x in unused_imports:
             _, _, lname, lineno, _ = x
-            if lname not in usednames:
-                # Search for the column in the relevant line.
-                mo = re.search(r'\b%s\b' % lname, lines[lineno-1])
-                colno = mo.start()+1 if mo else 0
-                write("%s:%d:%d:  Unused import '%s'\n" % (fn, lineno, colno, lname))
-            else:
-                filtered_imports.append(x)
+            # Search for the column in the relevant line.
+            mo = re.search(r'\b%s\b' % lname, lines[lineno-1])
+            colno = mo.start()+1 if mo else 0
+            write("%s:%d:%d:  Unused import '%s'\n" % (fn, lineno, colno, lname))
 
+        # (Optionally) Compute the list of names that are being assigned to.
         if opts.do_missing or opts.debug:
-            # Find all the names that are being assigned to.
             vis = AssignVisitor()
-            compiler.walk(mod, vis)
+            compiler.walk(ast, vis)
             assign_names = vis.finalize()
 
+        # (Optionally) Check for potentially missing imports (this cannot be
+        # precise, we are only providing a heuristic here).
         if opts.do_missing:
-            # Check for potentially missing imports (this cannot be precise, we are
-            # only providing a heuristic here).
-            defined = set(modname for modname, _, _, _, _ in filtered_imports)
+            defined = set(modname for modname, _, _, _, _ in used_imports)
             defined.update(x[0] for x in assign_names)
             for name, lineno in simple_names:
                 if name not in defined and name not in __builtin__.__dict__:
                     write("%s:%d:  Missing import for '%s'\n" % (fn, lineno, name))
-
-
 
         # Print out all the schmoo for debugging.
         if opts.debug:
             print
             print
             print '------ Imported names:'
-            for modname, rname, lname, lineno, pragma in imported:
+            for modname, rname, lname, lineno, pragma in found_imports:
                 print '%s:%d:  %s' % (fn, lineno, lname)
 
             print
@@ -129,9 +114,41 @@ def main():
             print
             print
             print '------ AST:'
-            printAst(mod, indent='    ', stream=sys.stdout, initlevel=1)
+            printAst(ast, indent='    ', stream=sys.stdout, initlevel=1)
             print
 
+
+
+def filter_unused_imports(ast, found_imports):
+    """
+    Given the ast and the list of found imports in the file, find out which of
+    the imports are not used and return two lists: a list of used imports, and a
+    list of unused imports.
+    """
+    used_imports, unused_imports = [], []
+
+    # Find all the names being referenced/used.
+    vis = NamesVisitor()
+    compiler.walk(ast, vis)
+    dotted_names, simple_names = vis.finalize()
+
+    # Find all the names being exported via __all__.
+    vis = AllVisitor()
+    compiler.walk(ast, vis)
+    exported = vis.finalize()
+
+    # Check that all imports have been referenced at least once.
+    usednames = set(x[0] for x in dotted_names)
+    usednames.update(x[0] for x in exported)
+    used_imports = []
+    for x in found_imports:
+        _, _, lname, lineno, _ = x
+        if lname not in usednames:
+            unused_imports.append(x)
+        else:
+            used_imports.append(x)
+
+    return used_imports, unused_imports
 
 
 class Visitor(object):

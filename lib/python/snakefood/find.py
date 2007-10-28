@@ -199,7 +199,15 @@ class ImportWalker(ASTVisitor):
 def parse_python_source(fn):
     """Parse the file 'fn' and return a list of module tuples, in the form:
 
-        (modname, name, lineno, pragma)
+        (modname, remote-name, local-name, lineno, pragma)
+
+    We return three things:
+
+    1. The found imports in the format described above.
+    2. The AST tree.
+    3. A list of lines of the source line (typically used for verbose error
+       messages).
+
     """
     # Read the file's contents to return it.
     try:
@@ -211,7 +219,7 @@ def parse_python_source(fn):
 
     # Convert the file to an AST.
     try:
-        mod = compiler.parse(contents)
+        ast = compiler.parse(contents)
     except SyntaxError, e:
         logging.error("Error processing file '%s':\n\n%s" %
                       (fn, traceback.format_exc(sys.stderr)))
@@ -219,10 +227,10 @@ def parse_python_source(fn):
 
     # Find all the imported names.
     vis = ImportVisitor()
-    compiler.walk(mod, vis, ImportWalker(vis))
+    compiler.walk(ast, vis, ImportWalker(vis))
     found_imports = vis.finalize()
 
-    return found_imports, mod, lines
+    return found_imports, ast, lines
 
 
 

@@ -4,6 +4,7 @@ Functional test for Python checker.
 """
 
 from snakefood.checker import *
+from snakefood.find import ImportVisitor
 
 
 def visit_source(source, cls):
