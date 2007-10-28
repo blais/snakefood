@@ -14,14 +14,15 @@
       5.1  How Packages Are Automatically Found
       5.2  Following Dependencies
       5.3  Restricting Dependencies
-      5.4  The Format of Dependencies Files
-      5.5  Caching Raw Dependencies
-      5.6  Warnings
-      5.7  Nodes Without Dependencies
-      5.8  Pragmas: Marking Dependencies as Ignored
+      5.4  Ignoring Unused Imports
+      5.5  The Format of Dependencies Files
+      5.6  Caching Raw Dependencies
+      5.7  Warnings
+      5.8  Nodes Without Dependencies
+      5.9  Pragmas: Marking Dependencies as Ignored
     6   Filtering and Clustering Dependencies
       6.1  Using Standard UNIX Tools
-      6.2  Using ``sfood-cluster``
+      6.2  Using the Clustering Tool
     7   Using a Makefile
     8   Listing the Imports
     9   Snakefood Import Checker
@@ -250,6 +251,20 @@ a larger project.
    dependencies and filter with grep.
 
 
+Ignoring Unused Imports
+-----------------------
+
+With the ``--ignore-unused`` option, ``sfood`` will automatically
+ignore dependencies motiviated by symbols imported but not used. This
+determination is performed using the same conservative and safe
+heuristic as is used in ``sfood-checker``.
+
+The resulting list of dependencies will always be smaller when running
+with this option than without. Note that the resulting dependency tree
+is the same that you would obtain should you clean up all the analyzed
+code using ``sfood-checker``, to hunt for unused imports.
+
+
 The Format of Dependencies Files
 --------------------------------
 
@@ -364,8 +379,8 @@ There is no formula for filtering or reformatting the dependencies; it
 depends on your codebase and what you want the graph to show.
 
 
-Using ``sfood-cluster``
------------------------
+Using the Clustering Tool
+-------------------------
 
 A useful operation is to transform the relative filenames into logical
 groups and to remove redundant lines.  We call this “clustering”.  A

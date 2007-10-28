@@ -3,11 +3,8 @@
 =======================================
 :Abstract:
 
-   Notes and outline for PyCon 2008 talk and proposal.
+   Notes and outline for PyCon 2008 talk.
 
-
-
-      
 
 .. contents::
 .. 
@@ -20,11 +17,9 @@
 Documentation
 =============
 
-- Prepare submission and slides for PyCon presentation
+talk outline:
 
-  Talk outline:
-
-  - intro/motivation: the use of dependencies
+- intro/motivation: the use of dependencies
 
 
 
@@ -71,3 +66,7 @@ motivation:
 - init-time code is bad, you need to know your dependencies
 - tools like Eclipse offer a bad cognitive model
 
+
+
+
+- What "good enough" means, i.e., where does it fail?
