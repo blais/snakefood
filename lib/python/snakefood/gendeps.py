@@ -21,10 +21,10 @@ from os.path import *
 from collections import defaultdict
 from operator import itemgetter
 
-from util import iter_pyfiles, setup_logging, def_ignores
-from depends import output_depends
-from find import find_dependencies, ERROR_IMPORT, ERROR_SYMBOL
-from roots import *
+from snakefood.util import iter_pyfiles, setup_logging, def_ignores
+from snakefood.depends import output_depends
+from snakefood.find import find_dependencies, ERROR_IMPORT, ERROR_SYMBOL
+from snakefood.roots import *
 
 
 
@@ -59,7 +59,7 @@ def gendeps():
                       dest='do_pragmas', default=True,
                       help="Disable processing of pragma directives as strings after imports.")
 
-    parser.add_option('-u', '--ignore-unused-imports', action='store_true',
+    parser.add_option('-u', '--ignore-unused', action='store_true',
                       help="Automatically ignore unused imports. (See sfood-checker.)")
 
     opts, args = parser.parse_args()
@@ -120,7 +120,8 @@ def gendeps():
 
             info("  %s" % fn)
             processed_files.add(fn)
-            files, errors = find_dependencies(fn, opts.verbose, opts.do_pragmas)
+            files, errors = find_dependencies(
+                fn, opts.verbose, opts.do_pragmas, opts.ignore_unused)
             allerrors.extend(errors)
 
             # When packages are the source of dependencies, remove the __init__

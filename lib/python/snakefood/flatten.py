@@ -7,7 +7,7 @@ Read a snakefood dependencies file and flatten and output the list of all files.
 import sys
 from os.path import join
 
-from depends import read_depends, flatten_depends
+from snakefood.depends import read_depends, flatten_depends
 
 
 

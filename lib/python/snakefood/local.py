@@ -1,25 +1,13 @@
 """Code for checking for local names and superfluous import statements.
 
-This script is used to detect forgotten imports that are not used anymore. When
-writing Python code (which happens so fast), it is often the case that we forget
-to remove useless imports.
-
-This is implemented using a search in the AST, and as such we do not require to
-import the module in order to run the checks. This is a major advantage over all
-the other lint/checker programs, and the main reason for taking the time to
-write it.
+This code provides searches for local symbols in the AST, assignments and such
+things.
 """
 # This file is part of the Snakefood open source package.
 # See http://furius.ca/snakefood/ for licensing details.
 
 # stdlib imports
-import sys, __builtin__, re
-from os.path import *
 import compiler
-
-from snakefood.util import def_ignores, iter_pyfiles
-from snakefood.find import parse_python_source, check_duplicate_imports
-from snakefood.astpretty import printAst
 
 __all__ = ('filter_unused_imports', 'NamesVisitor', 'AssignVisitor', 'AllVisitor')
 
@@ -49,7 +37,7 @@ def filter_unused_imports(ast, found_imports):
     used_imports = []
     for x in found_imports:
         _, _, lname, lineno, _ = x
-        if lname not in usednames:
+        if lname is not None and lname not in usednames:
             unused_imports.append(x)
         else:
             used_imports.append(x)

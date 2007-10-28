@@ -7,7 +7,7 @@ Read snakefood dependencies and output a visual graph.
 import sys, os
 from os.path import *
 
-from depends import read_depends, eliminate_redundant_depends
+from snakefood.depends import read_depends, eliminate_redundant_depends
 
 
 

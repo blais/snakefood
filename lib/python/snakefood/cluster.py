@@ -11,7 +11,7 @@ import sys
 from itertools import imap
 from collections import defaultdict
 
-from depends import read_depends, output_depends
+from snakefood.depends import read_depends, output_depends
 
 
 

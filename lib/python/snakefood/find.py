@@ -11,7 +11,8 @@ from compiler.visitor import ASTVisitor
 from compiler.ast import Discard, Const
 from os.path import *
 
-from roots import find_package_root
+from snakefood.roots import find_package_root
+from snakefood.local import filter_unused_imports
 
 __all__ = ('find_dependencies', 'find_imports',
            'parse_python_source', 
@@ -25,13 +26,17 @@ ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
 ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
-def find_dependencies(fn, verbose, process_pragmas):
+def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
-    found_modules, _, _ = parse_python_source(fn)
-    if found_modules is None:
+    found_imports, ast, _ = parse_python_source(fn)
+    if found_imports is None:
         return [], file_errors
+
+    # Filter out the unused imports if requested.
+    if ignore_unused:
+        found_imports, _ = filter_unused_imports(ast, found_imports)
 
     output_code = (verbose >= 2)
     source_lines = None
@@ -42,7 +47,7 @@ def find_dependencies(fn, verbose, process_pragmas):
     assert not isdir(fn)
     dn = dirname(fn)
     seenset = set()
-    for x in found_modules:
+    for x in found_imports:
         mod, rname, lname, lineno, pragma = x
         if process_pragmas and pragma == 'OPTIONAL':
             logging.warning(WARNING_OPTIONAL %
@@ -72,14 +77,14 @@ def find_dependencies(fn, verbose, process_pragmas):
 def find_imports(fn, verbose, ignores):
     "Yields a list of the module names the file 'fn' depends on."
 
-    found_modules, _, _ = parse_python_source(fn)
-    if found_modules is None:
+    found_imports, _, _ = parse_python_source(fn)
+    if found_imports is None:
         raise StopIteration
 
     dn = dirname(fn)
 
     packroot = None
-    for modname, rname, lname, lineno, _ in found_modules:
+    for modname, rname, lname, lineno, _ in found_imports:
         islocal = False
         names = modname.split('.')
         if find_dotted(names, dn):

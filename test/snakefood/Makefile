@@ -15,6 +15,9 @@ TARGETS =					\
 	project/foo_import			\
 	project/foo_from
 
+TARGETS_UNUSED =				\
+	simple/unused
+
 CHECK =						\
 	checker/notfound			\
 	checker/simple				\
@@ -24,7 +27,7 @@ CHECK =						\
 FUNCTIONAL = 					\
 	checker/test_checker
 
-depends: $(TARGETS) $(CHECK) $(FUNCTIONAL)
+depends: $(TARGETS) $(TARGETS_UNUSED) $(CHECK) $(FUNCTIONAL)
 
 functional: $(FUNCTIONAL)
 
@@ -33,6 +36,10 @@ $(TARGETS):
 	@sfood $@.py > $@.deps 2> $@.log
 	@diff $@.expect $@.deps
 
+$(TARGETS_UNUSED):
+	@echo "------ Testing $@"
+	@sfood --ignore-unused $@.py > $@.deps 2> $@.log
+	@diff $@.expect $@.deps
 
 
 # Testing the root identification, against expect files.

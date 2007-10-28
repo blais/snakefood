@@ -8,7 +8,7 @@ import os, logging
 from os.path import *
 from dircache import listdir
 
-from util import is_python, filter_separate
+from snakefood.util import is_python, filter_separate
 
 __all__ = ('find_roots', 'find_package_root', 'relfile',)
 
