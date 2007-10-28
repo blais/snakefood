@@ -12,6 +12,7 @@ from os.path import *
 from roots import find_package_root
 
 __all__ = ('find_dependencies', 'find_imports',
+           'ImportVisitor', 'get_local_names'
            'ERROR_IMPORT', 'ERROR_SYMBOL')
 
 
@@ -99,9 +100,6 @@ def find_imports(fn, verbose, ignores):
         yield (modname, lineno, islocal)
 
 
-
-
-
 class ImportVisitor(object):
     """AST visitor for grabbing the import statements.
 
@@ -118,13 +116,17 @@ class ImportVisitor(object):
 
     def visitImport(self, node):
         self.accept_imports()
-        self.recent.extend((x[0], None, x[0], node.lineno) for x in node.names)
+        self.recent.extend((x[0], None, x[1] or x[0], node.lineno)
+                           for x in node.names)
 
     def visitFrom(self, node):
         self.accept_imports()
         modname = node.modname
+        if modname == '__future__':
+            return # Ignore these.
         for name, as_ in node.names:
             if name == '*':
+                # We really don't know...
                 mod = (modname, None, None, node.lineno)
             else:
                 mod = (modname, name, as_ or name, node.lineno)
@@ -148,6 +150,16 @@ class ImportVisitor(object):
     def finalize(self):
         self.accept_imports()
         return self.modules
+
+def get_local_names(found_imports):
+    """
+    Convert the results of running the ImportVisitor into a simple list of local
+    names.
+    """
+    return [(lname, no)
+            for modname, rname, lname, no, pragma in found_imports
+            if lname is not None]
+
 
 class ImportWalker(ASTVisitor):
     "AST walker that we use to dispatch to a default method on the visitor."

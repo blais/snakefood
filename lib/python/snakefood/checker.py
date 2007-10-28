@@ -21,6 +21,7 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
+from snakefood.find import ImportVisitor, get_local_names
 from snakefood.astpretty import printAst
 
 
@@ -64,9 +65,10 @@ def main():
             continue
 
         # Find all the imported names.
-        vis = SimpleImportVisitor()
+        vis = ImportVisitor()
         compiler.walk(mod, vis)
-        imported = vis.finalize()
+        found_modules = vis.finalize()
+        imported = get_local_names(found_modules)
 
         # Check for duplicate imports.
         uimported = []
@@ -158,26 +160,6 @@ class Visitor(object):
     def continue_(self, node):
         for child in node.getChildNodes():
             self.visit(child)
-
-
-class SimpleImportVisitor(Visitor):
-    """AST visitor that accumulates the target names of import statements."""
-    def __init__(self):
-        self.symbols = []
-
-    def visitImport(self, node):
-        self.symbols.extend((x[1] or x[0], node.lineno) for x in node.names)
-
-    def visitFrom(self, node):
-        modname = node.modname
-        if modname == '__future__':
-            return # Ignore these.
-        for name, as_ in node.names:
-            if name != '*':
-                self.symbols.append((as_ or name, node.lineno))
-
-    def finalize(self):
-        return self.symbols
 
 
 class NamesVisitor(Visitor):
