@@ -56,7 +56,7 @@ def main():
         except (IOError, OSError), e:
             print >> sys.stderr, ("Could not read file '%s'." % fn)
             continue
-        
+
         # Convert the file to an AST.
         try:
             mod = compiler.parse(contents)
@@ -67,21 +67,18 @@ def main():
         # Find all the imported names.
         vis = ImportVisitor()
         compiler.walk(mod, vis)
-        found_modules = vis.finalize()
-        imported = get_local_names(found_modules)
+        found_imports = vis.finalize()
 
-        # Check for duplicate imports.
-        uimported = []
-        simp = set()
-        for x in imported:
-            modname, lineno = x
-            if modname in simp:
-                if opts.do_dups:
-                    write("%s:%d:  Duplicate import '%s'\n" % (fn, lineno, modname))
-            else:
-                uimported.append(x)
-                simp.add(modname)
-        imported = uimported
+        # Check for duplicate remote names imported.
+        if opts.do_dups:
+            found_imports, dups = check_duplicate_imports(found_imports)
+            for modname, rname, lname, lineno, pragma in dups:
+                write("%s:%d:  Duplicate import '%s'\n" % (fn, lineno, lname))
+
+        # Filter down to just the local names.
+        imported = [(lname, no)
+                    for modname, rname, lname, no, pragma in found_imports
+                    if lname is not None]
 
         # Find all the names being referenced/used.
         vis = NamesVisitor()

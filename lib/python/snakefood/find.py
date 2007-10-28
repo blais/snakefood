@@ -151,6 +151,25 @@ class ImportVisitor(object):
         self.accept_imports()
         return self.modules
 
+
+def check_duplicate_imports(found_imports):
+    """
+    Heuristically check for duplicate imports, and return two lists:
+    a list of the unique imports and a list of the duplicates.
+    """
+    uniq, dups = [], []
+    simp = set()
+    for x in found_imports:
+        modname, rname, lname, lineno, pragma = x
+        key = (modname, rname)
+        if key in simp:
+            dups.append(x)
+        else:
+            uniq.append(x)
+            simp.add(key)
+    return uniq
+
+
 def get_local_names(found_imports):
     """
     Convert the results of running the ImportVisitor into a simple list of local
