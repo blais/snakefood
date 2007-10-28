@@ -4,9 +4,9 @@ Parse Python files and output a unified list of imported symbols.
 The imported modules/symbols are output even if they cannot be found.  (You
 could try to do this with grep, but this is more accurate because it uses the
 AST to obtain the list of imports.)
-
-See http://furius.ca/snakefood for details.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import logging
 from os.path import *

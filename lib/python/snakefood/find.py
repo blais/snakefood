@@ -2,6 +2,8 @@
 Parsing and finding routines.
 This could be considered the core of snakefood, and where all the complexity lives.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys, os, logging, traceback
 import compiler

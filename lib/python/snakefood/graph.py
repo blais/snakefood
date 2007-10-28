@@ -1,8 +1,8 @@
 """
 Read snakefood dependencies and output a visual graph.
-
-See http://furius.ca/snakefood for details.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys, os
 from os.path import *

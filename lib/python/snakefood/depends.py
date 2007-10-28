@@ -1,6 +1,8 @@
 """
 Routines that manipulate, read and convert lists of dependencies.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys, logging
 from operator import itemgetter

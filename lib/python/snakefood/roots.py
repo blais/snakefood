@@ -1,6 +1,8 @@
 """
 Code that deals with search and classifying root directories.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import os, logging
 from os.path import *

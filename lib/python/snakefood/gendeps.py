@@ -12,9 +12,9 @@ graph from this list of dependencies.
 As a special case, if the 'to' tuple is (None, None), this means to at least
 include the 'from' tuple as a node.  This may happen if the file has no
 dependencies on anything.
-
-See http://furius.ca/snakefood for details.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys, logging
 from os.path import *

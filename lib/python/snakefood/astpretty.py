@@ -3,7 +3,8 @@
 This module exports a function that can be used to print a human-readable
 version of the AST.
 """
-__author__ = 'Martin Blais <blais@furius.ca>'
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys
 from compiler.ast import Node

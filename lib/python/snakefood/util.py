@@ -1,6 +1,8 @@
 """
 Various utilities, to iterate among files, global stuff, etc.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import os, logging, re
 from os.path import *

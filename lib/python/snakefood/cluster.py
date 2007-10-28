@@ -3,9 +3,9 @@ Read snakefood dependencies from stdin and cluster according to filenames.
 
 You need to call this script with the names of directories to cluster together,
 for relative filenames.
-
-See http://furius.ca/snakefood for details.
 """
+# This file is part of the Snakefood open source package.
+# See http://furius.ca/snakefood/ for licensing details.
 
 import sys
 from itertools import imap
