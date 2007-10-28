@@ -21,7 +21,7 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
-from snakefood.find import ImportVisitor, get_local_names
+from snakefood.find import ImportVisitor, check_duplicate_imports
 from snakefood.astpretty import printAst
 
 

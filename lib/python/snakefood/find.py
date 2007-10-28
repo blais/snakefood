@@ -12,7 +12,7 @@ from os.path import *
 from roots import find_package_root
 
 __all__ = ('find_dependencies', 'find_imports',
-           'ImportVisitor', 'get_local_names'
+           'ImportVisitor', 'get_local_names', 'check_duplicate_imports',
            'ERROR_IMPORT', 'ERROR_SYMBOL')
 
 
@@ -161,13 +161,16 @@ def check_duplicate_imports(found_imports):
     simp = set()
     for x in found_imports:
         modname, rname, lname, lineno, pragma = x
-        key = (modname, rname)
+        if rname is not None:
+            key = modname + '.' + rname
+        else:
+            key = modname
         if key in simp:
             dups.append(x)
         else:
             uniq.append(x)
             simp.add(key)
-    return uniq
+    return uniq, dups
 
 
 def get_local_names(found_imports):
