@@ -23,7 +23,8 @@ from operator import itemgetter
 
 from snakefood.util import iter_pyfiles, setup_logging, def_ignores
 from snakefood.depends import output_depends
-from snakefood.find import find_dependencies, ERROR_IMPORT, ERROR_SYMBOL
+from snakefood.find import find_dependencies
+from snakefood.find import ERROR_IMPORT, ERROR_SYMBOL, ERROR_UNUSED
 from snakefood.roots import *
 
 
@@ -170,13 +171,16 @@ def gendeps():
     info("=======")
 
     # Output a list of the symbols that could not be imported as modules.
-    reports = [("Modules that could not be imported:", ERROR_IMPORT, logging.warning)]
+    reports = [
+        ("Modules that were ignored because not used:", ERROR_UNUSED, logging.info),
+        ("Modules that could not be imported:", ERROR_IMPORT, logging.warning),
+        ]
     if opts.verbose >= 2:
         reports.append(
             ("Symbols that could not be imported as modules:", ERROR_SYMBOL, logging.debug))
 
     for msg, errtype, efun in reports:
-        names = frozenset(name for err, name in allerrors if err is errtype)
+        names = frozenset(name for (err, name) in allerrors if err is errtype)
         if names:
             efun("")
             efun(msg)

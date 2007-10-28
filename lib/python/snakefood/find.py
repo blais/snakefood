@@ -17,12 +17,13 @@ from snakefood.local import filter_unused_imports
 __all__ = ('find_dependencies', 'find_imports',
            'parse_python_source', 
            'ImportVisitor', 'get_local_names', 'check_duplicate_imports',
-           'ERROR_IMPORT', 'ERROR_SYMBOL')
+           'ERROR_IMPORT', 'ERROR_SYMBOL', 'ERROR_UNUSED')
 
 
 
 ERROR_IMPORT = "    Line %d: Could not import module '%s'"
 ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
+ERROR_UNUSED = "    Line %d: Ignored unused import: '%s'"
 ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
@@ -33,10 +34,12 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     found_imports, ast, _ = parse_python_source(fn)
     if found_imports is None:
         return [], file_errors
-
+    
     # Filter out the unused imports if requested.
     if ignore_unused:
-        found_imports, _ = filter_unused_imports(ast, found_imports)
+        found_imports, unused_imports = filter_unused_imports(ast, found_imports)
+        for modname, rname, lname, lineno, pragma in unused_imports:
+            file_errors.append((ERROR_UNUSED, lname))
 
     output_code = (verbose >= 2)
     source_lines = None

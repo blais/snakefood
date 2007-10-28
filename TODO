@@ -5,11 +5,7 @@
 sfood
 =====
 
-- Integrate sfood-checker features in our module that calculates the
-  dependencies, with an option to automatically ignore unused
-  imports!!!
-
-- (For 1.1) Integrate modulefinder code and compare results.
+- (For 1.2) Integrate modulefinder code and compare results.
 
 - Support pragmas as comments after an import.
 
