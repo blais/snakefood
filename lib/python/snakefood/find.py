@@ -12,6 +12,7 @@ from os.path import *
 from roots import find_package_root
 
 __all__ = ('find_dependencies', 'find_imports',
+           'parse_python_source', 
            'ImportVisitor', 'get_local_names', 'check_duplicate_imports',
            'ERROR_IMPORT', 'ERROR_SYMBOL')
 
@@ -26,7 +27,7 @@ def find_dependencies(fn, verbose, process_pragmas):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
-    found_modules = parse_python_source(fn)
+    found_modules, _, _ = parse_python_source(fn)
     if found_modules is None:
         return [], file_errors
 
@@ -69,7 +70,7 @@ def find_dependencies(fn, verbose, process_pragmas):
 def find_imports(fn, verbose, ignores):
     "Yields a list of the module names the file 'fn' depends on."
 
-    found_modules = parse_python_source(fn)
+    found_modules, _, _ = parse_python_source(fn)
     if found_modules is None:
         raise StopIteration
 
@@ -200,18 +201,28 @@ def parse_python_source(fn):
 
         (modname, name, lineno, pragma)
     """
+    # Read the file's contents to return it.
     try:
-        mod = compiler.parseFile(fn)
-    except Exception, e:
+        contents = open(fn).read()
+        lines = contents.splitlines()
+    except (IOError, OSError), e:
+        logging.error("Could not read file '%s'." % fn)
+        return None, None, None
+
+    # Convert the file to an AST.
+    try:
+        mod = compiler.parse(contents)
+    except SyntaxError, e:
         logging.error("Error processing file '%s':\n\n%s" %
                       (fn, traceback.format_exc(sys.stderr)))
-        return None
+        return None, None, lines
 
+    # Find all the imported names.
     vis = ImportVisitor()
     compiler.walk(mod, vis, ImportWalker(vis))
-    modules = vis.finalize()
+    found_imports = vis.finalize()
 
-    return modules
+    return found_imports, mod, lines
 
 
 

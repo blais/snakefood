@@ -21,7 +21,7 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
-from snakefood.find import ImportVisitor, check_duplicate_imports
+from snakefood.find import parse_python_source, ImportVisitor, check_duplicate_imports
 from snakefood.astpretty import printAst
 
 
@@ -29,8 +29,8 @@ def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
 
-    parser.add_option('-v', '--verbose', action='store_true',
-                      help="Verbose (debugging) output.")
+    parser.add_option('--debug', action='store_true',
+                      help="Debugging output.")
 
     parser.add_option('-I', '--ignore', dest='ignores', action='append',
                       default=def_ignores,
@@ -49,25 +49,8 @@ def main():
     write = sys.stderr.write
     for fn in iter_pyfiles(args or ['.'], opts.ignores, False):
 
-        # Read the file's contents (we will need it later).
-        try:
-            contents = open(fn).read()
-            lines = contents.splitlines()
-        except (IOError, OSError), e:
-            print >> sys.stderr, ("Could not read file '%s'." % fn)
-            continue
-
-        # Convert the file to an AST.
-        try:
-            mod = compiler.parse(contents)
-        except SyntaxError, e:
-            write("%s:%s: %s.\n" % (fn, e.lineno, e))
-            continue
-
-        # Find all the imported names.
-        vis = ImportVisitor()
-        compiler.walk(mod, vis)
-        found_imports = vis.finalize()
+        # Parse the file.
+        found_imports, mod, lines = parse_python_source(fn)
 
         # Check for duplicate remote names imported.
         if opts.do_dups:
@@ -100,7 +83,10 @@ def main():
                 colno = mo.start()+1 if mo else 0
                 write("%s:%d:%d:  Unused import '%s'\n" % (fn, lineno, colno, name))
 
-        if opts.do_missing or opts.verbose:
+
+
+
+        if opts.do_missing or opts.debug:
             # Find all the names that are being assigned to.
             vis = AssignVisitor()
             compiler.walk(mod, vis)
@@ -118,7 +104,7 @@ def main():
 
 
         # Print out all the schmoo for debugging.
-        if opts.verbose:
+        if opts.debug:
             print
             print
             print '------ Imported names:'
