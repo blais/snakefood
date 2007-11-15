@@ -113,7 +113,7 @@ def relfile(fn, ignores):
     "Return pairs of (package root, relative filename)."
     root = find_package_root(realpath(fn), ignores)
     if root is None:
-        assert basename(fn) in filesets_ignore[0]
+        assert basename(fn) in filesets_ignore[0], fn
         return
     return root, fn[len(root)+1:]
 
