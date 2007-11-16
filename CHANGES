@@ -5,6 +5,7 @@
 Version 1.2
 ===========
 
+* [2007-11-16] Fixed bug with faulty fedora packaging.
 * [2007-11-15] Fixed bug with std imports.
 
 
