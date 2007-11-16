@@ -97,6 +97,13 @@ def is_package_root(dn, ignores):
         if pyfiles and pyfiles not in filesets_ignore:
             return True
 
+        # Note: we need to check for a 'site-packages' subdirectory because some
+        # distributions package arch-specific files in a different place and
+        # have no .py files in /usr/lib/pythonVER, but a single 'config' or
+        # 'site-packages' directory instead. These aren't packages either.
+        if join(dn, 'site-packages') in subdirs:
+            return True
+            
         # Check if the directory contains Python packages.
         for sub in subdirs:
             bsub = basename(sub)
