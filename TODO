@@ -5,12 +5,34 @@
 sfood
 =====
 
+- BUG: cd snakefood/lib/python/snakefood -f .
+
+    INFO        :   /usr/lib/python2.5/lib-dynload/collections.so
+    Traceback (most recent call last):
+      File "/home/blais/p/snakefood/bin/sfood", line 6, in <module>
+        main()
+      File "/home/blais/p/snakefood/lib/python/snakefood/gendeps.py", line 210, in main
+        gendeps()
+      File "/home/blais/p/snakefood/lib/python/snakefood/gendeps.py", line 125, in gendeps
+        fn, opts.verbose, opts.do_pragmas, opts.ignore_unused)
+      File "/home/blais/p/snakefood/lib/python/snakefood/find.py", line 34, in find_dependencies
+        found_imports, ast, _ = parse_python_source(fn)
+      File "/home/blais/p/snakefood/lib/python/snakefood/find.py", line 232, in parse_python_source
+        ast = compiler.parse(contents)
+      File "/usr/lib/python2.5/compiler/transformer.py", line 52, in parse
+        return Transformer().parsesuite(buf)
+      File "/usr/lib/python2.5/compiler/transformer.py", line 129, in parsesuite
+        return self.transform(parser.suite(text))
+    TypeError: suite() argument 1 must be string without null bytes, not str
+
+
 - (For 1.2) Integrate modulefinder code and compare results.
 
 - Support pragmas as comments after an import.
 
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
+
 
 
 

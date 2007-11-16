@@ -76,6 +76,7 @@ def is_package_root(dn, ignores):
 
     if exists(join(dn, '__init__.py')):
         return False
+
     else:
         dirfiles = (join(dn, x) for x in listdir(dn))
         subdirs, files = filter_separate(isdir, dirfiles)
@@ -97,11 +98,11 @@ def is_package_root(dn, ignores):
             return True
 
         # Check if the directory contains Python packages.
-        #
         for sub in subdirs:
             bsub = basename(sub)
             # Note: Make use of the fact that dotted directory names cannot be
-            # imported as packaged for culling branches.
+            # imported as packages for culling away branches by removing those
+            # subdirectories that have dots in them.
             if '.' in bsub or bsub in ignores:
                 continue
             if exists(join(sub, '__init__.py')):
