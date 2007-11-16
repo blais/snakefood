@@ -21,7 +21,7 @@ from os.path import *
 from collections import defaultdict
 from operator import itemgetter
 
-from snakefood.util import iter_pyfiles, setup_logging, def_ignores
+from snakefood.util import iter_pyfiles, setup_logging, def_ignores, is_python
 from snakefood.depends import output_depends
 from snakefood.find import find_dependencies
 from snakefood.find import ERROR_IMPORT, ERROR_SYMBOL, ERROR_UNUSED
@@ -118,12 +118,19 @@ def gendeps():
         for fn in fiter:
             if fn in processed_files:
                 continue # Make sure we process each file only once.
-
+            
             info("  %s" % fn)
             processed_files.add(fn)
-            files, errors = find_dependencies(
-                fn, opts.verbose, opts.do_pragmas, opts.ignore_unused)
-            allerrors.extend(errors)
+
+            if is_python(fn):
+                files, errors = find_dependencies(
+                    fn, opts.verbose, opts.do_pragmas, opts.ignore_unused)
+                allerrors.extend(errors)
+            else:
+                # If the file is not a source file, we don't know how to get the
+                # dependencies of that (without importing, which we want to
+                # avoid).
+                files = []
 
             # When packages are the source of dependencies, remove the __init__
             # file.  This is important because the targets also do not include the

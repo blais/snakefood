@@ -2,6 +2,12 @@
    CHANGES: snakefood
 ========================
 
+Version 1.2
+===========
+
+* [2007-11-15] Fixed bug with std imports.
+
+
 Version 1.1 (2007-10-09)
 ========================
 
