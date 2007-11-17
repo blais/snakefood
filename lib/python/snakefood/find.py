@@ -5,7 +5,7 @@ This could be considered the core of snakefood, and where all the complexity liv
 # This file is part of the Snakefood open source package.
 # See http://furius.ca/snakefood/ for licensing details.
 
-import sys, os, logging, traceback
+import sys, os, logging
 import compiler
 from compiler.visitor import ASTVisitor
 from compiler.ast import Discard, Const
@@ -231,8 +231,9 @@ def parse_python_source(fn):
     try:
         ast = compiler.parse(contents)
     except SyntaxError, e:
-        logging.error("Error processing file '%s':\n\n%s" %
-                      (fn, traceback.format_exc(sys.stderr)))
+        err = '%s:%d: %s' % (fn, e.lineno, e.msg)
+        logging.error("Error processing file '%s':\n%s" %
+                      (fn, err))
         return None, None, lines
 
     # Find all the imported names.

@@ -51,6 +51,9 @@ def main():
         # Parse the file.
         found_imports, ast, lines = parse_python_source(fn)
 
+        if ast is None:
+            continue
+
         # Check for duplicate remote names imported.
         if opts.do_dups:
             found_imports, dups = check_duplicate_imports(found_imports)
