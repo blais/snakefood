@@ -18,22 +18,23 @@ Description
 Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:
 
-- It uses the AST to parse the Python files. This is pretty reliable.
+- It uses the AST to parse the Python files. This is **very
+  reliable**, it always runs.
 
-- No module is loaded.  Loading modules to figure out dependencies is
-  almost always problem, because a lot of codebases run initialization
-  code in the global namespace, which often requires additional setup.
-  Snakefood is guaranteed not to have this problem (it just runs, no
-  matter what).
+- **No module is loaded**. Loading modules to figure out dependencies
+  is almost always problem, because a lot of codebases run
+  initialization code in the global namespace, which often requires
+  additional setup. Snakefood is guaranteed not to have this problem
+  (it just runs, no matter what).
 
 - It works on a set of files, i.e. you do not have to specify a single
   script, you can select a directory (package or else) or a set of
   files.  It finds all the Python files recursively automatically.
 
-- Your PYTHONPATH is automatically adjusted to include the required
-  package roots.  It figures out the paths that are required from the
-  files/directories given as input.  You should not have to setup
-  ANYTHING.
+- **Automatic/no configuration**: your PYTHONPATH is automatically
+  adjusted to include the required package roots. It figures out the
+  paths that are required from the files/directories given as input.
+  You should not have to setup ANYTHING.
 
 - It does not have to automatically 'follow' dependencies between
   modules, i.e. by default it only considers the files and directories
@@ -41,14 +42,11 @@ package has a few distinguishing characteristics:
   It also has an option to automatically include only the dependencies
   within the packages of the files you specify.
 
-- It follows the UNIX philosophy of small programs that do one thing
-  well: it consists of a few simple programs whose outputs you combine
-  via pipes.  Graphing dependencies always requires the user to filter
-  and cluster the filenames, so this is appropriate.  You can combine
-  it with your favourite tools, grep, sed, etc.
-
-- The code is darn simple and there very little of it.  We have run it
-  on a variety of popular Python packages.
+- It follows the UNIX philosophy of **small programs that do one thing
+  well**: it consists of a few simple programs whose outputs you
+  combine via pipes. Graphing dependencies always requires the user to
+  filter and cluster the filenames, so this is appropriate. You can
+  combine it with your favourite tools, grep, sed, etc.
 
 A problem with dependency trackers that run code is that they are
 unreliable, due to the dynamic nature of Python (the presence of
@@ -64,24 +62,21 @@ directory).
 Tools Included
 --------------
 
-1. ``sfood``: Given a set of input files or root directories,
+#. ``sfood``: Given a set of input files or root directories,
    generate a list of dependencies between the files;
 
-2. ``sfood-graph``: Read a list of dependencies and produce a
-   Graphviz dot file.  This file can be run through the Graphviz
-   ``dot`` tool to produce a viewable/printable PDF file;
+#. ``sfood-graph``: Read a list of dependencies and produce a Graphviz
+   dot file. (This file can be run through the Graphviz ``dot`` tool
+   to produce a viewable/printable PDF file);
 
-3. ``sfood-cluster`` (optional use): Read a list of dependencies,
-   a list of file clusters, and output a list of simplified
-   (clustered) dependencies.
+#. ``sfood-cluster``: Read a list of dependencies, a list of file
+   clusters, and output a list of simplified (clustered) dependencies.
 
-4. ``sfood-imports`` (complementary): A tool that given a set of
-   files and directories, finds and lists all the import statements
-   that are found, regardless of whether they can be imported or not.
+#. ``sfood-checker``: Analyze the source code with the AST and list
+   unused or redundant imports.
 
-5. ``sfood-checker`` (complementary): An import checker that always
-   runs: analyze the source code with the AST and list unused or
-   redundant imports.
+#. ``sfood-imports``: Find and list import statements in Python files,
+   regardless of whether they can be imported or not.
 
 See `full documentation </snakefood/doc/snakefood-doc.html>`_ for more
 details.
@@ -115,9 +110,6 @@ Copyright and License
 Copyright (C) 2001-2007  Martin Blais.  All Rights Reserved.
 
 This code is distributed under the `GNU General Public License <COPYING>`_;
-
-  Special thanks for EWT LLC/Madison Tyler for supporting some of this
-  work through time on the job.
 
 
 Author

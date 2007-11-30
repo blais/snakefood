@@ -45,31 +45,30 @@
 <p>Generate dependency graphs from Python code.  This dependency tracker
 package has a few distinguishing characteristics:</p>
 <ul class="simple">
-<li>It uses the AST to parse the Python files. This is pretty reliable.</li>
-<li>No module is loaded.  Loading modules to figure out dependencies is
-almost always problem, because a lot of codebases run initialization
-code in the global namespace, which often requires additional setup.
-Snakefood is guaranteed not to have this problem (it just runs, no
-matter what).</li>
+<li>It uses the AST to parse the Python files. This is <strong>very
+reliable</strong>, it always runs.</li>
+<li><strong>No module is loaded</strong>. Loading modules to figure out dependencies
+is almost always problem, because a lot of codebases run
+initialization code in the global namespace, which often requires
+additional setup. Snakefood is guaranteed not to have this problem
+(it just runs, no matter what).</li>
 <li>It works on a set of files, i.e. you do not have to specify a single
 script, you can select a directory (package or else) or a set of
 files.  It finds all the Python files recursively automatically.</li>
-<li>Your PYTHONPATH is automatically adjusted to include the required
-package roots.  It figures out the paths that are required from the
-files/directories given as input.  You should not have to setup
-ANYTHING.</li>
+<li><strong>Automatic/no configuration</strong>: your PYTHONPATH is automatically
+adjusted to include the required package roots. It figures out the
+paths that are required from the files/directories given as input.
+You should not have to setup ANYTHING.</li>
 <li>It does not have to automatically 'follow' dependencies between
 modules, i.e. by default it only considers the files and directories
 you specify on the command-line and their immediate dependencies.
 It also has an option to automatically include only the dependencies
 within the packages of the files you specify.</li>
-<li>It follows the UNIX philosophy of small programs that do one thing
-well: it consists of a few simple programs whose outputs you combine
-via pipes.  Graphing dependencies always requires the user to filter
-and cluster the filenames, so this is appropriate.  You can combine
-it with your favourite tools, grep, sed, etc.</li>
-<li>The code is darn simple and there very little of it.  We have run it
-on a variety of popular Python packages.</li>
+<li>It follows the UNIX philosophy of <strong>small programs that do one thing
+well</strong>: it consists of a few simple programs whose outputs you
+combine via pipes. Graphing dependencies always requires the user to
+filter and cluster the filenames, so this is appropriate. You can
+combine it with your favourite tools, grep, sed, etc.</li>
 </ul>
 <p>A problem with dependency trackers that run code is that they are
 unreliable, due to the dynamic nature of Python (the presence of
@@ -85,18 +84,15 @@ directory).</p>
 <ol class="arabic simple">
 <li><tt class="docutils literal"><span class="pre">sfood</span></tt>: Given a set of input files or root directories,
 generate a list of dependencies between the files;</li>
-<li><tt class="docutils literal"><span class="pre">sfood-graph</span></tt>: Read a list of dependencies and produce a
-Graphviz dot file.  This file can be run through the Graphviz
-<tt class="docutils literal"><span class="pre">dot</span></tt> tool to produce a viewable/printable PDF file;</li>
-<li><tt class="docutils literal"><span class="pre">sfood-cluster</span></tt> (optional use): Read a list of dependencies,
-a list of file clusters, and output a list of simplified
-(clustered) dependencies.</li>
-<li><tt class="docutils literal"><span class="pre">sfood-imports</span></tt> (complementary): A tool that given a set of
-files and directories, finds and lists all the import statements
-that are found, regardless of whether they can be imported or not.</li>
-<li><tt class="docutils literal"><span class="pre">sfood-checker</span></tt> (complementary): An import checker that always
-runs: analyze the source code with the AST and list unused or
-redundant imports.</li>
+<li><tt class="docutils literal"><span class="pre">sfood-graph</span></tt>: Read a list of dependencies and produce a Graphviz
+dot file. (This file can be run through the Graphviz <tt class="docutils literal"><span class="pre">dot</span></tt> tool
+to produce a viewable/printable PDF file);</li>
+<li><tt class="docutils literal"><span class="pre">sfood-cluster</span></tt>: Read a list of dependencies, a list of file
+clusters, and output a list of simplified (clustered) dependencies.</li>
+<li><tt class="docutils literal"><span class="pre">sfood-checker</span></tt>: Analyze the source code with the AST and list
+unused or redundant imports.</li>
+<li><tt class="docutils literal"><span class="pre">sfood-imports</span></tt>: Find and list import statements in Python files,
+regardless of whether they can be imported or not.</li>
 </ol>
 <p>See <a class="reference" href="/snakefood/doc/snakefood-doc.html">full documentation</a> for more
 details.</p>
@@ -127,9 +123,6 @@ details.</p>
 <h1><a class="toc-backref" href="#id7">Copyright and License</a></h1>
 <p>Copyright (C) 2001-2007  Martin Blais.  All Rights Reserved.</p>
 <p>This code is distributed under the <a class="reference" href="COPYING">GNU General Public License</a>;</p>
-<blockquote>
-Special thanks for EWT LLC/Madison Tyler for supporting some of this
-work through time on the job.</blockquote>
 </div>
 <div class="section" id="author">
 <h1><a class="toc-backref" href="#id8">Author</a></h1>

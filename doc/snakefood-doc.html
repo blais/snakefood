@@ -49,7 +49,7 @@
 </li>
 <li><a class="reference" href="#filtering-and-clustering-dependencies" id="id18">Filtering and Clustering Dependencies</a><ul>
 <li><a class="reference" href="#using-standard-unix-tools" id="id19">Using Standard UNIX Tools</a></li>
-<li><a class="reference" href="#using-sfood-cluster" id="id20">Using <tt class="docutils literal"><span class="pre">sfood-cluster</span></tt></a></li>
+<li><a class="reference" href="#using-the-clustering-tool" id="id20">Using the Clustering Tool</a></li>
 </ul>
 </li>
 <li><a class="reference" href="#using-a-makefile" id="id21">Using a Makefile</a></li>
@@ -80,7 +80,7 @@
   5.9  Pragmas: Marking Dependencies as Ignored
 6   Filtering and Clustering Dependencies
   6.1  Using Standard UNIX Tools
-  6.2  Using ``sfood-cluster``
+  6.2  Using the Clustering Tool
 7   Using a Makefile
 8   Listing the Imports
 9   Snakefood Import Checker
@@ -395,8 +395,8 @@ cat raw.deps | grep -v /usr/lib/python | sfood-graph &gt; out.dot
 <p>There is no formula for filtering or reformatting the dependencies; it
 depends on your codebase and what you want the graph to show.</p>
 </div>
-<div class="section" id="using-sfood-cluster">
-<h2><a class="toc-backref" href="#id20">Using <tt class="docutils literal"><span class="pre">sfood-cluster</span></tt></a></h2>
+<div class="section" id="using-the-clustering-tool">
+<h2><a class="toc-backref" href="#id20">Using the Clustering Tool</a></h2>
 <p>A useful operation is to transform the relative filenames into logical
 groups and to remove redundant lines.  We call this &#8220;clustering&#8221;.  A
 common example is to lump together all the filenames that start with a
