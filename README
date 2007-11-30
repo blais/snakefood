@@ -62,21 +62,31 @@ directory).
 Tools Included
 --------------
 
-#. ``sfood``: Given a set of input files or root directories,
-   generate a list of dependencies between the files;
+#. ``sfood``: 
 
-#. ``sfood-graph``: Read a list of dependencies and produce a Graphviz
-   dot file. (This file can be run through the Graphviz ``dot`` tool
-   to produce a viewable/printable PDF file);
+     Given a set of input files or root directories, generate a list
+     of dependencies between the files;
 
-#. ``sfood-cluster``: Read a list of dependencies, a list of file
-   clusters, and output a list of simplified (clustered) dependencies.
+#. ``sfood-graph``: 
 
-#. ``sfood-checker``: Analyze the source code with the AST and list
-   unused or redundant imports.
+     Read a list of dependencies and produce a Graphviz dot file.
+     (This file can be run through the Graphviz ``dot`` tool to
+     produce a viewable/printable PDF file);
 
-#. ``sfood-imports``: Find and list import statements in Python files,
-   regardless of whether they can be imported or not.
+#. ``sfood-cluster``: 
+
+     Read a list of dependencies, a list of file clusters, and output
+     a list of simplified (clustered) dependencies.
+
+#. ``sfood-checker``: 
+
+     Analyze the source code with the AST and list unused or
+     redundant imports.
+
+#. ``sfood-imports``: 
+
+     Find and list import statements in Python files, regardless of
+     whether they can be imported or not.
 
 See `full documentation </snakefood/doc/snakefood-doc.html>`_ for more
 details.
