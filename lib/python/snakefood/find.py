@@ -44,7 +44,7 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     output_code = (verbose >= 2)
     source_lines = None
     if output_code:
-        source_lines = open(fn).read().splitlines()
+        source_lines = open(fn, 'rU').read().splitlines()
 
     files = []
     assert not isdir(fn)
@@ -220,8 +220,9 @@ def parse_python_source(fn):
 
     """
     # Read the file's contents to return it.
+    # Note: we make sure to use universal newlines.
     try:
-        contents = open(fn).read()
+        contents = open(fn, 'rU').read()
         lines = contents.splitlines()
     except (IOError, OSError), e:
         logging.error("Could not read file '%s'." % fn)
@@ -235,6 +236,7 @@ def parse_python_source(fn):
         logging.error("Error processing file '%s':\n%s" %
                       (fn, err))
         return None, None, lines
+
 
     # Find all the imported names.
     vis = ImportVisitor()

@@ -28,7 +28,7 @@ def apply_cluster(cdirs, root, fn):
 
 def read_clusters(fn):
     "Return a list of cluster prefixes read from the file 'fn'."
-    f = open(fn)
+    f = open(fn, 'rU')
     clusters = []
     for x in imap(str.strip, f.xreadlines()):
         if not x:

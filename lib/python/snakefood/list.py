@@ -52,7 +52,7 @@ def list_imports():
     else:
         for fn in iter_pyfiles(args, opts.ignores):
             if opts.verbose:
-                lines = list(open(fn))
+                lines = list(open(fn, 'rU'))
             for symname, lineno, islocal in find_imports(fn,
                                                          opts.verbose,
                                                          opts.ignores):
