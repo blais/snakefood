@@ -2,9 +2,11 @@
    CHANGES: snakefood
 ========================
 
-Version 1.2
-===========
+Version 1.2 (2007-11-30)
+========================
 
+* [2007-11-30] Fixed bug with processing files with DOS chars from
+  Linux (needed to use universal newlines).
 * [2007-11-16] Fixed bug with faulty fedora packaging.
 * [2007-11-15] Fixed bug with std imports.
 
