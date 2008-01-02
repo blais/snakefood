@@ -12,9 +12,6 @@ sfood
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
 
-
-
-
 sfood-checker
 =============
 
