@@ -74,7 +74,7 @@ def is_package_root(dn, ignores):
     """Return true if this is a package root.  A package root is a directory
     that could be used as a PYTHONPATH entry."""
 
-    if exists(join(dn, '__init__.py')):
+    if not exists(dn) or exists(join(dn, '__init__.py')):
         return False
 
     else:
