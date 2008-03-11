@@ -31,7 +31,10 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
-    found_imports, ast, _ = parse_python_source(fn)
+    ast, _ = parse_python_source(fn)
+    if ast is None:
+        return [], file_errors
+    found_imports = get_ast_imports(ast)
     if found_imports is None:
         return [], file_errors
     
@@ -80,7 +83,8 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
 def find_imports(fn, verbose, ignores):
     "Yields a list of the module names the file 'fn' depends on."
 
-    found_imports, _, _ = parse_python_source(fn)
+    ast, _ = parse_python_source(fn)
+    found_imports = get_ast_imports(ast)
     if found_imports is None:
         raise StopIteration
 
@@ -207,15 +211,10 @@ class ImportWalker(ASTVisitor):
 
 
 def parse_python_source(fn):
-    """Parse the file 'fn' and return a list of module tuples, in the form:
+    """Parse the file 'fn' and return two things:
 
-        (modname, remote-name, local-name, lineno, pragma)
-
-    We return three things:
-
-    1. The found imports in the format described above.
-    2. The AST tree.
-    3. A list of lines of the source line (typically used for verbose error
+    1. The AST tree.
+    2. A list of lines of the source line (typically used for verbose error
        messages).
 
     """
@@ -226,7 +225,7 @@ def parse_python_source(fn):
         lines = contents.splitlines()
     except (IOError, OSError), e:
         logging.error("Could not read file '%s'." % fn)
-        return None, None, None
+        return None, None
 
     # Convert the file to an AST.
     try:
@@ -235,17 +234,21 @@ def parse_python_source(fn):
         err = '%s:%d: %s' % (fn, e.lineno, e.msg)
         logging.error("Error processing file '%s':\n%s" %
                       (fn, err))
-        return None, None, lines
+        return None, lines
 
+    return ast, lines
 
-    # Find all the imported names.
+def get_ast_imports(ast):
+    """
+    Given an AST, return a list of module tuples for the imports found, in the
+    form:
+        (modname, remote-name, local-name, lineno, pragma)
+    """
+    assert ast is not None
     vis = ImportVisitor()
     compiler.walk(ast, vis, ImportWalker(vis))
     found_imports = vis.finalize()
-
-    return found_imports, ast, lines
-
-
+    return found_imports
 
 
 # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.

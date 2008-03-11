@@ -19,7 +19,8 @@ from os.path import *
 import compiler
 
 from snakefood.util import def_ignores, iter_pyfiles
-from snakefood.find import parse_python_source, check_duplicate_imports
+from snakefood.find import parse_python_source, get_ast_imports
+from snakefood.find import check_duplicate_imports
 from snakefood.astpretty import printAst
 from snakefood.local import *
 
@@ -49,7 +50,8 @@ def main():
     for fn in iter_pyfiles(args or ['.'], opts.ignores, False):
 
         # Parse the file.
-        found_imports, ast, lines = parse_python_source(fn)
+        ast, lines = parse_python_source(fn)
+        found_imports = get_ast_imports(ast)
 
         if ast is None:
             continue
