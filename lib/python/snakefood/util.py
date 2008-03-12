@@ -34,7 +34,7 @@ def iter_pyfiles(dirsorfns, ignores, abspaths=False):
     of filenames or directories.  If 'abspaths' is true, we assumethe paths are
     absolute paths."""
     assert isinstance(dirsorfns, (list, tuple))
-    assert isinstance(ignores, list)
+    assert isinstance(ignores, (type(None), list))
 
     ignores = ignores or def_ignores
     for dn in dirsorfns:
