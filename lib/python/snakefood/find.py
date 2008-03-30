@@ -253,7 +253,12 @@ def get_ast_imports(ast):
 
 # **WARNING** This is where all the evil lies.  Risk and peril.  Watch out.
 
-libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
+if sys.platform == "win32":
+    #  Location of  python lib on win32
+    libpath = join(sys.prefix, 'lib')
+else:
+    libpath = join(sys.prefix, 'lib', 'python%d.%d' % sys.version_info[:2])
+
 
 exceptions = ('os.path',)
 builtin_module_names = sys.builtin_module_names + exceptions

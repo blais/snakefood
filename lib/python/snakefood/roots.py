@@ -120,9 +120,17 @@ def is_package_root(dn, ignores):
 def relfile(fn, ignores):
     "Return pairs of (package root, relative filename)."
     root = find_package_root(realpath(fn), ignores)
+
+    # (This is for windows, from submitted patch).
+    if root is None:
+        if splitext(fn)[1] in ('.pyd', '.dll'):
+            root = dirname(fn)
+
     if root is None:
         assert basename(fn) in filesets_ignore[0], fn
-        return
-    return root, fn[len(root)+1:]
+        rlen = None
+    else:
+        rlen = fn[len(root)+1:]
+    return root, rlen
 
 
