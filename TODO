@@ -15,6 +15,11 @@ sfood
 sfood-checker
 =============
 
+- snakefood: Modify sfood-checker to detect missing imports like this:
+  for every symbol that gets an attribute fetched from it, try to
+  import the module using find_module() and report those which can't
+  be found.
+
 - checkers: Handle the case of importing a class attribute more
   gracefully? ::
 
