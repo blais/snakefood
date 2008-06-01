@@ -60,7 +60,7 @@ generate and filter lists of dependency relationships between Python
 modules and packages and convert the lists into viewable graphs. It
 aims to provide a conservative, slightly imperfect but "good enough"
 solution but that runs reliably on any codes (i.e. it *always* runs
-and finished, no matter what evils the analyzed code may be doing).
+and finishes, no matter what evils the analyzed code may be doing).
 
 My intention is to start with presenting a short introduction to
 module dependencies in the context of Python in order to motivate the
