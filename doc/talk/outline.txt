@@ -3,67 +3,400 @@
 =======================================
 :Abstract:
 
-   Notes and outline for PyCon 2008 talk.
-
+   Slides outline for a talk on Snakefood.
 
 .. contents::
 ..
-    1  Documentation
+    1   Introduction
+    2   Motivation: the use of dependencies
+    3   What do I mean by "a dependency"
+    4   The Python style often tolerates side-effects
+    5   Conditional dependencies
+    6   AST
+    7   The food-chain
+    8   Clustering
+    9   Examples / Filtering
+    10  Zero Configuration: Auto-detect roots
+    11  "Follow" and "Internal"
+    12  File format
+    13  Parser
+    14  Checker
+    15  Codebase
+    16  Results
+    17  Results
+    18  Demo
+    19  Links
 
 
-Documentation
-=============
+Introduction
+============
 
-talk outline:
+    [Slide]
 
-- intro/motivation: the use of dependencies
+      Snakefood
+      http://furius.ca/snakefood/
 
-
-
- ``I have problems with that code. The reason why?
-  This."''
-one slide with global initializer
-  ``You cannot assume that you can import a module without
-side-effects.''
+      Martin Blais
+      Furius
 
 
-``Good enough'' dependencies (central concept)
+Motivation: the use of dependencies
+===================================
+
+    [Slide]
+
+        {pretty picture of a nice depgraph}
+
+      - Snakefood generates dependency graphs
+      - Is an analysis and refactoring tool
+      - Zero configuration
+      - All pure Python code
+      - Works on many platforms
+
+    [Notes]
+
+      - How to generate dependency graphs between Python modules
+      - Useful for analysing and refactoring code.
+
+
+What do I mean by "a dependency"
+================================
+
+    [Slide]
+
+       a.py                          b.py
+       ----------------------        ----------------------
+       import b                      ...
+
+           {[could of a}  -> {cloud of b}
+
+    [Notes]
+
+    "In Python, there is no enforcement that the dependencies are a
+    DAG:
+
+    - No compile-time dependencies (via the linker)
+    - Circular dependencies are not even a problem most of the time.
+
+    A full graph is not desireable, because it can cause problems
+    later. Dependencies start creeping where they were not expected,
+    code becomes difficult to modularize, chaos ensues. "
+
+
+The Python style often tolerates side-effects
+=============================================
+
+    [Slide/1]
+
+      import SomeModule
+
+    [Notes]
+
+      "In Python, I have problems with that code. The reason why?
+      This."
+
+    [Slide/2]
+
+      SomeModule.py:
+      ------------------------
+
+      # Connect to the database.
+      conn = dbapi.connect(dbname="accounts.db", user=...)
+
+    [Notes]
+
+      "You cannot assume that you can import a module without
+      side-effects. In fact, in Python, people do things like that all
+      the time. It's a cultural problem."
+
+      I stopped counting the times where I chased problems due to
+      Python code having to occur in a certain order.
+
+
+Conditional dependencies
+========================
+
+    [Slide]
+
+       a.py
+       ----------------------
+       if __debug__:
+         import b
+
+       def foo():
+           import b
+
+    [Notes]
+
+    - Dependencies are not well-defined in Python, they depend on
+      runtime conditions, e.g. if "foo()" gets called (or not).
+
+
+AST
+===
+
+    [Slide]
+
+       Code analysis via AST: is Good Enough
+
+
+       Works:                    Fails:
+
+       def foo():                mod = __import__(module_name)
+           import Module
+
+
+    [Notes]
+
+      - Provide a solution that is "good enough", works in the common
+        cases.
+      - Does not run any code, so it pretty much always works.
+      - On the rare codebases (Zope, Enthought), it works if you run
+        it on the installed code.
+
+      My intention: to make this a useful, working, never failing tool
+      that all Pythonistas use. Please use it and report problems!
+
+
+The food-chain
+==============
+
+    [Slide]
+
+     filenames, directories ->
+        {snakefood} -> {filters} -> {snakefood-graph} -> dot file
+
+    [Notes]
+
+      - If you have a lot of files, you will want to cluster many
+        dependency nodes together to make the tree more readable.
+
+      - The final result is a dot file that can be processed by the
+        Graphviz tools
+
+      - There is a Makefile include file in the distribution, with a
+        number of examples on how to run on popular open source
+        codebases.
+
+
+Clustering
+==========
+
+    [Slide]
+
+FIXME TODO, build an example of clustering.
+
+    [Notes]
+
+      - Here is an example of clustering
+
+
+Examples / Filtering
+====================
+
+    [Slide]
+
+       - Why does this module depend on this other one?
+
+       - Why is there a circular dependency here, and how can I remove
+         it?"
+
+    [Notes]
+
+      - "This is all cool theory, but in practice, you're trying to
+        answer a question. For example, you're trying to answer the
+        question like Why does this module depend on this other one?
+        or Why is there a circular dependency here, and how can I
+        remove it?"
+
+      - In general, the process is iterative: you filter out
+        dependency lines and cluster as needed.
+
+      - I generally cache the raw dependencies, because they are slow
+        to obtain, and then experiment with my filter. I usually do
+        this in a Makefile.
+
+      - Example: write a custom script to enforce specific
+        dependencies in a subversion hook
+
+
+Zero Configuration: Auto-detect roots
+=====================================
+
+   [Slides]
+
+      {Tree of files, with annotations}
+
+
+       lib/                        <--- ROOT
+          booze/
+               __init__.py
+               scotch.py
+               whiskey.py
+               rhye.py
+               test/               <--- ROOT
+                   test_liquor.py
+                   test_perf.py
+
+    [Notes]
+
+      - Contains two roots.
+      - You only specify the code that you want to analyze, files and
+        directories.
+      - You should never need to change your PYTHONPATH
 
 
 
-  - implementation details
-    * zero config
-    * does not run code
-  - makefile + dataflow chart for deps/clusters/dot, etc.
-  - examples
-  - enforcing specific dependencies in a subversion hook
 
-``This is all theoretically cool, but in practice, you're trying to
-  answer a question.  For example, you're trying to answer the
-  question like Why does this module depend on this other one? or Why
-  is there a circular dependency here, and how can I remove it?''
+"Follow" and "Internal"
+=======================
 
+    [Slide]
 
-- checker + integration with sfood-gendeps
+      Default:
 
-  - do stats on typical codebases, number of unused imports
+         from                        to
+         --------------------        --------------------
+         files specified by user --> files depended upon
 
-- fully automatic
-- always works (In which cases does it fail?)
+    [Notes]
 
+      - By default, the "from" files include only the files that the
+        user runs snakefood on.
+      - Recursively analyses the included files.
+      - You could grep out the roots that you're not interested in.
 
-- my firm intention: to make this a useful, working, never failing
-  tool that all Pythonistas use. Please use it and report problems!
+      - INTERNAL: filters OUT all files which are not included in the
+        set of roots that we are running snakefood on.
 
 
 
+File format
+===========
 
-motivation:
+    [Slide]
 
-- init-time code is bad, you need to know your dependencies
-- tools like Eclipse offer a bad cognitive model
+        ((ROOT, FILENAME), (ROOT, FILENAME))
+        ((ROOT, FILENAME), (ROOT, FILENAME))
+        ((ROOT, FILENAME), (ROOT, FILENAME))
+        ...
+
+        Existence of a node:
+        ((ROOT, FILENAME), (None, None))
+
+      e.g.
+
+        (('/home/blais/lib', 'booze/whiskey.py'),
+         ('/home/blais/lib', 'booze/scotch.py'))
+
+    [Notes]
+
+      - Syntax is Python code itself
+
+
+Parser
+======
+
+    [Slide]
+
+       for (root1, p1), (root2, p2) in
+         map(eval, sys.stdin):
+           ...
+
+    [Notes]
+
+      - Easy to parse.
+      - You can easily write simple filters without having to import
+        snakefood modules.
+
+
+
+Checker
+=======
+
+    [Slide]
+
+        import sys, os, re, StringIO, datetime, math, urllib, ...
+
+      Stats:
+FIXME: TODO, do stats on typical codebases, number of unused imports
+
+    [Notes]
+
+      - An easy extension to the dependency analysis was to check for
+        unused imports.
+      - Outputs warnings in a format that Emacs parses, convenient to
+        edit.
+      - Can be enabled as an option to snakefood in order to obtain
+        the minimal set of dependencies that would exist if the
+        unused imports were to removed.
 
 
 
 
-- What "good enough" means, i.e., where does it fail?
+
+
+Codebase
+========
+
+    [Slide]
+
+      4suite cgkit django docutils enthought genshi gnosis mailman
+      matplotlib neoui numpy pypy pythonweb pyutil reportlab scipy
+      snakefood sqlobject stdlib twisted webstack zope
+
+    [Notes]
+
+      - Here is a list of popular open source codebases that I've
+        tested running snakefood on.
+
+
+Results
+=======
+
+    [Slide]
+
+        {Results of analysis on well-known codebase}
+
+Results
+=======
+
+    [Slide]
+
+        {Results of analysis on well-known codebase}
+
+    ...
+
+
+Demo
+====
+
+  Do a short demo.
+
+
+
+Links
+=====
+
+    [Slide]
+
+      Full documentation at:
+
+         http://furius.ca/snakefood/
+
+      Questions?
+
+    [Notes]
+
+
+
+
+
+
+a.py
+----------------------
+if __debug__:
+  import b
+
+def foo():
+    import b
