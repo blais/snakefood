@@ -92,7 +92,8 @@ The Python style often tolerates side-effects
 
     [Notes]
 
-      "I have problems with that code. The reason why? This."
+      "In Python, I have problems with that code. The reason why?
+      This."
 
     [Slide/2]
 
@@ -389,3 +390,13 @@ Links
 
 
 
+
+
+
+a.py
+----------------------
+if __debug__:
+  import b
+
+def foo():
+    import b
