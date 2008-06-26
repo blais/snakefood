@@ -158,7 +158,7 @@ AST
       that all Pythonistas use. Please use it and report problems!
 
 
-The food-chain
+The Food Chain
 ==============
 
     [Slide]
@@ -177,6 +177,12 @@ The food-chain
       - There is a Makefile include file in the distribution, with a
         number of examples on how to run on popular open source
         codebases.
+
+      - I generally cache the raw dependencies, because they are slow
+        to obtain, and then experiment with my filter. I usually do
+        this in a Makefile.
+
+
 
 
 Clustering
@@ -212,10 +218,6 @@ Examples / Filtering
       - In general, the process is iterative: you filter out
         dependency lines and cluster as needed.
 
-      - I generally cache the raw dependencies, because they are slow
-        to obtain, and then experiment with my filter. I usually do
-        this in a Makefile.
-
       - Example: write a custom script to enforce specific
         dependencies in a subversion hook
 
@@ -244,8 +246,6 @@ Zero Configuration: Auto-detect roots
       - You only specify the code that you want to analyze, files and
         directories.
       - You should never need to change your PYTHONPATH
-
-
 
 
 "Follow" and "Internal"
