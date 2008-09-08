@@ -51,10 +51,10 @@ def main():
 
         # Parse the file.
         ast, lines = parse_python_source(fn)
-        found_imports = get_ast_imports(ast)
-
         if ast is None:
             continue
+        found_imports = get_ast_imports(ast)
+
 
         # Check for duplicate remote names imported.
         if opts.do_dups:
