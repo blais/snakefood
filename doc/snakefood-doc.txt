@@ -26,6 +26,7 @@
     7   Using a Makefile
     8   Listing the Imports
     9   Snakefood Import Checker
+      9.1  Using a Pragma to Ignore an Unused Dependency
     10  Original Uses
       10.1  Enforcing Dependency Relationships on Commit
       10.2  Splitting a Codebase
@@ -364,6 +365,7 @@ This is especially useful with the ``--follow`` option, when you want
 to avoid dragging a large dependency in the dependency list.
 
 
+
 Filtering and Clustering Dependencies
 =====================================
 
@@ -530,6 +532,19 @@ not import the code it analyzes, rather, it uses the AST to perform a
 the same as the reason for making snakefood: it **always** works on
 your code, no matter what; it provides a "good enough" / 99% accurate
 solution that at least, always "just works".
+
+
+Using a Pragma to Ignore an Unused Dependency
+---------------------------------------------
+
+If you are importing a file for its side-effects only,
+``sfood-checker`` has no way to detect this and will report the import
+as unused. To avoid this, use a pragma after the import statement to
+disable the warning::
+
+  # Importing for side-effects only.
+  import injectrace; 'SIDE-EFFECTS'
+
 
 
 Original Uses

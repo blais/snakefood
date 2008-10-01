@@ -36,11 +36,15 @@ def main():
                       default=def_ignores,
                       help="Add the given directory name to the list to be ignored.")
 
-    parser.add_option('-d', '--duplicates', '--enable-duplicates',
+    parser.add_option('-d', '--disable-pragmas', action='store_false',
+                      dest='do_pragmas', default=True,
+                      help="Disable processing of pragma directives as strings after imports.")
+
+    parser.add_option('-D', '--duplicates', '--enable-duplicates',
                       dest='do_dups', action='store_true',
                       help="Enable experimental heuristic for finding duplicate imports.")
 
-    parser.add_option('-m', '--missing', '--enable-missing',
+    parser.add_option('-M', '--missing', '--enable-missing',
                       dest='do_missing', action='store_true',
                       help="Enable experimental heuristic for finding missing imports.")
 
@@ -55,7 +59,6 @@ def main():
             continue
         found_imports = get_ast_imports(ast)
 
-
         # Check for duplicate remote names imported.
         if opts.do_dups:
             found_imports, dups = check_duplicate_imports(found_imports)
@@ -67,7 +70,11 @@ def main():
 
         # Output warnings for the unused imports.
         for x in unused_imports:
-            _, _, lname, lineno, _ = x
+            _, _, lname, lineno, pragma = x
+
+            if opts.do_pragmas and pragma:
+                continue
+
             # Search for the column in the relevant line.
             mo = re.search(r'\b%s\b' % lname, lines[lineno-1])
             colno = mo.start()+1 if mo else 0
@@ -96,18 +103,18 @@ def main():
             for modname, rname, lname, lineno, pragma in found_imports:
                 print '%s:%d:  %s' % (fn, lineno, lname)
 
-            print
-            print
-            print '------ Exported names:'
-            for name, lineno in exported:
-                print '%s:%d:  %s' % (fn, lineno, name)
+            ## print
+            ## print
+            ## print '------ Exported names:'
+            ## for name, lineno in exported:
+            ##     print '%s:%d:  %s' % (fn, lineno, name)
 
-            print
-            print
-            print '------ Used names:'
-            for name, lineno in dotted_names:
-                print '%s:%d:  %s' % (fn, lineno, name)
-            print
+            ## print
+            ## print
+            ## print '------ Used names:'
+            ## for name, lineno in dotted_names:
+            ##     print '%s:%d:  %s' % (fn, lineno, name)
+            ## print
 
             print
             print
