@@ -1,0 +1,50 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SFOOD-GRAPH 1 "January 2, 2009"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sfood-graph \- read snakefood dependencies from stdin and output a visual graph.
+.SH SYNOPSIS
+.B sfood-graph
+.RI [ options ]
+.SH DESCRIPTION
+Read snakefood dependencies from stdin and output a visual graph.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show the help message and exit
+.TP
+\fB\-f\fR, \fB\-\-full\-pathnames\fR, \fB\-\-full\fR
+Output the full pathnames, not just the relative.
+.TP
+\fB\-p\fR, \fB\-\-pythonify\-filenames\fR, \fB\-\-remove\-extensions\fR
+Remove filename extensions in the graph and replace
+slashes with dots.
+.TP
+\fB\-r\fR, \fB\-\-redundant\fR
+Do not eliminate redundant dependencies.
+.SH SEE ALSO
+.BR sfood (1),
+.BR sfood-checker (1),
+.BR sfood-cluster (1),
+.BR sfood-copy (1),
+.BR sfood-flatten (1),
+.BR sfood-imports (1).
+.SH AUTHOR
+sfood-graph was written by Martin Blais <blais@furius.ca> and it's part of snakefood suite.
+.PP
+This manual page was written by Sandro Tosi <morph@debian.org>,
+for the Debian project (and may be used by others).

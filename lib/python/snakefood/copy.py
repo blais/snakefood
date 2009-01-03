@@ -1,5 +1,6 @@
 """
-Read a snakefood dependencies file and flatten and output the list of all files.
+Read a snakefood dependencies file and copy all the files to a destination
+directory, using the same filename to its python root.
 """
 # This file is part of the Snakefood open source package.
 # See http://furius.ca/snakefood/ for licensing details.

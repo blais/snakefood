@@ -1,0 +1,44 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SFOOD-CLUSTER 1 "January 2, 2009"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sfood-cluster \- read snakefood dependencies from stdin and cluster according to filenames
+.SH SYNOPSIS
+.B sfood-cluster
+.RI [ options ] " directories" ...
+.SH DESCRIPTION
+You need to call this script with the names of directories to cluster together,
+for relative filenames.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show the help message and exit
+.TP
+\fB\-f\fR FROM_FILE, \fB\-\-from\-file\fR=\fIFROM_FILE\fR
+Read cluster list from the given filename.
+.SH SEE ALSO
+.BR sfood (1),
+.BR sfood-checker (1),
+.BR sfood-copy (1),
+.BR sfood-flatten (1),
+.BR sfood-graph (1),
+.BR sfood-imports (1).
+.SH AUTHOR
+sfood-cluster was written by Martin Blais <blais@furius.ca> and it's part of snakefood suite.
+.PP
+This manual page was written by Sandro Tosi <morph@debian.org>,
+for the Debian project (and may be used by others).

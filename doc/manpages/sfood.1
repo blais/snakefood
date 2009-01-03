@@ -1,0 +1,84 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SFOOD 1 "January 2, 2009"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sfood \- detect import statements using the AST parser
+.SH SYNOPSIS
+.B sfood
+.RI [ options ] " files " ...
+.SH DESCRIPTION
+This script outputs a comma\-separated list of tuples:
+.IP
+((from_root, from_filename), (to_root, to_filename))
+.PP
+The roots are the root directories where the modules lie.  You can use
+sfood\-graph or some other tool to filter, cluster and generate a meaningful
+graph from this list of dependencies.
+.PP
+As a special case, if the 'to' tuple is (None, None), this means to at least
+include the 'from' tuple as a node.  This may happen if the file has no
+dependencies on anything.
+.PP
+As inputs, it can receive either files or directories; in case no
+argument is passed, it parses the current directory recursively.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show the help message and exit
+.TP
+\fB\-i\fR, \fB\-\-internal\fR, \fB\-\-internal\-only\fR
+Filter out dependencies that are outside of the roots
+of the input files. If internal is used twice, we
+filter down further the dependencies to the # set of
+files that were processed only, not just to the files
+that live in the same roots.
+.TP
+\fB\-I\fR IGNORES, \fB\-\-ignore\fR=\fIIGNORES\fR
+Add the given directory name to the list to be
+ignored.
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Output more debugging information
+.TP
+\fB\-f\fR, \fB\-r\fR, \fB\-\-follow\fR, \fB\-\-recursive\fR
+Follow the modules depended upon and trace their
+dependencies. WARNING: This can be slow.  Use
+\fB\-\-internal\fR to limit the scope.
+.TP
+\fB\-\-print\-roots\fR
+Only print the package roots corresponding to the
+input files.This is mostly used for testing and
+troubleshooting.
+.TP
+\fB\-d\fR, \fB\-\-disable\-pragmas\fR
+Disable processing of pragma directives as strings
+after imports.
+.TP
+\fB\-u\fR, \fB\-\-ignore\-unused\fR
+Automatically ignore unused imports. (See \fBsfood-checker\fR(1))
+.SH SEE ALSO
+.BR sfood-checker (1),
+.BR sfood-cluster (1),
+.BR sfood-copy (1),
+.BR sfood-flatten (1),
+.BR sfood-graph (1),
+.BR sfood-imports (1).
+.SH AUTHOR
+sfood was written by Martin Blais <blais@furius.ca> and it's part of snakefood suite.
+.PP
+This manual page was written by Sandro Tosi <morph@debian.org>,
+for the Debian project (and may be used by others).

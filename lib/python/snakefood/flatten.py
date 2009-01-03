@@ -1,5 +1,5 @@
 """
-Read a snakefood dependencies file and flatten and output the list of all files.
+Read a snakefood dependencies file and output the list of all files.
 """
 # This file is part of the Snakefood open source package.
 # See http://furius.ca/snakefood/ for licensing details.

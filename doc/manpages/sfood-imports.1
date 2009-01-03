@@ -1,0 +1,55 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SFOOD-IMPORTS 1 "January 2, 2009"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sfood-imports \- parse Python files and output a unified list of imported symbols
+.SH SYNOPSIS
+.B sfood-imports
+.RI [ options ] " files" ...
+.SH DESCRIPTION
+The imported modules/symbols are output even if they cannot be found.  (You
+could try to do this with grep, but this is more accurate because it uses the
+AST to obtain the list of imports.)
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show the help message and exit
+.TP
+\fB\-I\fR IGNORES, \fB\-\-ignore\fR=\fIIGNORES\fR
+Add the given directory name to the list to be
+ignored.
+.TP
+\fB\-u\fR, \fB\-\-unified\fR
+Just output the unique set of dependencies found, in
+no particular order, without the filenames.  The
+default is to output all imports, in order of
+appearance, along with the filename and line number.
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Output input lines as well.
+.SH SEE ALSO
+.BR sfood (1),
+.BR sfood-checker (1),
+.BR sfood-cluster (1),
+.BR sfood-copy (1),
+.BR sfood-flatten (1),
+.BR sfood-graph (1).
+.SH AUTHOR
+sfood-graph was written by Martin Blais <blais@furius.ca> and it's part of snakefood suite.
+.PP
+This manual page was written by Sandro Tosi <morph@debian.org>,
+for the Debian project (and may be used by others).
