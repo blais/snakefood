@@ -12,13 +12,6 @@ sfood
 - Check if there is a directly enclosing try/except Importerror block
   for ignoring deps ('CAUGHT')
 
-sfood-external
-==============
-
-- Write a 'sfood-external' script that lists whatever is not an
-  internal dependency, except for the stdlib. The answer we want to
-  provide is "What other libraries does this codebase depend on?"
-
 
 sfood-checker
 =============
@@ -57,6 +50,9 @@ sfood-cluster
 
 sfood-graph
 ===========
+
+- Whatever shows up at left should be drawn automatically with a
+  different colour.
 
 - Make the graphs a lot prettier.  I'm not a Graphviz expert by any
   measure and I generally don't care much about pretty, so if someone

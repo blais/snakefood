@@ -66,9 +66,16 @@ LOG_FORMAT = "%(levelname)-12s: %(message)s"
 
 def setup_logging(verbose):
     "Initialize the logger."
-    logging.basicConfig(level=logging.DEBUG if verbose >= 1 else logging.INFO,
-                        format=LOG_FORMAT)
-    
+    levels = {-1: logging.ERROR,
+              0: logging.WARNING,
+              1: logging.INFO,
+              2: logging.DEBUG}
+    try:
+        level = levels[verbose]
+    except KeyError:
+        raise SystemExit("Invalid verbose level.")
+    logging.basicConfig(level=level, format=LOG_FORMAT)
+
 
 
 def filter_separate(pred, seq):

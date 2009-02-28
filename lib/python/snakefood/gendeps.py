@@ -37,9 +37,18 @@ def gendeps():
                       default=0, action='count',
                       help="Filter out dependencies that are outside of the "
                       "roots of the input files. If internal is used twice, we "
-                      "filter down further the dependencies to the # set of "
+                      "filter down further the dependencies to the set of "
                       "files that were processed only, not just to the files "
                       "that live in the same roots.")
+
+    parser.add_option('-e', '--external', '--external-only',
+                      action='store_true',
+                      help="Filter out dependencies to modules within the "
+                      "roots of the input files. This can be used to find out "
+                      "what external modules a package depends on, for example. "
+                      "Note that it does not make sense to use --internal and "
+                      "--external at the same time, as --internal will reject "
+                      "all the dependencies --external allows would output.")
 
     parser.add_option('-I', '--ignore', dest='ignores', action='append',
                       default=def_ignores,
@@ -47,6 +56,8 @@ def gendeps():
 
     parser.add_option('-v', '--verbose', action='count', default=0,
                       help="Output more debugging information")
+    parser.add_option('-q', '--quiet', action='count', default=0,
+                      help="Output less debugging information")
 
     parser.add_option('-f', '--follow', '-r', '--recursive', action='store_true',
                       help="Follow the modules depended upon and trace their dependencies. "
@@ -64,6 +75,7 @@ def gendeps():
                       help="Automatically ignore unused imports. (See sfood-checker.)")
 
     opts, args = parser.parse_args()
+    opts.verbose -= opts.quiet
     setup_logging(opts.verbose)
 
     if not args:
@@ -71,6 +83,9 @@ def gendeps():
         args = ['.']
 
     info = logging.info
+
+    if opts.internal and opts.external:
+        parser.error("Using --internal and --external at the same time does not make sense.")
 
     if opts.print_roots:
         inroots = find_roots(args, opts.ignores)
@@ -89,7 +104,7 @@ def gendeps():
     # Get the list of package roots for our input files and prepend them to the
     # module search path to insure localized imports.
     inroots = find_roots(args, opts.ignores)
-    if opts.internal and not inroots:
+    if (opts.internal or opts.external) and not inroots:
         parser.error("No package roots found from the given files or directories. "
                      "Using --internal with these roots will generate no dependencies.")
     info("")
@@ -118,7 +133,7 @@ def gendeps():
         for fn in fiter:
             if fn in processed_files:
                 continue # Make sure we process each file only once.
-            
+
             info("  %s" % fn)
             processed_files.add(fn)
 
@@ -143,9 +158,11 @@ def gendeps():
             from_ = relfile(fn, opts.ignores)
             if from_ is None:
                 continue
-            if opts.internal and from_[0] not in inroots:
+            infrom = from_[0] in inroots
+            if opts.internal and not infrom:
                 continue
-            allfiles[from_].add((None, None))
+            if 1: ## not opts.external:
+                allfiles[from_].add((None, None))
 
             # Add the dependencies.
             for dfn in files:
@@ -154,7 +171,8 @@ def gendeps():
                     xfn = dirname(xfn)
 
                 to_ = relfile(xfn, opts.ignores)
-                if opts.internal and to_[0] not in inroots:
+                into = to_[0] in inroots
+                if (opts.internal and not into) or (opts.external and into):
                     continue
                 allfiles[from_].add(to_)
                 newfiles.add(dfn)
