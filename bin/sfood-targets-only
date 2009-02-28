@@ -24,5 +24,8 @@ def main():
             if base is not None:
                 print join(base, fn)
 
+FIXME you need to add an option to keep site-packages in
+
+
 if __name__ == '__main__':
     main()
