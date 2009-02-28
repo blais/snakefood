@@ -25,6 +25,13 @@ strict digraph "dependencies" {
         clusterrank = "local"
         ]
 
+       node [
+           fontsize=7
+           shape=ellipse
+//           style=filled
+//           shape=box
+       ];
+
 //     node [
 //         fontsize=7
 //       style=ellipse
@@ -49,7 +56,7 @@ def graph(pairs, write):
             if troot:
                 t = join(troot, t)
         if troot is None:
-            write('"%s";\n' % f)
+            write('"%s"  [style=filled];\n' % f)
         else:
             write('"%s" -> "%s";\n' % (f, t))
     write(postfix)
