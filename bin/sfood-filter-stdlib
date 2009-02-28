@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+"""
+Simple script to remove entries which are from the Python stdlib.
+"""
+
+import re
+from snakefood.filter import do_filter
+
+for x in do_filter():
+    (fbase, ffn), (tbase, tfn) = x
+    if ((re.match('/usr/lib/python', fbase) or
+         (tbase and re.match('/usr/lib/python', tbase))) and
+        not (re.match('site-packages', fbase) or
+             (tbase and re.match('site-packages', tbase)))):
+            continue
+    print repr(x)
+

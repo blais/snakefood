@@ -1,12 +1,12 @@
-#!/usr/bin/env python
 """
-Simple script to print out only the right side of dependencies.
+A helper module to build simple filter scripts.
 """
 
 import sys
 from os.path import join
 
-def main():
+
+def do_filter(populate_parser=None):
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
     opts, args = parser.parse_args()
@@ -20,11 +20,9 @@ def main():
             f = open(fn)
 
         for line in f.xreadlines():
-            (_, _), (base, fn) = eval(line)
-            if base is not None:
-                print join(base, fn)
+            try:
+                yield eval(line)
+            except Exception, e:
+                print >> sys.stderr, e
+                raise SystemExit
 
-
-
-if __name__ == '__main__':
-    main()
