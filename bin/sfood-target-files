@@ -3,7 +3,7 @@
 Simple script to print the right side of dependencies as filenames.
 """
 
-import re
+from os.path import join
 from snakefood.filter import do_filter
 
 for _, (tbase, tfn) in do_filter():
