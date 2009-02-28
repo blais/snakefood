@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+"""
+Simple script to print out only the right side of dependencies.
+"""
+
+import sys
+from os.path import join
+
+def main():
+    import optparse
+    parser = optparse.OptionParser(__doc__.strip())
+    opts, args = parser.parse_args()
+
+    if not args:
+        args = ['-']
+    for fn in args:
+        if fn == '-':
+            f = sys.stdin
+        else:
+            f = open(fn)
+
+        for line in f.xreadlines():
+            (_, _), (base, fn) = eval(line)
+            if base is not None:
+                print join(base, fn)
+
+if __name__ == '__main__':
+    main()
