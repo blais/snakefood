@@ -1,0 +1,4 @@
+syntax: glob
+*.deps
+*.log
+.roots
