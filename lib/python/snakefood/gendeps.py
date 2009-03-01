@@ -79,7 +79,7 @@ def gendeps():
     setup_logging(opts.verbose)
 
     if not args:
-        logging.warning("Searching for files from root directory.")
+        logging.warning("Searching for files from current directory.")
         args = ['.']
 
     info = logging.info
