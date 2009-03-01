@@ -25,7 +25,7 @@ def is_python(fn):
             return False
 
 
-def_ignores = ['.svn', 'CVS', 'build']
+def_ignores = ['.svn', 'CVS', 'build', '.hg', '.git']
 # Note: 'build' is for those packages which have been installed with setup.py.
 # It is pretty common to forget these around.
 
