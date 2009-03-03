@@ -1,1 +1,1 @@
-WARNING:root:File '/home/blais/p/snakefood/test/snakefood/checker/notfound.py' does not exist.
+checker/notfound.py:8:8:  Unused import 'logging'

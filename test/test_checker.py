@@ -1,7 +1,9 @@
-#!/usr/bin/env python
 """
 Functional test for Python checker.
 """
+
+import os
+from testsupport import *
 
 from snakefood.checker import *
 from snakefood.find import ImportVisitor
@@ -30,7 +32,7 @@ _names_tests = (
     ('a = 1; print b.c ; d.e = 3', ['b', 'b.c', 'd']),
     )
 
-def test():
+def test_checker_functional():
     for source, expected in _import_tests:
         found = visit_source(source, ImportVisitor)
         actual = [x[2] for x in found if x[2] is not None]
@@ -41,7 +43,16 @@ def test():
         actual = [x[0] for x in dotted]
         assert actual == expected, (actual, expected)
 
-if __name__ == '__main__':
-    test()
 
+
+
+def test_checker_expected():
+    checkdir = join(data, 'checker')
+    pytocheck = [join(checkdir, fn) for fn in 
+                 os.listdir(checkdir) if fn.endswith('.py')]
+
+    for fn in pytocheck:
+        print 'Testing checker on: %s' % fn
+        compare_expect(None, fn.replace('.py', '.expect'),
+                       'sfood-checker', fn, filterdir=data + '/')
 
