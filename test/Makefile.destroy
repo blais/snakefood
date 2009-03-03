@@ -25,7 +25,6 @@ TARGETS_UNUSED =				\
 	simple/unused
 
 
-
 depends: $(TARGETS) $(TARGETS_UNUSED) $(CHECK)
 
 $(TARGETS):
@@ -44,27 +43,6 @@ TESTROOT = $(PWD)
 RDIRS := $(shell find roots -type d | grep -v /.svn)
 REXPECTS := $(RDIRS:=/.expect)
 ROOTS = $(RDIRS:=/.roots)
-
-
-
-
-
-
-
-
-SFOOD_CHECKER = $(PYTHON) $(BINDIR)/sfood-checker
-
-CHECK =						\
-	checker/notfound			\
-	checker/simple				\
-	checker/duplicate			\
-	checker/alllist
-
-$(CHECK):
-	@echo "------ Testing $@"
-	@$(SFOOD_CHECKER) $@.py > $@.log 2>&1
-	@diff $@.expect $@.log
-
 
 
 
