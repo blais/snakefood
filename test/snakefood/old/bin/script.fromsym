@@ -1,3 +1,0 @@
-from simple import foo
-from testsub.moda import foo as foo2
-
