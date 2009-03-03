@@ -49,16 +49,20 @@ def run_sfood(*args, **kw):
     if filterdir is not None:
         out = re.sub(re.escape(filterdir), '', out)
         log = re.sub(re.escape(filterdir), '', log)
-    return p.returncode, out, log
+
+    if p.returncode != 0:
+        print >> sys.stderr, "Program failed to run: %s" % p.returncode
+        print >> sys.stderr, ' '.join(cmd)
+
+    return out, log
 
 
 
 def compare_expect(exp_stdout, exp_stderr, *args, **kw):
-    r, out, err = run_sfood(*args, **kw)
+    out, err = run_sfood(*args, **kw)
 
     filterdir = kw.get('filterdir', None)
 
-    assert r == 0, "Program failed to run: %d" % r
     for name, efn, text in (('stdout', exp_stdout, out),
                             ('stderr', exp_stderr, err)):
         if efn is None:

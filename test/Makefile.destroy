@@ -21,21 +21,15 @@ TARGETS =					\
 	project/foo_import			\
 	project/foo_from
 
-TARGETS_UNUSED =				\
-	simple/unused
 
 
-depends: $(TARGETS) $(TARGETS_UNUSED)
+depends: $(TARGETS)
 
 $(TARGETS):
 	@echo "------ Testing $@"
 	@$(SFOOD) $@.py > $@.deps 2> $@.log
 	@diff $@.expect $@.deps
 
-$(TARGETS_UNUSED):
-	@echo "------ Testing $@"
-	@$(SFOOD) --ignore-unused $@.py > $@.deps 2> $@.log
-	@diff $@.expect $@.deps
 
 
 
