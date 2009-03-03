@@ -9,8 +9,8 @@ for relative filenames.
 
 import sys
 from itertools import imap
-from collections import defaultdict
 
+from snakefood.fallback.collections import defaultdict
 from snakefood.depends import read_depends, output_depends
 
 
