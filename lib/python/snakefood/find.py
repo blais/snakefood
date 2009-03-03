@@ -318,7 +318,10 @@ def find_dotted_module(modname, rname, parentdir):
 try:
     from imp import ImpImporter
 except ImportError:
-    from pkgutil import ImpImporter
+    try:
+        from pkgutil import ImpImporter
+    except ImportError:
+        from snakefood.fallback.pkgutil import ImpImporter
 
 def find_dotted(names, parentdir=None):
     """
