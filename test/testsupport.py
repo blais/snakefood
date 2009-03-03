@@ -25,7 +25,7 @@ hgroot = find_hg_root()
 bindir = join(hgroot, 'bin')
 
 # Root location where the data files are to be found.
-data = join(dirname(__file__), 'snakefood')
+data = join(dirname(__file__), 'data')
 
 
 def find_dirs(startdir):
