@@ -21,6 +21,6 @@ def test_various():
         fn = join(data, fn)
         print 'Testing for: %s' % fn
         compare_expect(fn.replace('.py', '.expect'), None,
-                       'sfood', fn, filterdir=data+'/')
+                       'sfood', fn, filterdir=(data, 'ROOT'))
 
 

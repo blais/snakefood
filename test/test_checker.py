@@ -54,5 +54,5 @@ def test_checker_expected():
     for fn in pytocheck:
         print 'Testing checker on: %s' % fn
         compare_expect(None, fn.replace('.py', '.expect'),
-                       'sfood-checker', fn, filterdir=data + '/')
+                       'sfood-checker', fn, filterdir=(data, 'ROOT'))
 

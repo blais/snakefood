@@ -1,1 +1,1 @@
-checker/notfound.py:8:8:  Unused import 'logging'
+ROOT/checker/notfound.py:8:8:  Unused import 'logging'

@@ -39,7 +39,7 @@ def find_dirs(startdir):
 def run_sfood(*args, **kw):
     """
     Run sfood with the given args, and capture and return output.
-    If 'filterdir' is provided, remove those strins from the output.
+    If 'filterdir' is provided, remove those strings are replaced in the output.
     """
     filterdir = kw.get('filterdir', None)
     cmd = [join(bindir, args[0])] + list(args[1:])
@@ -49,8 +49,9 @@ def run_sfood(*args, **kw):
     p = Popen(cmd, shell=False, stdout=PIPE, stderr=PIPE)
     out, log = p.communicate()
     if filterdir is not None:
-        out = re.sub(re.escape(filterdir), '', out)
-        log = re.sub(re.escape(filterdir), '', log)
+        from_, to_ = filterdir
+        out = re.sub(re.escape(from_), to_, out)
+        log = re.sub(re.escape(from_), to_, log)
 
     if p.returncode != 0:
         print >> sys.stderr, "Program failed to run: %s" % p.returncode
@@ -71,7 +72,8 @@ def compare_expect(exp_stdout, exp_stderr, *args, **kw):
             continue
         expected = open(efn).read()
         if filterdir is not None:
-            expected = re.sub(re.escape(filterdir), '', expected)
+            from_, to_ = filterdir
+            expected = re.sub(re.escape(from_), to_, expected)
 
         try:
             assert text == expected, "Unexpected text."
