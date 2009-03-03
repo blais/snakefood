@@ -33,7 +33,7 @@ from the dependency list.
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
       package_dir = {'': 'lib/python'},
-      packages = ['snakefood'],
+      packages = ['snakefood', 'snakefood/fallback'],
       scripts=scripts
      )
 
