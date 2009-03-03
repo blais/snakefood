@@ -77,7 +77,9 @@ def main():
 
             # Search for the column in the relevant line.
             mo = re.search(r'\b%s\b' % lname, lines[lineno-1])
-            colno = mo.start()+1 if mo else 0
+            colno = 0
+            if mo:
+                colno = mo.start()+1
             write("%s:%d:%d:  Unused import '%s'\n" % (fn, lineno, colno, lname))
 
         # (Optionally) Compute the list of names that are being assigned to.

@@ -91,7 +91,10 @@ def main():
     if not args:
         args = ['-']
     for fn in args:
-        f = sys.stdin if fn == '-' else open(fn)
+        if fn == '-':
+            f = sys.stdin
+        else:
+            f = open(fn)
         depends = read_depends(f)
         if opts.redundant:
             depends = eliminate_redundant_depends(depends)

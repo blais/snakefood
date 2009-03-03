@@ -56,8 +56,11 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     for x in found_imports:
         mod, rname, lname, lineno, pragma = x
         if process_pragmas and pragma == 'OPTIONAL':
-            logging.warning(WARNING_OPTIONAL %
-                            (lineno, mod if rname is None else '%s.%s' % (mod, rname)))
+            if rname is None:
+                msg = WARNING_OPTIONAL % (lineno, mod)
+            else:
+                msg = '%s.%s' % (mod, rname)
+            logging.warning(msg)
             continue
 
         sig = (mod, rname)
@@ -69,7 +72,10 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
         if errors:
             file_errors.extend(errors)
             for err, name in errors:
-                efun = logging.warning if err is ERROR_IMPORT else logging.debug
+                if err is ERROR_IMPORT:
+                    efun = logging.warning
+                else:
+                    efun = logging.debug
                 efun(err % (lineno, name))
                 if output_code:
                     efun(ERROR_SOURCE % source_lines[lineno-1].rstrip())
