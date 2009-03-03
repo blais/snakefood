@@ -43,7 +43,9 @@ def run_sfood(*args, **kw):
     """
     filterdir = kw.get('filterdir', None)
     cmd = [join(bindir, args[0])] + list(args[1:])
-    ## trace('CMD', ' '.join(cmd))
+    print >> sys.stderr, 'Running cmd:'
+    print >> sys.stderr, ' '.join(cmd)
+    print >> sys.stderr
     p = Popen(cmd, shell=False, stdout=PIPE, stderr=PIPE)
     out, log = p.communicate()
     if filterdir is not None:

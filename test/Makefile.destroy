@@ -3,7 +3,7 @@
 .SUFFIXES: .py .deps .log .expect
 
 
-all: depends
+all: 
 
 
 # Version of Python to use for the tests.
@@ -11,25 +11,6 @@ PYTHON = python2.5
 
 BINDIR = ../../bin
 SFOOD = $(PYTHON) $(BINDIR)/sfood
-
-
-# Tests comparing actual output with expected output.
-TARGETS =					\
-	simple/stdlib				\
-	simple/invalid				\
-	simple/notfound				\
-	project/foo_import			\
-	project/foo_from
-
-
-
-depends: $(TARGETS)
-
-$(TARGETS):
-	@echo "------ Testing $@"
-	@$(SFOOD) $@.py > $@.deps 2> $@.log
-	@diff $@.expect $@.deps
-
 
 
 
