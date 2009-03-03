@@ -1,9 +1,9 @@
 # Run the automated tests.
 
-.SUFFIXES: .py .deps .log .expect .roots
+.SUFFIXES: .py .deps .log .expect
 
 
-all: roots depends functional
+all: depends
 
 
 # Version of Python to use for the tests.
@@ -25,7 +25,7 @@ TARGETS_UNUSED =				\
 	simple/unused
 
 
-depends: $(TARGETS) $(TARGETS_UNUSED) $(CHECK)
+depends: $(TARGETS) $(TARGETS_UNUSED)
 
 $(TARGETS):
 	@echo "------ Testing $@"
@@ -38,17 +38,10 @@ $(TARGETS_UNUSED):
 	@diff $@.expect $@.deps
 
 
-# Testing the root identification, against expect files.
-TESTROOT = $(PWD)
-RDIRS := $(shell find roots -type d | grep -v /.svn)
-REXPECTS := $(RDIRS:=/.expect)
-ROOTS = $(RDIRS:=/.roots)
-
 
 
 
 
 clean:
 	rm -f *.deps *.log {project,simple}/*.{deps,log}
-	rm -f $(ROOTS)
 
