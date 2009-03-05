@@ -1,3 +1,3 @@
-/home/blais/p/snakefood/test/data/checker/simple.py:5:8:  Unused import 'used1'
-/home/blais/p/snakefood/test/data/checker/simple.py:5:15:  Unused import 'un2'
-/home/blais/p/snakefood/test/data/checker/simple.py:5:20:  Unused import 'un3'
+ROOT/checker/simple.py:5:8:  Unused import 'used1'
+ROOT/checker/simple.py:5:15:  Unused import 'un2'
+ROOT/checker/simple.py:5:20:  Unused import 'un3'
