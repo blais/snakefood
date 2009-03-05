@@ -5,6 +5,9 @@
 sfood
 =====
 
+- Consider removing --internal and --external to a filter, look at if
+  it would be at all possible.
+
 - (For 1.2) Integrate modulefinder code and compare results.
 
 - Support pragmas as comments after an import.
@@ -51,9 +54,6 @@ sfood-cluster
 sfood-graph
 ===========
 
-- Whatever shows up at left should be drawn automatically with a
-  different colour.
-
 - Make the graphs a lot prettier.  I'm not a Graphviz expert by any
   measure and I generally don't care much about pretty, so if someone
   wants to contribute that could be a good area.
@@ -94,12 +94,4 @@ sfood-sweep
 
 - Implement a similar tool that only traces the dependencies between a
   source and a sink node.
-
-
-Other Ideas
-===========
-
-- Create a new sfood-filter script that does the same as
-  --internal (use the set of roots from the dependency sources).
-
 
