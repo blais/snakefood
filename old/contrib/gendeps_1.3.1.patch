@@ -1,0 +1,89 @@
+--- lib/python/snakefood/gendeps.py	2008-10-01 03:41:04.000000000 +0200
++++ /home/cr/opt/lib/python2.6/site-packages/snakefood/gendeps.py	2009-03-04 11:26:13.000000000 +0100
+@@ -20,6 +20,7 @@
+ from os.path import *
+ from collections import defaultdict
+ from operator import itemgetter
++import re
+ 
+ from snakefood.util import iter_pyfiles, setup_logging, def_ignores, is_python
+ from snakefood.depends import output_depends
+@@ -28,6 +29,17 @@
+ from snakefood.roots import *
+ 
+ 
++def_nofollow = []
++def_nolist = []
++
++def gen_match_func(patterns):
++    if not patterns:
++        return None, None
++    rx = re.compile("(%s)" % "|".join(patterns))
++    is_match = rx.match
++    def match(fn):
++        return bool(is_match(fn))
++    return rx.pattern, match
+ 
+ def gendeps():
+     import optparse
+@@ -45,6 +57,20 @@
+                       default=def_ignores,
+                       help="Add the given directory name to the list to be ignored.")
+ 
++    parser.add_option('-F', '--no-follow', dest='nofollow', action='append',
++                      default=def_nofollow,
++                      help="Do not follow modules residing in directories matching the given (re) pattern. "
++                      "The modules are listed as leaf nodes in the dependency graph."
++                      " Example: -F \"/lib/python/site-packages/.*\""
++                      )
++
++    parser.add_option('-X', '--no-list', dest='nolist', action='append',
++                      default=def_nolist,
++                      help="Completely ignore modules residing in directories matching the given (re) pattern. "
++                      "The modules are not shown in the dependency graph."
++                      "\n Example: -X \"/lib/python(2\.\d)?/.*\""
++                      )
++
+     parser.add_option('-v', '--verbose', action='count', default=0,
+                       help="Output more debugging information")
+ 
+@@ -104,6 +130,18 @@
+         info("  %s" % dn)
+     inroots = frozenset(inroots)
+ 
++    pat, no_list_func = gen_match_func(opts.nolist)
++    if no_list_func:
++        info("")
++        info("Not listing modules in directories like:")
++        info("  %s" % pat)
++
++    pat, no_follow_func = gen_match_func(opts.nofollow)
++    if no_follow_func:
++        info("")
++        info("Not following modules in directories like:")
++        info("  %s" % pat)
++    
+     # Find all the dependencies.
+     info("")
+     info("Processing files:")
+@@ -138,6 +176,9 @@
+             if basename(fn) == '__init__.py':
+                 fn = dirname(fn)
+ 
++            if no_list_func:
++                files = [xfn for xfn in files if not no_list_func(xfn)]
++
+             # Make sure all the files at least appear in the output, even if it has
+             # no dependency.
+             from_ = relfile(fn, opts.ignores)
+@@ -157,7 +198,9 @@
+                 if opts.internal and to_[0] not in inroots:
+                     continue
+                 allfiles[from_].add(to_)
+-                newfiles.add(dfn)
++
++                if not (no_follow_func and no_follow_func(xfn)):
++                    newfiles.add(dfn)
+ 
+         if not (opts.follow and newfiles):
+             break
