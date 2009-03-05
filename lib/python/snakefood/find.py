@@ -20,7 +20,6 @@ __all__ = ('find_dependencies', 'find_imports',
            'ERROR_IMPORT', 'ERROR_SYMBOL', 'ERROR_UNUSED')
 
 
-
 ERROR_IMPORT = "    Line %d: Could not import module '%s'"
 ERROR_SYMBOL = "    Line %d: Symbol is not a module: '%s'"
 ERROR_UNUSED = "    Line %d: Ignored unused import: '%s'"
@@ -41,7 +40,7 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     # Filter out the unused imports if requested.
     if ignore_unused:
         found_imports, unused_imports = filter_unused_imports(ast, found_imports)
-        for modname, rname, lname, lineno, pragma in unused_imports:
+        for modname, rname, lname, lineno, level, pragma in unused_imports:
             file_errors.append((ERROR_UNUSED, lname))
 
     output_code = (verbose >= 2)
@@ -54,7 +53,7 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     dn = dirname(fn)
     seenset = set()
     for x in found_imports:
-        mod, rname, lname, lineno, pragma = x
+        mod, rname, lname, lineno, level, pragma = x
         if process_pragmas and pragma == 'OPTIONAL':
             if rname is None:
                 msg = WARNING_OPTIONAL % (lineno, mod)
@@ -68,7 +67,7 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
             continue
         seenset.add(sig)
 
-        modfile, errors = find_dotted_module(mod, rname, dn)
+        modfile, errors = find_dotted_module(mod, rname, dn, level)
         if errors:
             file_errors.extend(errors)
             for err, name in errors:
@@ -97,7 +96,7 @@ def find_imports(fn, verbose, ignores):
     dn = dirname(fn)
 
     packroot = None
-    for modname, rname, lname, lineno, _ in found_imports:
+    for modname, rname, lname, lineno, _, _ in found_imports:
         islocal = False
         names = modname.split('.')
         if find_dotted(names, dn):
@@ -137,7 +136,7 @@ class ImportVisitor(object):
 
     def visitImport(self, node):
         self.accept_imports()
-        self.recent.extend((x[0], None, x[1] or x[0], node.lineno)
+        self.recent.extend((x[0], None, x[1] or x[0], node.lineno, 0)
                            for x in node.names)
 
     def visitFrom(self, node):
@@ -148,9 +147,9 @@ class ImportVisitor(object):
         for name, as_ in node.names:
             if name == '*':
                 # We really don't know...
-                mod = (modname, None, None, node.lineno)
+                mod = (modname, None, None, node.lineno, node.level)
             else:
-                mod = (modname, name, as_ or name, node.lineno)
+                mod = (modname, name, as_ or name, node.lineno, node.level)
             self.recent.append(mod)
 
     def default(self, node):
@@ -165,7 +164,8 @@ class ImportVisitor(object):
         self.accept_imports(pragma)
 
     def accept_imports(self, pragma=None):
-        self.modules.extend((m, r, l, n, pragma) for (m, r, l, n) in self.recent)
+        self.modules.extend((m, r, l, n, lvl, pragma)
+                            for (m, r, l, n, lvl) in self.recent)
         self.recent = []
 
     def finalize(self):
@@ -181,7 +181,7 @@ def check_duplicate_imports(found_imports):
     uniq, dups = [], []
     simp = set()
     for x in found_imports:
-        modname, rname, lname, lineno, pragma = x
+        modname, rname, lname, lineno, _, pragma = x
         if rname is not None:
             key = modname + '.' + rname
         else:
@@ -200,7 +200,7 @@ def get_local_names(found_imports):
     names.
     """
     return [(lname, no)
-            for modname, rname, lname, no, pragma in found_imports
+            for modname, rname, lname, no, _, pragma in found_imports
             if lname is not None]
 
 
@@ -271,7 +271,7 @@ builtin_module_names = sys.builtin_module_names + exceptions
 
 module_cache = {}
 
-def find_dotted_module(modname, rname, parentdir):
+def find_dotted_module(modname, rname, parentdir, level):
     """
     A version of find_module that supports dotted module names (packages).  This
     function returns the filename of the module if found, otherwise returns
@@ -283,6 +283,9 @@ def find_dotted_module(modname, rname, parentdir):
 
     'parentdir' is the directory of the file that attempts to do the import.  We
     attempt to do a local import there first.
+
+    'level' is the level of a relative import (i.e. the number of leading dots). 
+    If 0, the import is absolute.
     """
     # Check for builtins.
     if modname in builtin_module_names:
@@ -290,7 +293,8 @@ def find_dotted_module(modname, rname, parentdir):
 
     errors = []
     names = modname.split('.')
-
+    for i in range(level - 1):
+        parentdir = dirname(parentdir)
     # Try relative import, then global imports.
     fn = find_dotted(names, parentdir)
     if not fn:

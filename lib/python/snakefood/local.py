@@ -36,7 +36,7 @@ def filter_unused_imports(ast, found_imports):
     usednames.update(x[0] for x in exported)
     used_imports = []
     for x in found_imports:
-        _, _, lname, lineno, _ = x
+        _, _, lname, lineno, _,  _ = x
         if lname is not None and lname not in usednames:
             unused_imports.append(x)
         else:

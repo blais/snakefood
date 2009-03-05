@@ -70,7 +70,7 @@ def main():
 
         # Output warnings for the unused imports.
         for x in unused_imports:
-            _, _, lname, lineno, pragma = x
+            _, _, lname, lineno, _, pragma = x
 
             if opts.do_pragmas and pragma:
                 continue
@@ -102,7 +102,7 @@ def main():
             print
             print
             print '------ Imported names:'
-            for modname, rname, lname, lineno, pragma in found_imports:
+            for modname, rname, lname, lineno, level, pragma in found_imports:
                 print '%s:%d:  %s' % (fn, lineno, lname)
 
             ## print
