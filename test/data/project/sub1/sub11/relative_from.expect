@@ -1,0 +1,4 @@
+(('ROOT', 'project/sub1/sub11/relative_from.py'), (None, None))
+(('ROOT', 'project/sub1/sub11/relative_from.py'), ('ROOT', 'project/sub1/sub11/test11.py'))
+(('ROOT', 'project/sub1/sub11/relative_from.py'), ('ROOT', 'project/sub1/test.py'))
+(('ROOT', 'project/sub1/sub11/relative_from.py'), ('ROOT', 'project/sub2/test2.py'))

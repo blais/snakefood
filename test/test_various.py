@@ -12,6 +12,7 @@ _files = [
     'simple/notfound.py',
     'project/foo_import.py',
     'project/foo_from.py',
+    'project/sub1/sub11/relative_from.py',
     ]
 
 def test_various():
