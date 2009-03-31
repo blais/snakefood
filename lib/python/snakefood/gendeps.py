@@ -161,7 +161,7 @@ def gendeps():
             infrom = from_[0] in inroots
             if opts.internal and not infrom:
                 continue
-            if 1: ## not opts.external:
+            if not opts.external:
                 allfiles[from_].add((None, None))
 
             # Add the dependencies.
