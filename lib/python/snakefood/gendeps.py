@@ -205,7 +205,7 @@ def gendeps():
             ("Symbols that could not be imported as modules:", ERROR_SYMBOL, logging.debug))
 
     for msg, errtype, efun in reports:
-        names = frozenset(name for (err, name) in allerrors if err is errtype)
+        names = set(name for (err, name) in allerrors if err is errtype)
         if names:
             efun("")
             efun(msg)
