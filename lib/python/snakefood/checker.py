@@ -62,7 +62,7 @@ def main():
         # Check for duplicate remote names imported.
         if opts.do_dups:
             found_imports, dups = check_duplicate_imports(found_imports)
-            for modname, rname, lname, lineno, pragma in dups:
+            for modname, rname, lname, lineno, level, pragma in dups:
                 write("%s:%d:  Duplicate import '%s'\n" % (fn, lineno, lname))
 
         # Filter out the unused imports.
@@ -91,7 +91,7 @@ def main():
         # (Optionally) Check for potentially missing imports (this cannot be
         # precise, we are only providing a heuristic here).
         if opts.do_missing:
-            defined = set(modname for modname, _, _, _, _ in used_imports)
+            defined = set(modname for modname, _, _, _, _, _ in used_imports)
             defined.update(x[0] for x in assign_names)
             for name, lineno in simple_names:
                 if name not in defined and name not in __builtin__.__dict__:
