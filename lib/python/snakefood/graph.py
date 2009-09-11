@@ -26,16 +26,11 @@ strict digraph "dependencies" {
         ]
 
        node [
-           fontsize=7
+           fontsize=%s
            shape=ellipse
-//           style=filled
-//           shape=box
+           // style=filled
+           // shape=box
        ];
-
-//     node [
-//         fontsize=7
-//       style=ellipse
-//     ];
 
 '''
 postfix = '''
@@ -43,9 +38,9 @@ postfix = '''
 }
 '''
 
-def graph(pairs, write):
+def graph(pairs, write, fontsize):
     "Given (from, to) pairs of (root, fn) files, output a dot graph."
-    write(prefix)
+    write(prefix % fontsize)
     lines = []
     for (froot, f), (troot, t) in pairs:
         if opts.pythonify_filenames:
@@ -85,6 +80,10 @@ def main():
     parser.add_option('-r', '--redundant', action='store_false', default=True,
                       help="Do not eliminate redundant dependencies.")
 
+    parser.add_option('--fontsize', action='store', type='int',
+                      default=10,
+                      help="The size of the font to use for nodes.")
+
     global opts
     opts, args = parser.parse_args()
 
@@ -98,6 +97,6 @@ def main():
         depends = read_depends(f)
         if opts.redundant:
             depends = eliminate_redundant_depends(depends)
-        graph(depends, sys.stdout.write)
+        graph(depends, sys.stdout.write, opts.fontsize)
 
 
