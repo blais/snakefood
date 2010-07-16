@@ -237,7 +237,7 @@ def parse_python_source(fn):
     try:
         ast = compiler.parse(contents)
     except SyntaxError, e:
-        err = '%s:%d: %s' % (fn, e.lineno, e.msg)
+        err = '%s:%d: %s' % (fn, e.lineno or '--', e.msg)
         logging.error("Error processing file '%s':\n%s" %
                       (fn, err))
         return None, lines
