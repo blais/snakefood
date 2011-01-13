@@ -8,14 +8,15 @@ This could be considered the core of snakefood, and where all the complexity liv
 import sys, os, logging
 import compiler
 from compiler.visitor import ASTVisitor
-from compiler.ast import Discard, Const
+from compiler.ast import Discard, Const, AssName, List, Tuple
+from compiler.consts import OP_ASSIGN
 from os.path import *
 
 from snakefood.roots import find_package_root
 from snakefood.local import filter_unused_imports
 
 __all__ = ('find_dependencies', 'find_imports',
-           'parse_python_source', 
+           'parse_python_source',
            'ImportVisitor', 'get_local_names', 'check_duplicate_imports',
            'ERROR_IMPORT', 'ERROR_SYMBOL', 'ERROR_UNUSED')
 
@@ -36,7 +37,7 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
     found_imports = get_ast_imports(ast)
     if found_imports is None:
         return [], file_errors
-    
+
     # Filter out the unused imports if requested.
     if ignore_unused:
         found_imports, unused_imports = filter_unused_imports(ast, found_imports)
@@ -151,6 +152,33 @@ class ImportVisitor(object):
             else:
                 mod = (modname, name, as_ or name, node.lineno, node.level)
             self.recent.append(mod)
+
+    # For package initialization files, try to fetch the __all__ list, which
+    # implies an implicit import if the package is being imported via
+    # from-import; from the documentation:
+    #
+    #  The import statement uses the following convention: if a package's
+    #  __init__.py code defines a list named __all__, it is taken to be the list
+    #  of module names that should be imported when from package import * is
+    #  encountered. It is up to the package author to keep this list up-to-date
+    #  when a new version of the package is released. Package authors may also
+    #  decide not to support it, if they don't see a use for importing * from
+    #  their package.
+    def visitAssign(self, node):
+        lhs = node.nodes
+        if (len(lhs) == 1 and
+            isinstance(lhs[0], AssName) and
+            lhs[0].name == '__all__' and
+            lhs[0].flags == OP_ASSIGN):
+
+            rhs = node.expr
+            if isinstance(rhs, (List, Tuple)):
+                for namenode in rhs:
+                    # Note: maybe we should handle the case of non-consts.
+                    if isinstance(namenode, Const):
+                        modname = namenode.value
+                        mod = (modname, None, modname, node.lineno, 0)#node.level
+                        self.recent.append(mod)
 
     def default(self, node):
         pragma = None
@@ -284,7 +312,7 @@ def find_dotted_module(modname, rname, parentdir, level):
     'parentdir' is the directory of the file that attempts to do the import.  We
     attempt to do a local import there first.
 
-    'level' is the level of a relative import (i.e. the number of leading dots). 
+    'level' is the level of a relative import (i.e. the number of leading dots).
     If 0, the import is absolute.
     """
     # Check for builtins.
