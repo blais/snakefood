@@ -1,0 +1,5 @@
+(('/home/blais/snakefood', 'pack2'), (None, None))
+(('/home/blais/snakefood', 'pack2'), ('/home/blais/snakefood', 'pack2/foo2.py'))
+(('/home/blais/snakefood', 'pack2/foo2.py'), (None, None))
+(('/home/blais/snakefood/pack1', 'foo1.py'), (None, None))
+(('/home/blais/snakefood/pack1', 'foo1.py'), ('/home/blais/snakefood', 'pack2'))
