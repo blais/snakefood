@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+"""
+Single-name wrapper with subcommand for all executables.
+'deps' is the basic snakefood dependency generation command.
+"""
+import sys, os
+
+commands = set("""
+deps checker cluster copy filter-stdlib flatten
+graph imports target-files
+""".split())
+
+
+incmd = sys.argv[1]
+if incmd not in commands:
+    print >> sys.stderr, "Invalid command '%s'." % incmd
+    sys.exit(1)
+
+if incmd == 'deps':
+    cmdname = 'sfood'
+else:
+    cmdname = 'sfood-%s' % incmd
+
+os.execvp(cmdname, [cmdname] + sys.argv[2:])
