@@ -76,7 +76,7 @@ def compare_expect(exp_stdout, exp_stderr, *args, **kw):
             expected = re.sub(re.escape(from_), to_, expected)
 
         try:
-            assert text == expected, "Unexpected text."
+            assert text == expected, ("Unexpected text: \n%s\n != \n%s\n" % (text, expected))
         except AssertionError:
             print >> sys.stderr, "%s:" % name
             print >> sys.stderr, "--------"
