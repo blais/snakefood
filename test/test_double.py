@@ -32,3 +32,8 @@ def test_double():
     print 'Testing for: %s' % fn
     compare_expect(fn.replace('.py', '.expect'), None,
                    'sfood', fn, filterdir=(data, 'ROOT'))
+
+    fn = join(data, 'double/invalid.py')
+    print 'Testing for: %s' % fn
+    compare_expect(fn.replace('.py', '.expect'), None,
+                   'sfood', fn, filterdir=(data, 'ROOT'))

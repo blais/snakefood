@@ -90,6 +90,9 @@ def find_imports(fn, verbose, ignores):
     "Yields a list of the module names the file 'fn' depends on."
 
     ast, _ = parse_python_source(fn)
+    if ast is None:
+        raise StopIteration
+
     found_imports = get_ast_imports(ast)
     if found_imports is None:
         raise StopIteration
@@ -251,6 +254,7 @@ def parse_python_source(fn):
     2. A list of lines of the source line (typically used for verbose error
        messages).
 
+    If the file has a syntax error in it, the first argument will be None.
     """
     # Read the file's contents to return it.
     # Note: we make sure to use universal newlines.
