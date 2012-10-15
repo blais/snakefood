@@ -5,6 +5,16 @@
 sfood
 =====
 
+- Add support for absolute imports
+
+    Ronny Pfannschmidt
+
+      while scanning one of my packages i noticed, that there is no support for
+      absolute imports and sharing a submodule name with the stdlib creates a
+      strange cycle in the graph. (i have foo.bar.subprocess, in which i import
+      the stdlib subprocess as absolute import)
+
+
 - Consider removing --internal and --external to a filter, look at if
   it would be at all possible.
 
