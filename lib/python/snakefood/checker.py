@@ -93,6 +93,7 @@ def main():
         if opts.do_missing:
             defined = set(modname for modname, _, _, _, _, _ in used_imports)
             defined.update(x[0] for x in assign_names)
+            _, simple_names = get_names_from_ast(ast)
             for name, lineno in simple_names:
                 if name not in defined and name not in __builtin__.__dict__:
                     write("%s:%d:  Missing import for '%s'\n" % (fn, lineno, name))
@@ -134,4 +135,3 @@ def main():
 if __name__ == '__main__':
     main()
     # For tests, see snakefood/test/snakefood.
-

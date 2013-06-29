@@ -9,8 +9,16 @@ things.
 # stdlib imports
 import compiler
 
-__all__ = ('filter_unused_imports', 'NamesVisitor', 'AssignVisitor', 'AllVisitor')
+__all__ = ('get_names_from_ast', 'filter_unused_imports',
+           'NamesVisitor', 'AssignVisitor', 'AllVisitor')
 
+
+def get_names_from_ast(ast):
+    "Find all the names being referenced/used."
+    vis = NamesVisitor()
+    compiler.walk(ast, vis)
+    dotted_names, simple_names = vis.finalize()
+    return (dotted_names, simple_names)
 
 
 def filter_unused_imports(ast, found_imports):
@@ -22,9 +30,7 @@ def filter_unused_imports(ast, found_imports):
     used_imports, unused_imports = [], []
 
     # Find all the names being referenced/used.
-    vis = NamesVisitor()
-    compiler.walk(ast, vis)
-    dotted_names, simple_names = vis.finalize()
+    dotted_names, simple_names = get_names_from_ast(ast)
 
     # Find all the names being exported via __all__.
     vis = AllVisitor()
@@ -134,5 +140,3 @@ class AllVisitor(Visitor):
 
     def finalize(self):
         return self.all
-
-
