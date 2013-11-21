@@ -1,0 +1,81 @@
+Return-Path: <matthew.fernandez@gmail.com>
+Received: from compute3.internal (compute3.nyi.mail.srv.osa [10.202.2.43])
+	 by sloti26m12 (Cyrus git2.5+0-git-fastmail-9457) with LMTPA;
+	 Thu, 21 Nov 2013 01:24:44 -0500
+X-Sieve: CMU Sieve 2.4
+X-Spam-score: 0.1
+X-Spam-hits: BAYES_50 0.8, FREEMAIL_FROM 0.001, RCVD_IN_DNSWL_LOW -0.7, LANGUAGES en,
+  BAYES_USED user, SA_VERSION 3.3.2
+X-Spam-source: IP='209.85.213.44', Host='mail-yh0-f44.google.com', Country='US',
+  FromHeader='com', MailFrom='com'
+X-Spam-charsets: plain='ISO-8859-1'
+X-Resolved-to: blais@fastmail.fm
+X-Delivered-to: blais@furius.ca
+X-Mail-from: matthew.fernandez@gmail.com
+Received: from mx3 ([10.202.2.202])
+  by compute3.internal (LMTPProxy); Thu, 21 Nov 2013 01:24:44 -0500
+Received: from mail-yh0-f44.google.com (mail-yh0-f44.google.com [209.85.213.44])
+	(using TLSv1 with cipher ECDHE-RSA-RC4-SHA (128/128 bits))
+	(No client certificate requested)
+	by mx3.messagingengine.com (Postfix) with ESMTPS id EA192C0053
+	for <blais@furius.ca>; Thu, 21 Nov 2013 01:24:43 -0500 (EST)
+Received: by mail-yh0-f44.google.com with SMTP id f64so2551205yha.3
+        for <blais@furius.ca>; Wed, 20 Nov 2013 22:24:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=message-id:date:from:user-agent:mime-version:to:subject
+         :content-type:content-transfer-encoding;
+        bh=4b5EdM5/HYBhIQ8RhuzZdz9eVQtwwRkXT//+w5E5oXM=;
+        b=CF56BwFGsLkie87wWgrKJ908fzMJSuuEhmMgvUuXQMNYPjmrS+kqSKeCjKvkIwvMq7
+         u7FJRJde4vksiNHr9h5VdS11YlBfTGhZ/y3RlNDLxxQvXgqetgTtyFeJgegW+ITmcZCk
+         STKSfypQs8WmNdlr+RWO5tMoXGwG4cBsRPpt49ahzFaHoQPlQqm2JWt2rNoxs0Kux6BU
+         u6J3xKlE8wHuS9MdXo2C74Lw1UBVZjJRHEKBFXDuA4B2poCQnZdgzjEMCx+3ARDV5bTD
+         ud6wv9Sk0edXvnw62wNe1V/8MIJI6Oby188DTJjiXAQkNZowg1BHduyMcJDE+fVJv1p5
+         4Kew==
+X-Received: by 10.236.81.237 with SMTP id m73mr4476654yhe.29.1385015082672;
+        Wed, 20 Nov 2013 22:24:42 -0800 (PST)
+Received: from ?IPv6:2402:1800:4000:1:bc29:4d92:380d:ec70? ([2402:1800:4000:1:bc29:4d92:380d:ec70])
+        by mx.google.com with ESMTPSA id v45sm47305042yha.2.2013.11.20.22.24.41
+        for <blais@furius.ca>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Wed, 20 Nov 2013 22:24:42 -0800 (PST)
+Message-ID: <528DA727.4080802@gmail.com>
+Date: Thu, 21 Nov 2013 17:24:39 +1100
+From: Matthew Fernandez <matthew.fernandez@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Thunderbird/24.1.0
+MIME-Version: 1.0
+To: Martin Blais <blais@furius.ca>
+Subject: [PATCH 3/5] Return dependencies from gendeps instead of printing
+ them
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Return dependencies from gendeps instead of printing them.
+
+diff -r 37e78888ef16 lib/python/snakefood/gendeps.py
+--- a/lib/python/snakefood/gendeps.py	Thu Nov 21 17:15:09 2013 +1100
++++ b/lib/python/snakefood/gendeps.py	Thu Nov 21 17:17:37 2013 +1100
+@@ -148,11 +148,12 @@
+
+      # Output the dependencies.
+      info("")
+-    output_depends(allfiles)
+
+      # Restore sys.path.
+      sys.path = old_sys_path
+
++    return allfiles
++
+
+  def parse_arguments():
+      import optparse
+@@ -242,7 +243,8 @@
+  def main():
+      try:
+          args, opts, inroots = parse_arguments()
+-        gendeps(args, opts, inroots)
++        depends = gendeps(args, opts, inroots)
++        output_depends(depends)
+      except KeyboardInterrupt:
+          raise SystemExit("Interrupted.")
+

@@ -1,0 +1,77 @@
+Return-Path: <matthew.fernandez@gmail.com>
+Received: from compute3.internal (compute3.nyi.mail.srv.osa [10.202.2.43])
+	 by sloti26m12 (Cyrus git2.5+0-git-fastmail-9457) with LMTPA;
+	 Thu, 21 Nov 2013 01:24:22 -0500
+X-Sieve: CMU Sieve 2.4
+X-Spam-score: 0.1
+X-Spam-hits: BAYES_50 0.8, FREEMAIL_FROM 0.001, RCVD_IN_DNSWL_LOW -0.7, LANGUAGES en,
+  BAYES_USED user, SA_VERSION 3.3.2
+X-Spam-source: IP='209.85.213.51', Host='mail-yh0-f51.google.com', Country='US',
+  FromHeader='com', MailFrom='com'
+X-Spam-charsets: plain='ISO-8859-1'
+X-Resolved-to: blais@fastmail.fm
+X-Delivered-to: blais@furius.ca
+X-Mail-from: matthew.fernandez@gmail.com
+Received: from mx4 ([10.202.2.203])
+  by compute3.internal (LMTPProxy); Thu, 21 Nov 2013 01:24:22 -0500
+Received: from mail-yh0-f51.google.com (mail-yh0-f51.google.com [209.85.213.51])
+	(using TLSv1 with cipher ECDHE-RSA-RC4-SHA (128/128 bits))
+	(No client certificate requested)
+	by mx4.messagingengine.com (Postfix) with ESMTPS id 210543C009D
+	for <blais@furius.ca>; Thu, 21 Nov 2013 01:24:22 -0500 (EST)
+Received: by mail-yh0-f51.google.com with SMTP id t59so6164682yho.38
+        for <blais@furius.ca>; Wed, 20 Nov 2013 22:24:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=message-id:date:from:user-agent:mime-version:to:subject
+         :content-type:content-transfer-encoding;
+        bh=SmtmO2eDoo8cFnNXaCcmeL9fsFpRmYM/qs7LCWgZ9og=;
+        b=NKOansXhNsq2XX727THpaf9l4goubl7LW6daA4vP+/adSP08gmMRAMoV/RGtbDdgSx
+         GiTbM8vcczQ4VQj7XlhiC75VQq5bGm0XlzQLV5zHqRJ+or4mgc+DyLEhtWtNNowOJAjD
+         g2OydrpsmNg04gRfd7YhFeMn74dPdh62CD6NA3kKd2usyOJ5+NJAuKWGvM8AJs9hfqRN
+         Bzc9x+R1OTRLS5DS7YB24f7Vm76zNouSvwVhrfjPjBMtrGfF/CzKhxV69KGwcEH4JMdP
+         /lyeSDhiPA12QZSVWeb73F24jb/iAHjuLkdOQaWVfpX16lFfiqii3wzF65yls0KKqQBi
+         VLBg==
+X-Received: by 10.236.14.202 with SMTP id d50mr4470444yhd.47.1385015060841;
+        Wed, 20 Nov 2013 22:24:20 -0800 (PST)
+Received: from ?IPv6:2402:1800:4000:1:bc29:4d92:380d:ec70? ([2402:1800:4000:1:bc29:4d92:380d:ec70])
+        by mx.google.com with ESMTPSA id w45sm47295363yhk.4.2013.11.20.22.24.19
+        for <blais@furius.ca>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Wed, 20 Nov 2013 22:24:20 -0800 (PST)
+Message-ID: <528DA711.50001@gmail.com>
+Date: Thu, 21 Nov 2013 17:24:17 +1100
+From: Matthew Fernandez <matthew.fernandez@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Thunderbird/24.1.0
+MIME-Version: 1.0
+To: Martin Blais <blais@furius.ca>
+Subject: [PATCH 1/5] Restore sys.path before exiting gendeps
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Restore sys.path before exiting gendeps.
+
+This is irrelevant when we are exiting immediately afterwards, but is necessary
+when we call gendeps from another programmatic context, as planned.
+
+diff -r 5e7dec159f39 lib/python/snakefood/gendeps.py
+--- a/lib/python/snakefood/gendeps.py	Thu Oct 24 12:40:15 2013 -0400
++++ b/lib/python/snakefood/gendeps.py	Thu Nov 21 17:08:49 2013 +1100
+@@ -114,6 +114,7 @@
+
+      info("")
+      info("Using the following import path to search for modules:")
++    old_sys_path = sys.path
+      sys.path = inroots + sys.path
+      for dn in sys.path:
+          info("  %s" % dn)
+@@ -229,6 +230,9 @@
+      info("")
+      output_depends(allfiles)
+
++    # Restore sys.path.
++    sys.path = old_sys_path
++
+
+  def main():
+      try:

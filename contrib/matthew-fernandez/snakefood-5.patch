@@ -1,0 +1,63 @@
+Return-Path: <matthew.fernandez@gmail.com>
+Received: from compute3.internal (compute3.nyi.mail.srv.osa [10.202.2.43])
+	 by sloti26m12 (Cyrus git2.5+0-git-fastmail-9457) with LMTPA;
+	 Thu, 21 Nov 2013 01:25:05 -0500
+X-Sieve: CMU Sieve 2.4
+X-Spam-score: 0.1
+X-Spam-hits: BAYES_50 0.8, FREEMAIL_FROM 0.001, RCVD_IN_DNSWL_LOW -0.7, LANGUAGES en,
+  BAYES_USED user, SA_VERSION 3.3.2
+X-Spam-source: IP='209.85.213.45', Host='mail-yh0-f45.google.com', Country='US',
+  FromHeader='com', MailFrom='com'
+X-Spam-charsets: plain='ISO-8859-1'
+X-Resolved-to: blais@fastmail.fm
+X-Delivered-to: blais@furius.ca
+X-Mail-from: matthew.fernandez@gmail.com
+Received: from mx2 ([10.202.2.201])
+  by compute3.internal (LMTPProxy); Thu, 21 Nov 2013 01:25:05 -0500
+Received: from mail-yh0-f45.google.com (mail-yh0-f45.google.com [209.85.213.45])
+	(using TLSv1 with cipher ECDHE-RSA-RC4-SHA (128/128 bits))
+	(No client certificate requested)
+	by mx2.messagingengine.com (Postfix) with ESMTPS id CECCD6C03C9
+	for <blais@furius.ca>; Thu, 21 Nov 2013 01:25:04 -0500 (EST)
+Received: by mail-yh0-f45.google.com with SMTP id i7so6184817yha.18
+        for <blais@furius.ca>; Wed, 20 Nov 2013 22:25:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=message-id:date:from:user-agent:mime-version:to:subject
+         :content-type:content-transfer-encoding;
+        bh=XF9Z6ehyKpOXiNN2YgM47QCubfXOftD810askeBjfkM=;
+        b=rrrexwz7VuyojkwTspPRpYHH2LuSGscQjzAksp/1eUJfxG96mYxxEr4EFpIVkOeB70
+         jFKmxGgsr66MMpjNop+/8+miDyRIrNE4ayJQHYScSa4ZzLR/qlRm5T0SKudr6dbuY6Ye
+         3MJx3ljFytDySDc+9gT6VZ+zPw9SKQTR1W0181bjT7EFMoz0UpYxI6n3S7vXiatS95AV
+         VnzewyIXxz1fitWhoGzcpT0gGm2dunrPPjz9xlB8Uk22JoDvh5bcqbL3KI7EFaZMz6y5
+         JkmnLEytGAzNeaZavvM6613/TG4mhyDAFRERkJEnbnRR998wR73MEI1XVr7pGkiNGSAW
+         TIfQ==
+X-Received: by 10.236.102.200 with SMTP id d48mr4542445yhg.38.1385015103576;
+        Wed, 20 Nov 2013 22:25:03 -0800 (PST)
+Received: from ?IPv6:2402:1800:4000:1:bc29:4d92:380d:ec70? ([2402:1800:4000:1:bc29:4d92:380d:ec70])
+        by mx.google.com with ESMTPSA id s46sm47267804yha.27.2013.11.20.22.25.02
+        for <blais@furius.ca>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Wed, 20 Nov 2013 22:25:02 -0800 (PST)
+Message-ID: <528DA73C.30508@gmail.com>
+Date: Thu, 21 Nov 2013 17:25:00 +1100
+From: Matthew Fernandez <matthew.fernandez@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Thunderbird/24.1.0
+MIME-Version: 1.0
+To: Martin Blais <blais@furius.ca>
+Subject: [PATCH 5/5] Expose gendeps to be imported
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+
+Expose gendeps to be imported.
+
+Untested as yet and likely does not work correctly right now.
+
+diff -r 325883515e73 lib/python/snakefood/__init__.py
+--- a/lib/python/snakefood/__init__.py	Thu Nov 21 17:18:30 2013 +1100
++++ b/lib/python/snakefood/__init__.py	Thu Nov 21 17:20:23 2013 +1100
+@@ -1,3 +1,4 @@
+  """
+  Snakefood dependency graph generator for Python source code.
+  """
++from gendeps import gendeps
