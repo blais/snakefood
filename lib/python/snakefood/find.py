@@ -273,6 +273,12 @@ def parse_python_source(fn):
         logging.error("Error processing file '%s':\n%s" %
                       (fn, err))
         return None, lines
+    except TypeError, e:
+        # Note: this branch untested, applied from a user-submitted patch.
+        err = '%s: %s' % (fn, str(e))
+        logging.error("Error processing file '%s':\n%s" %
+                      (fn, err))
+        return None, lines
 
     return ast, lines
 
