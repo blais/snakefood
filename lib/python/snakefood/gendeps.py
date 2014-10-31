@@ -26,6 +26,7 @@ from snakefood.find import find_dependencies
 from snakefood.find import ERROR_IMPORT, ERROR_SYMBOL, ERROR_UNUSED
 from snakefood.fallback.collections import defaultdict
 from snakefood.roots import *
+from snakefood.six import print_
 
 
 
@@ -90,7 +91,7 @@ def gendeps():
     if opts.print_roots:
         inroots = find_roots(args, opts.ignores)
         for dn in sorted(inroots):
-            print dn
+            print_(dn)
         return
 
     info("")

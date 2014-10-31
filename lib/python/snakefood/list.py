@@ -13,6 +13,7 @@ from os.path import *
 
 from snakefood.util import iter_pyfiles, setup_logging, def_ignores
 from snakefood.find import find_imports
+from snakefood.six import print_
 
 
 
@@ -48,7 +49,7 @@ def list_imports():
             all_symnames.update(x[0] for x in
                                 find_imports(fn, opts.verbose, opts.ignores))
         for symname in sorted(all_symnames):
-            print symname
+            print_(symname)
     else:
         for fn in iter_pyfiles(args, opts.ignores):
             if opts.verbose:
@@ -56,15 +57,15 @@ def list_imports():
             for symname, lineno, islocal in find_imports(fn,
                                                          opts.verbose,
                                                          opts.ignores):
-                print '%s:%d: %s' % (fn, lineno, symname)
+                print_('%s:%d: %s' % (fn, lineno, symname))
                 if opts.verbose:
                     for no in xrange(lineno-1, len(lines)):
                         l = lines[no].rstrip()
-                        print '   %s' % l
+                        print_('   %s' % l)
                         if l[-1] != '\\':
                             break
-                    print
-                        
+                    print_()
+
 
 def main():
     try:

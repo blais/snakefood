@@ -9,6 +9,7 @@ import sys, os, logging, shutil
 from os.path import *
 
 from snakefood.depends import read_depends, flatten_depends
+from snakefood.six import print_
 
 
 
@@ -35,7 +36,7 @@ def main():
         sys.exit(1)
 
     depends = list(read_depends(sys.stdin))
-    
+
     for droot, drel in flatten_depends(depends):
         srcfn = join(droot, drel)
         if isdir(srcfn):
@@ -50,8 +51,8 @@ def main():
         destdir = dirname(dstfn)
         if not exists(destdir):
             os.makedirs(destdir)
-            
-        print 'Copying: %s' % srcfn
+
+        print_('Copying: %s' % srcfn)
         if not exists(srcfn):
             logging.error("Could not copy file '%s'." % srcfn)
             continue
@@ -63,7 +64,7 @@ def main():
                 continue  # Not needed at the very root.
             initfn = join(root, '__init__.py')
             if not exists(initfn):
-                print 'Creating: %s' % initfn
+                print_('Creating: %s' % initfn)
                 f = open(initfn, 'w')
                 f.close()
-            
+

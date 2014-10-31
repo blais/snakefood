@@ -23,6 +23,7 @@ from snakefood.find import parse_python_source, get_ast_imports
 from snakefood.find import check_duplicate_imports
 from snakefood.astpretty import printAst
 from snakefood.local import *
+from snakefood.six import print_
 
 
 def main():
@@ -100,36 +101,36 @@ def main():
 
         # Print out all the schmoo for debugging.
         if opts.debug:
-            print
-            print
-            print '------ Imported names:'
+            print_()
+            print_()
+            print_('------ Imported names:')
             for modname, rname, lname, lineno, level, pragma in found_imports:
-                print '%s:%d:  %s' % (fn, lineno, lname)
+                print_('%s:%d:  %s' % (fn, lineno, lname))
 
-            ## print
-            ## print
-            ## print '------ Exported names:'
+            ## print_()
+            ## print_()
+            ## print_('------ Exported names:')
             ## for name, lineno in exported:
-            ##     print '%s:%d:  %s' % (fn, lineno, name)
+            ##     print_('%s:%d:  %s' % (fn, lineno, name))
 
-            ## print
-            ## print
-            ## print '------ Used names:'
+            ## print_()
+            ## print_()
+            ## print_('------ Used names:')
             ## for name, lineno in dotted_names:
-            ##     print '%s:%d:  %s' % (fn, lineno, name)
-            ## print
+            ##     print_('%s:%d:  %s' % (fn, lineno, name))
+            ## print_()
 
-            print
-            print
-            print '------ Assigned names:'
+            print_()
+            print_()
+            print_('------ Assigned names:')
             for name, lineno in assign_names:
-                print '%s:%d:  %s' % (fn, lineno, name)
+                print_('%s:%d:  %s' % (fn, lineno, name))
 
-            print
-            print
-            print '------ AST:'
+            print_()
+            print_()
+            print_('------ AST:')
             printAst(ast, indent='    ', stream=sys.stdout, initlevel=1)
-            print
+            print_()
 
 
 if __name__ == '__main__':
