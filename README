@@ -62,28 +62,28 @@ directory).
 Tools Included
 --------------
 
-#. ``sfood``: 
+#. ``sfood``:
 
      Given a set of input files or root directories, generate a list
      of dependencies between the files;
 
-#. ``sfood-graph``: 
+#. ``sfood-graph``:
 
      Read a list of dependencies and produce a Graphviz dot file.
      (This file can be run through the Graphviz ``dot`` tool to
      produce a viewable/printable PDF file);
 
-#. ``sfood-cluster``: 
+#. ``sfood-cluster``:
 
      Read a list of dependencies, a list of file clusters, and output
      a list of simplified (clustered) dependencies.
 
-#. ``sfood-checker``: 
+#. ``sfood-checker``:
 
      Analyze the source code with the AST and list unused or
      redundant imports.
 
-#. ``sfood-imports``: 
+#. ``sfood-imports``:
 
      Find and list import statements in Python files, regardless of
      whether they can be imported or not.
@@ -113,9 +113,7 @@ Download
 
 A Mercurial repository can be found at:
 
-  http://hg.furius.ca/public/snakefood/
-
-`Click here for download instructions. </web-furius/downloading.html>`_
+  http://bitbucket.org/blais/snakefood
 
 
 Links
@@ -138,4 +136,3 @@ Author
 ======
 
 Martin Blais <blais@furius.ca>
-
