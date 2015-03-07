@@ -2,6 +2,8 @@
 Support routines for all tests.
 """
 
+from __future__ import print_function
+
 import sys, os, re
 from os.path import *
 from subprocess import *
@@ -43,19 +45,24 @@ def run_sfood(*args, **kw):
     """
     filterdir = kw.get('filterdir', None)
     cmd = [join(bindir, args[0])] + list(args[1:])
-    print >> sys.stderr, 'Running cmd:'
-    print >> sys.stderr, ' '.join(cmd)
-    print >> sys.stderr
+    sys.stderr.write('Running cmd:\n')
+    sys.stderr.write(' '.join(cmd))
+    sys.stderr.write('\n\n')
     p = Popen(cmd, shell=False, stdout=PIPE, stderr=PIPE)
     out, log = p.communicate()
+    if not isinstance(out, str):
+        out = out.decode('utf8')
+    if not isinstance(log, str):
+        log = log.decode('utf8')
     if filterdir is not None:
         from_, to_ = filterdir
         out = re.sub(re.escape(from_), to_, out)
         log = re.sub(re.escape(from_), to_, log)
 
     if p.returncode != 0:
-        print >> sys.stderr, "Program failed to run: %s" % p.returncode
-        print >> sys.stderr, ' '.join(cmd)
+        sys.stderr.write("Program failed to run: %s\n" % p.returncode)
+        sys.stderr.write(' '.join(cmd))
+        sys.stderr.write('\n')
 
     return out, log
 
@@ -78,14 +85,12 @@ def compare_expect(exp_stdout, exp_stderr, *args, **kw):
         try:
             assert text == expected, ("Unexpected text: \n%s\n != \n%s\n" % (text, expected))
         except AssertionError:
-            print >> sys.stderr, "%s:" % name
-            print >> sys.stderr, "--------"
+            sys.stderr.write("%s:\n" % name)
+            sys.stderr.write("--------\n")
             sys.stderr.write(text)
-            print >> sys.stderr, "--------"
-            print >> sys.stderr
-            print >> sys.stderr, "expected:"
-            print >> sys.stderr, "--------"
+            sys.stderr.write("\n--------\n\n")
+            sys.stderr.write("expected:\n")
+            sys.stderr.write("--------\n")
             sys.stderr.write(expected)
-            print >> sys.stderr, "--------"
+            sys.stderr.write("\n--------\n")
             raise
-
