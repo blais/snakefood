@@ -11,9 +11,10 @@ AST to obtain the list of imports.)
 import logging
 from os.path import *
 
+from six import print_
+
 from snakefood.util import iter_pyfiles, setup_logging, def_ignores
 from snakefood.find import find_imports
-from snakefood.six import print_
 
 
 
@@ -72,5 +73,3 @@ def main():
         list_imports()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
-
-

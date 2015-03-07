@@ -8,8 +8,9 @@ directory, using the same filename to its python root.
 import sys, os, logging, shutil
 from os.path import *
 
+from six import print_
+
 from snakefood.depends import read_depends, flatten_depends
-from snakefood.six import print_
 
 
 
@@ -67,4 +68,3 @@ def main():
                 print_('Creating: %s' % initfn)
                 f = open(initfn, 'w')
                 f.close()
-

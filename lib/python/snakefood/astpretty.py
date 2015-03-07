@@ -8,7 +8,8 @@ version of the AST.
 
 import sys
 from compiler.ast import Node
-from snakefood.six import print_
+
+from six import print_
 
 __all__ = ('printAst',)
 
@@ -65,5 +66,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

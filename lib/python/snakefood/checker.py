@@ -18,12 +18,13 @@ import sys, __builtin__, re
 from os.path import *
 import compiler
 
+from six import print_
+
 from snakefood.util import def_ignores, iter_pyfiles
 from snakefood.find import parse_python_source, get_ast_imports
 from snakefood.find import check_duplicate_imports
 from snakefood.astpretty import printAst
 from snakefood.local import *
-from snakefood.six import print_
 
 
 def main():

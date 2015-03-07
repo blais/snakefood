@@ -95,7 +95,8 @@ details.
 Dependencies
 ============
 
-- Python 2.5 or higher.  That's it.
+- Python 2.7 or higher.  Python-3.x works too.
+- The Python "six" library.
 
 
 Documentation

@@ -7,8 +7,10 @@ Read a snakefood dependencies file and output the list of all files.
 import sys
 from os.path import join
 
+from six import print_
+
 from snakefood.depends import read_depends, flatten_depends
-from snakefood.six import print_
+
 
 
 
@@ -20,4 +22,3 @@ def main():
     depends = read_depends(sys.stdin)
     for droot, drel in flatten_depends(depends):
         print_(join(droot, drel))
-

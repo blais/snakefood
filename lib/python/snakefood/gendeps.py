@@ -20,13 +20,14 @@ import sys, logging
 from os.path import *
 from operator import itemgetter
 
+from six import print_
+
 from snakefood.util import iter_pyfiles, setup_logging, def_ignores, is_python
 from snakefood.depends import output_depends
 from snakefood.find import find_dependencies
 from snakefood.find import ERROR_IMPORT, ERROR_SYMBOL, ERROR_UNUSED
 from snakefood.fallback.collections import defaultdict
 from snakefood.roots import *
-from snakefood.six import print_
 
 
 
@@ -236,7 +237,3 @@ def main():
         gendeps()
     except KeyboardInterrupt:
         raise SystemExit("Interrupted.")
-
-
-
-

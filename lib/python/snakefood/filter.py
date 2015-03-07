@@ -2,9 +2,10 @@
 A helper module to build simple filter scripts.
 """
 
+from six import print_
+
 import sys
 from os.path import join
-from snakefood.six import print_
 
 
 def do_filter(populate_parser=None):
@@ -26,4 +27,3 @@ def do_filter(populate_parser=None):
             except Exception, e:
                 print_(e, sys.stderr)
                 raise SystemExit
-
