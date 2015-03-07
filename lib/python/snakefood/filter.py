@@ -4,6 +4,7 @@ A helper module to build simple filter scripts.
 
 import sys
 from os.path import join
+from snakefood.six import print_
 
 
 def do_filter(populate_parser=None):
@@ -23,6 +24,6 @@ def do_filter(populate_parser=None):
             try:
                 yield eval(line)
             except Exception, e:
-                print >> sys.stderr, e
+                print_(e, sys.stderr)
                 raise SystemExit
 

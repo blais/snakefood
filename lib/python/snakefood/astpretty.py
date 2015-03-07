@@ -8,6 +8,7 @@ version of the AST.
 
 import sys
 from compiler.ast import Node
+from snakefood.six import print_
 
 __all__ = ('printAst',)
 
@@ -55,10 +56,11 @@ def main():
 
     import compiler, traceback
     for fn in args:
-        print '\n\n%s:\n' % fn
+        print_('\n\n%s:\n' % fn)
         try:
             printAst(compiler.parseFile(fn), initlevel=1)
-        except SyntaxError, e:
+        except SyntaxError:
+            _, e, _ = sys.exc_info()
             traceback.print_exc()
 
 if __name__ == '__main__':

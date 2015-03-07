@@ -8,15 +8,17 @@ __author__ = "Martin Blais <blais@furius.ca>"
 import os
 from os.path import join, isfile
 from distutils.core import setup
+import sys
 
 
 # Install all scripts under bin.
-scripts = filter(isfile, [join('bin', x) for x in os.listdir('bin')])
+scripts = list(filter(isfile, [join('bin', x) for x in os.listdir('bin')]))
 
 def read_version():
     try:
         return open('VERSION', 'r').readline().strip()
-    except IOError, e:
+    except IOError:
+        _, e, _ = sys.exc_info()
         raise SystemExit(
             "Error: you must run setup from the root directory (%s)" % str(e))
 

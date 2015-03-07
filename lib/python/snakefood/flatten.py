@@ -8,6 +8,7 @@ import sys
 from os.path import join
 
 from snakefood.depends import read_depends, flatten_depends
+from snakefood.six import print_
 
 
 
@@ -18,5 +19,5 @@ def main():
 
     depends = read_depends(sys.stdin)
     for droot, drel in flatten_depends(depends):
-        print join(droot, drel)
+        print_(join(droot, drel))
 
