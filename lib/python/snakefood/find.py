@@ -27,7 +27,7 @@ ERROR_UNUSED = "    Line %d: Ignored unused import: '%s'"
 ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
-def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
+def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False, warning_lambda = logging.warning, debug_lambda=logging.debug):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
@@ -73,9 +73,9 @@ def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False):
             file_errors.extend(errors)
             for err, name in errors:
                 if err is ERROR_IMPORT:
-                    efun = logging.warning
+                    efun = warning_lambda
                 else:
-                    efun = logging.debug
+                    efun = debug_lambda
                 efun(err % (lineno, name))
                 if output_code:
                     efun(ERROR_SOURCE % source_lines[lineno-1].rstrip())
