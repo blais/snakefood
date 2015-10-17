@@ -27,7 +27,10 @@ ERROR_UNUSED = "    Line %d: Ignored unused import: '%s'"
 ERROR_SOURCE = "       %s"
 WARNING_OPTIONAL = "    Line %d: Pragma suppressing import '%s'"
 
-def find_dependencies(fn, verbose, process_pragmas, ignore_unused=False, warning_lambda = logging.warning, debug_lambda=logging.debug):
+def find_dependencies(fn, verbose, process_pragmas,
+                      ignore_unused=False,
+                      warning_lambda=logging.warning,
+                      debug_lambda=logging.debug):
     "Returns a list of the files 'fn' depends on."
     file_errors = []
 
@@ -381,4 +384,3 @@ def find_dotted(names, parentdir=None):
         parentdir = dirname(filename)
     else:
         return filename
-
