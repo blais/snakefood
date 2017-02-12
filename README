@@ -95,7 +95,12 @@ details.
 Dependencies
 ============
 
-- Python 2.7 or higher.  Python-3.x works too.
+- Python 2.7 or higher.
+
+- Python-3.x is NOT supported, but there have been a few
+  efforts to port to it. I never had time to fully port it; it would require a
+  fair bit of a rewrite to do so IMO.
+
 - The Python "six" library.
 
 
