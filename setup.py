@@ -50,7 +50,7 @@ from the dependency list.
       author="Martin Blais",
       author_email="blais@furius.ca",
       url="http://furius.ca/snakefood",
-      download_url="http://bitbucket.org/blais/snakefood",
+      download_url="http://github.com/blais/snakefood",
       package_dir = {'': 'lib/python'},
       packages = ['snakefood', 'snakefood/fallback'],
       scripts=scripts

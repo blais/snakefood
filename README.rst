@@ -119,7 +119,7 @@ Download
 
 A Mercurial repository can be found at:
 
-  http://bitbucket.org/blais/snakefood
+  http://github.com/blais/snakefood
 
 
 Links
